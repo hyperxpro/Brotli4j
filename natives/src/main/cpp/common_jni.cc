@@ -36,9 +36,7 @@ extern "C" {
  * @param buffer direct ByteBuffer
  * @returns false if dictionary data was already set; otherwise true
  */
-JNIEXPORT jint JNICALL
-Java_com_aayushatharva_brotli4j_common_CommonJNI_nativeSetDictionaryData(
-    JNIEnv* env, jobject /*jobj*/, jobject buffer) {
+JNIEXPORT jint JNICALL Java_com_aayushatharva_brotli4j_common_CommonJNI_nativeSetDictionaryData(JNIEnv* env, jobject /*jobj*/, jobject buffer) {
   jobject buffer_ref = env->NewGlobalRef(buffer);
   if (!buffer_ref) {
     return false;

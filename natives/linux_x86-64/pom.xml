@@ -26,15 +26,16 @@ along with Brotli4j.  If not, see <https://www.gnu.org/licenses/>.
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>linux_x86-64</artifactId>
+    <artifactId>native-linux_x86-64</artifactId>
     <packaging>jar</packaging>
 
     <profiles>
         <profile>
-            <id>default</id>
+            <id>linux_x86-64</id>
             <activation>
                 <os>
                     <family>linux</family>
+                    <arch>amd64</arch>
                 </os>
             </activation>
             <build>

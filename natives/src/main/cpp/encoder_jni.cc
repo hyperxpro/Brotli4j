@@ -123,7 +123,7 @@ JNIEXPORT jobject JNICALL Java_com_aayushatharva_brotli4j_encoder_EncoderJNI_nat
  * @param input_length number of bytes provided in input or direct input;
  *                     0 to process further previous input
  */
-JNIEXPORT void JNICALL Java_org_brotli_wrapper_enc_EncoderJNI_nativePush(JNIEnv* env, jobject /*jobj*/, jlongArray ctx, jint input_length) {
+JNIEXPORT void JNICALL Java_com_aayushatharva_brotli4j_encoder_EncoderJNI_nativePush(JNIEnv* env, jobject /*jobj*/, jlongArray ctx, jint input_length) {
   jlong context[5];
   env->GetLongArrayRegion(ctx, 0, 5, context);
   EncoderHandle* handle = getHandle(reinterpret_cast<void*>(context[0]));
@@ -172,7 +172,7 @@ JNIEXPORT void JNICALL Java_org_brotli_wrapper_enc_EncoderJNI_nativePush(JNIEnv*
  * @returns direct ByteBuffer; all the produced data MUST be consumed before
  *          any further invocation; null in case of error
  */
-JNIEXPORT jobject JNICALL Java_org_brotli_wrapper_enc_EncoderJNI_nativePull(JNIEnv* env, jobject /*jobj*/, jlongArray ctx) {
+JNIEXPORT jobject JNICALL Java_com_aayushatharva_brotli4j_encoder_EncoderJNI_nativePull(JNIEnv* env, jobject /*jobj*/, jlongArray ctx) {
   jlong context[5];
   env->GetLongArrayRegion(ctx, 0, 5, context);
   EncoderHandle* handle = getHandle(reinterpret_cast<void*>(context[0]));
@@ -191,7 +191,7 @@ JNIEXPORT jobject JNICALL Java_org_brotli_wrapper_enc_EncoderJNI_nativePull(JNIE
  *
  * @param ctx {in_cookie} tuple
  */
-JNIEXPORT void JNICALL Java_org_brotli_wrapper_enc_EncoderJNI_nativeDestroy(JNIEnv* env, jobject /*jobj*/, jlongArray ctx) {
+JNIEXPORT void JNICALL Java_com_aayushatharva_brotli4j_encoder_EncoderJNI_nativeDestroy(JNIEnv* env, jobject /*jobj*/, jlongArray ctx) {
   jlong context[2];
   env->GetLongArrayRegion(ctx, 0, 2, context);
   EncoderHandle* handle = getHandle(reinterpret_cast<void*>(context[0]));

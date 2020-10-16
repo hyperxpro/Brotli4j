@@ -197,8 +197,7 @@ JNIEXPORT jobject JNICALL Java_com_aayushatharva_brotli4j_decoder_DecoderJNI_nat
  *
  * @param ctx {in_cookie} tuple
  */
-JNIEXPORT void JNICALL
-Java_com_aayushatharva_brotli4j_decoder_DecoderJNI_nativeDestroy(JNIEnv* env, jobject /*jobj*/, jlongArray ctx) {
+JNIEXPORT void JNICALL Java_com_aayushatharva_brotli4j_decoder_DecoderJNI_nativeDestroy(JNIEnv* env, jobject /*jobj*/, jlongArray ctx) {
   jlong context[3];
   env->GetLongArrayRegion(ctx, 0, 3, context);
   DecoderHandle* handle = getHandle(reinterpret_cast<void*>(context[0]));

@@ -69,7 +69,7 @@ public class Encoder {
         }
         /* data.length > 0 */
         EncoderJNI.Wrapper encoder = new EncoderJNI.Wrapper(data.length, params.quality, params.lgwin);
-        ArrayList<byte[]> output = new ArrayList<byte[]>();
+        ArrayList<byte[]> output = new ArrayList<>();
         int totalOutputSize = 0;
         try {
             encoder.getInputBuffer().put(data);

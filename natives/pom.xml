@@ -30,23 +30,9 @@ along with Brotli4j.  If not, see <https://www.gnu.org/licenses/>.
     <packaging>pom</packaging>
     <modules>
         <module>linux_x86-64</module>
-        <module>windows_x86-64</module>
     </modules>
 
     <profiles>
-        <profile>
-            <id>win-x86-64</id>
-            <activation>
-                <os>
-                    <family>Windows</family>
-                    <arch>amd64</arch>
-                </os>
-            </activation>
-            <modules>
-                <module>windows_x86-64</module>
-            </modules>
-        </profile>
-
         <profile>
             <id>linux-x86-64</id>
             <activation>
@@ -63,7 +49,6 @@ along with Brotli4j.  If not, see <https://www.gnu.org/licenses/>.
         <profile>
             <id>release</id>
             <modules>
-                <module>windows_x86-64</module>
                 <module>linux_x86-64</module>
             </modules>
         </profile>

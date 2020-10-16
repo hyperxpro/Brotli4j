@@ -1,3 +1,20 @@
+/*
+ * This file is part of Brotli4j.
+ * Copyright (c) 2020 Aayush Atharva
+ *
+ * Brotli4j is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Brotli4j is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Brotli4j.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package com.aayushatharva.brotli4j;
 
 import java.io.File;
@@ -5,6 +22,9 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 
+/**
+ * Loads Brotli Native Library
+ */
 public class Brotli4jLoader {
 
     private static final Throwable UNAVAILABILITY_CAUSE;
@@ -16,23 +36,22 @@ public class Brotli4jLoader {
         } catch (Throwable t) {
             try {
                 String nativeLibName = System.mapLibraryName("brotli");
-                String libPath = "lib/" + getPlatform() + "/" + nativeLibName;
+                String libPath = "/lib/" + getPlatform() + "/" + nativeLibName;
 
-                System.out.println(libPath);
+                File tempDir = new File(System.getProperty("java.io.tmpdir"), "com_aayushatharva_brotli4j_" + System.nanoTime());
+                tempDir.mkdir();
+                tempDir.deleteOnExit();
 
-                File temporaryDir = new File(System.getProperty("java.io.tmpdir"), "com/aayushatharva/brotli4j" + System.nanoTime());
-                temporaryDir.deleteOnExit();
+                File tempFile = new File(tempDir, nativeLibName);
 
-                File temp = new File(temporaryDir, libPath);
-
-                try (InputStream in = Brotli4jLoader.class.getResourceAsStream("/" + libPath)) {
-                    Files.copy(in, temp.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                try (InputStream in = Brotli4jLoader.class.getResourceAsStream(libPath)) {
+                    Files.copy(in, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 } catch (Throwable throwable) {
-                    temp.delete();
+                    tempFile.delete();
                     throw throwable;
                 }
 
-                System.load(temp.getAbsolutePath());
+                System.load(tempFile.getAbsolutePath());
 
                 cause = null;
             } catch (Throwable throwable) {
@@ -71,11 +90,8 @@ public class Brotli4jLoader {
         if (osName.equalsIgnoreCase("Linux")) {
             if (archName.equalsIgnoreCase("amd64")) {
                 return "linux_x86-64";
-            } else {
-                return "linux_x86";
             }
-        } else {
-            throw new UnsupportedOperationException("Unsupported OS and Architecture: " + osName + ", " + archName);
         }
+        throw new UnsupportedOperationException("Unsupported OS and Architecture: " + osName + ", " + archName);
     }
 }

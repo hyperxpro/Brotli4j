@@ -32,34 +32,17 @@ along with Brotli4j.  If not, see <https://www.gnu.org/licenses/>.
     <profiles>
 
         <profile>
-            <id>windows-x86-64</id>
+            <id>linux_x86-64</id>
             <activation>
                 <os>
-                    <family>Windows</family>
+                    <family>linux</family>
                     <arch>amd64</arch>
                 </os>
             </activation>
             <dependencies>
                 <dependency>
                     <groupId>com.aayushatharva.brotli4j</groupId>
-                    <artifactId>windows_x86-64</artifactId>
-                    <version>0.0.1-SNAPSHOT</version>
-                </dependency>
-            </dependencies>
-        </profile>
-
-        <profile>
-            <id>linux-x86-64</id>
-            <activation>
-                <os>
-                    <family>Linux</family>
-                    <arch>amd64</arch>
-                </os>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.aayushatharva.brotli4j</groupId>
-                    <artifactId>linux_x86-64</artifactId>
+                    <artifactId>native-linux_x86-64</artifactId>
                     <version>0.0.1-SNAPSHOT</version>
                 </dependency>
             </dependencies>

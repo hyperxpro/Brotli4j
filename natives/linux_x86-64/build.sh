@@ -1,12 +1,12 @@
 #!/bin/sh
 
 CURPATH=$(pwd)
-TARGET_CLASSES_PATH="target/classes/lib/linux-x86-64"
+TARGET_CLASSES_PATH="target/classes/lib/linux_x86-64"
 TARGET_PATH="target"
 
 exitWithError() {
   cd ${CURPATH}
-  echo "*** An error occured. Please check log messages. ***"
+  echo "*** An error occurred. Please check log messages. ***"
   exit $1
 }
 
