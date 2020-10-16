@@ -2,12 +2,12 @@
  * This file is part of Brotli4j.
  * Copyright (c) 2020 Aayush Atharva
  *
- * ShieldBlaze ExpressGateway is free software: you can redistribute it and/or modify
+ * Brotli4j is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * ShieldBlaze ExpressGateway is distributed in the hope that it will be useful,
+ * Brotli4j is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -21,18 +21,17 @@
    Distributed under MIT license.
    See file LICENSE for detail or copy at https://opensource.org/licenses/MIT
 */
-package com.aayushatharva.brotli4j.encoder;
+package com.aayushatharva.brotli4j.decoder;
 
 import java.io.IOException;
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
-import java.nio.channels.WritableByteChannel;
+import java.nio.channels.ReadableByteChannel;
 
 /**
- * WritableByteChannel that wraps native brotli encoder.
+ * ReadableByteChannel that wraps native brotli decoder.
  */
-public class BrotliEncoderChannel extends Encoder implements WritableByteChannel {
+public class BrotliDecoderChannel extends Decoder implements ReadableByteChannel {
     /**
      * The default internal buffer size used by the decoder.
      */
@@ -41,22 +40,17 @@ public class BrotliEncoderChannel extends Encoder implements WritableByteChannel
     private final Object mutex = new Object();
 
     /**
-     * Creates a BrotliEncoderChannel.
+     * Creates a BrotliDecoderChannel.
      *
-     * @param destination underlying destination
-     * @param params      encoding settings
-     * @param bufferSize  intermediate buffer size
+     * @param source     underlying source
+     * @param bufferSize intermediate buffer size
      */
-    public BrotliEncoderChannel(WritableByteChannel destination, Encoder.Parameters params, int bufferSize) throws IOException {
-        super(destination, params, bufferSize);
+    public BrotliDecoderChannel(ReadableByteChannel source, int bufferSize) throws IOException {
+        super(source, bufferSize);
     }
 
-    public BrotliEncoderChannel(WritableByteChannel destination, Encoder.Parameters params) throws IOException {
-        this(destination, params, DEFAULT_BUFFER_SIZE);
-    }
-
-    public BrotliEncoderChannel(WritableByteChannel destination) throws IOException {
-        this(destination, new Encoder.Parameters());
+    public BrotliDecoderChannel(ReadableByteChannel source) throws IOException {
+        this(source, DEFAULT_BUFFER_SIZE);
     }
 
     @Override
@@ -74,19 +68,18 @@ public class BrotliEncoderChannel extends Encoder implements WritableByteChannel
     }
 
     @Override
-    public int write(ByteBuffer src) throws IOException {
+    public int read(ByteBuffer dst) throws IOException {
         synchronized (mutex) {
             if (closed) {
                 throw new ClosedChannelException();
             }
             int result = 0;
-            while (src.hasRemaining() && encode(EncoderJNI.Operation.PROCESS)) {
-                int limit = Math.min(src.remaining(), inputBuffer.remaining());
-                ByteBuffer slice = src.slice();
-                ((Buffer) slice).limit(limit);
-                inputBuffer.put(slice);
-                result += limit;
-                ((Buffer) src).position(src.position() + limit);
+            while (dst.hasRemaining()) {
+                int outputSize = decode();
+                if (outputSize <= 0) {
+                    return result == 0 ? outputSize : result;
+                }
+                result += consume(dst);
             }
             return result;
         }
