@@ -86,8 +86,7 @@ along with Brotli4j.  If not, see <https://www.gnu.org/licenses/>.
                 <configuration>
                     <serverId>ossrh</serverId>
                     <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                    <autoReleaseAfterClose>false</autoReleaseAfterClose>
-                    <skipRemoteStaging>false</skipRemoteStaging>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
                 </configuration>
             </plugin>
 
