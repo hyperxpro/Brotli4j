@@ -21,7 +21,6 @@
    Distributed under MIT license.
    See file LICENSE for detail or copy at https://opensource.org/licenses/MIT
 */
-
 package com.aayushatharva.brotli4j.decoder;
 
 import java.io.IOException;
@@ -34,7 +33,7 @@ import java.util.ArrayList;
  * Base class for InputStream / Channel implementations.
  */
 public class Decoder {
-    private static final ByteBuffer EMPTY_BUFER = ByteBuffer.allocate(0);
+    private static final ByteBuffer EMPTY_BUFFER = ByteBuffer.allocate(0);
     private final ReadableByteChannel source;
     private final DecoderJNI.Wrapper decoder;
     ByteBuffer buffer;
@@ -47,8 +46,7 @@ public class Decoder {
      * @param source          underlying source
      * @param inputBufferSize read buffer size
      */
-    public Decoder(ReadableByteChannel source, int inputBufferSize)
-            throws IOException {
+    public Decoder(ReadableByteChannel source, int inputBufferSize) throws IOException {
         if (inputBufferSize <= 0) {
             throw new IllegalArgumentException("buffer size must be positive");
         }
@@ -62,9 +60,9 @@ public class Decoder {
     /**
      * Decodes the given data buffer.
      */
-    public static byte[] decompress(byte[] data) throws IOException {
+    public static DirectDecompress decompress(byte[] data) throws IOException {
         DecoderJNI.Wrapper decoder = new DecoderJNI.Wrapper(data.length);
-        ArrayList<byte[]> output = new ArrayList<byte[]>();
+        ArrayList<byte[]> output = new ArrayList<>();
         int totalOutputSize = 0;
         try {
             decoder.getInputBuffer().put(data);
@@ -84,22 +82,24 @@ public class Decoder {
                         break;
 
                     default:
-                        throw new IOException("corrupted input");
+                        return new DirectDecompress(decoder.getStatus(), null);
                 }
             }
         } finally {
             decoder.destroy();
         }
+
         if (output.size() == 1) {
-            return output.get(0);
+            return new DirectDecompress(decoder.getStatus(), output.get(0));
         }
+
         byte[] result = new byte[totalOutputSize];
         int offset = 0;
         for (byte[] chunk : output) {
             System.arraycopy(chunk, 0, result, offset, chunk.length);
             offset += chunk.length;
         }
-        return result;
+        return new DirectDecompress(decoder.getStatus(), result);
     }
 
     private void fail(String message) throws IOException {
@@ -152,7 +152,7 @@ public class Decoder {
                     }
                     if (bytesRead == 0) {
                         // No input data is currently available.
-                        buffer = EMPTY_BUFER;
+                        buffer = EMPTY_BUFFER;
                         return 0;
                     }
                     decoder.push(bytesRead);

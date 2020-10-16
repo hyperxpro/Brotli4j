@@ -21,7 +21,6 @@
    Distributed under MIT license.
    See file LICENSE for detail or copy at https://opensource.org/licenses/MIT
 */
-
 package com.aayushatharva.brotli4j.encoder;
 
 import java.io.IOException;
@@ -47,8 +46,7 @@ public class Encoder {
      * @param params          encoding parameters
      * @param inputBufferSize read buffer size
      */
-    Encoder(WritableByteChannel destination, Parameters params, int inputBufferSize)
-            throws IOException {
+    Encoder(WritableByteChannel destination, Parameters params, int inputBufferSize) throws IOException {
         if (inputBufferSize <= 0) {
             throw new IllegalArgumentException("buffer size must be positive");
         }

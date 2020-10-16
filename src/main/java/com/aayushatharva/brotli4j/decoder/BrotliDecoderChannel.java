@@ -21,7 +21,6 @@
    Distributed under MIT license.
    See file LICENSE for detail or copy at https://opensource.org/licenses/MIT
 */
-
 package com.aayushatharva.brotli4j.decoder;
 
 import java.io.IOException;

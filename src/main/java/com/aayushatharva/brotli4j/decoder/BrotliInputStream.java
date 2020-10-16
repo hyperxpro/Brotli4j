@@ -21,7 +21,6 @@
    Distributed under MIT license.
    See file LICENSE for detail or copy at https://opensource.org/licenses/MIT
 */
-
 package com.aayushatharva.brotli4j.decoder;
 
 import java.io.IOException;
@@ -45,8 +44,7 @@ public class BrotliInputStream extends InputStream {
      * @param source     underlying source
      * @param bufferSize intermediate buffer size
      */
-    public BrotliInputStream(InputStream source, int bufferSize)
-            throws IOException {
+    public BrotliInputStream(InputStream source, int bufferSize) throws IOException {
         this.decoder = new Decoder(Channels.newChannel(source), bufferSize);
     }
 
@@ -74,13 +72,10 @@ public class BrotliInputStream extends InputStream {
             throw new IOException("read after close");
         }
         int decoded;
-        // Iterate until at leat one byte is decoded, or EOF reached.
-        while (true) {
+        // Iterate until at least one byte is decoded, or EOF reached.
+        do {
             decoded = decoder.decode();
-            if (decoded != 0) {
-                break;
-            }
-        }
+        } while (decoded == 0);
 
         if (decoded == -1) {
             return -1;

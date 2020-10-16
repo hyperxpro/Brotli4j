@@ -21,7 +21,6 @@
    Distributed under MIT license.
    See file LICENSE for detail or copy at https://opensource.org/licenses/MIT
 */
-
 package com.aayushatharva.brotli4j.encoder;
 
 import java.io.IOException;
@@ -46,13 +45,11 @@ public class BrotliOutputStream extends OutputStream {
      * @param params      encoding settings
      * @param bufferSize  intermediate buffer size
      */
-    public BrotliOutputStream(OutputStream destination, Encoder.Parameters params, int bufferSize)
-            throws IOException {
+    public BrotliOutputStream(OutputStream destination, Encoder.Parameters params, int bufferSize) throws IOException {
         this.encoder = new Encoder(Channels.newChannel(destination), params, bufferSize);
     }
 
-    public BrotliOutputStream(OutputStream destination, Encoder.Parameters params)
-            throws IOException {
+    public BrotliOutputStream(OutputStream destination, Encoder.Parameters params) throws IOException {
         this(destination, params, DEFAULT_BUFFER_SIZE);
     }
 

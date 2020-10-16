@@ -21,7 +21,6 @@
    Distributed under MIT license.
    See file LICENSE for detail or copy at https://opensource.org/licenses/MIT
 */
-
 package com.aayushatharva.brotli4j.encoder;
 
 import java.io.IOException;
@@ -30,7 +29,7 @@ import java.nio.ByteBuffer;
 /**
  * JNI wrapper for brotli encoder.
  */
-class EncoderJNI {
+public class EncoderJNI {
     private static native ByteBuffer nativeCreate(long[] context);
 
     private static native void nativePush(long[] context, int length);
@@ -39,7 +38,7 @@ class EncoderJNI {
 
     private static native void nativeDestroy(long[] context);
 
-    enum Operation {
+    public enum Operation {
         PROCESS,
         FLUSH,
         FINISH
@@ -48,10 +47,8 @@ class EncoderJNI {
     static class Wrapper {
         protected final long[] context = new long[5];
         private final ByteBuffer inputBuffer;
-        private boolean fresh = true;
 
-        Wrapper(int inputBufferSize, int quality, int lgwin)
-                throws IOException {
+        Wrapper(int inputBufferSize, int quality, int lgwin) throws IOException {
             if (inputBufferSize <= 0) {
                 throw new IOException("buffer size must be positive");
             }
@@ -81,7 +78,6 @@ class EncoderJNI {
                 throw new IllegalStateException("pushing input to encoder over previous input");
             }
             context[1] = op.ordinal();
-            fresh = false;
             nativePush(context, length);
         }
 
@@ -112,7 +108,6 @@ class EncoderJNI {
             if (!isSuccess() || !hasMoreOutput()) {
                 throw new IllegalStateException("pulling while data is not ready");
             }
-            fresh = false;
             return nativePull(context);
         }
 
