@@ -26,6 +26,6 @@ components that this product depends on.
 This product depends on 'Google Brotli. License for the same can be obtained at:
 
   * LICENSE:
-    * license/LICENSE.googlebrotli.txt (MIT License)
+    * LICENSES/LICENSE.googlebrotli.txt (MIT License)
 
 ---------------------------------

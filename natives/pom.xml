@@ -22,10 +22,11 @@ along with Brotli4j.  If not, see <https://www.gnu.org/licenses/>.
     <parent>
         <groupId>com.aayushatharva.brotli4j</groupId>
         <artifactId>brotli4j-parent</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
+    <version>1.0.0</version>
     <artifactId>natives</artifactId>
     <packaging>pom</packaging>
     <modules>
