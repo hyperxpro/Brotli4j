@@ -1,2 +1,80 @@
 # Brotli4j
-Java bindings for Brotli
+Brotli4j provides Brotli compression and decompression for Java.
+
+# Maven
+```
+        <dependency>
+            <groupId>com.aayushatharva.brotli4j</groupId>
+            <artifactId>brotli4j</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+```
+
+# Supported Platforms:
+Linux 64-Bit (Tested on CentOS 7, CentOS 8 and Ubuntu 20.04 LTS)
+
+# Loading native library:
+Call `Brotli4jLoader.ensureAvailability()` in your application once before using Brotli4j.
+
+# Examples
+## Direct API
+```java
+        // Load the native library
+        Brotli4jLoader.ensureAvailability();
+
+        // Compress data and get output in byte array
+        byte[] compressed = Encoder.compress("Meow".getBytes());
+
+        // Decompress data and get output in DirectDecompress
+        DirectDecompress directDecompress = Decoder.decompress(compressed); // or DirectDecompress.decompress(compressed);
+
+        if (directDecompress.getResultStatus() == DecoderJNI.Status.DONE) {
+            System.out.println("Decompression Successful: " + new String(directDecompress.getDecompressedData()));
+        } else {
+            System.out.println("Some Error Occurred While Decompressing");
+        }
+```
+
+## Compressing a stream:
+```java
+        // Load the native library
+        Brotli4jLoader.ensureAvailability();
+
+        FileInputStream inFile = new FileInputStream(filePath);
+        FileOutputStream outFile = new FileOutputStream(filePath + ".br");
+
+        Encoder.Parameters params = new Encoder.Parameters().setQuality(4);
+        
+        BrotliOutputStream brotliOutputStream = new BrotliOutputStream(outFile, params);
+
+        int read = inFile.read();
+        while(read > -1) {
+            brotliOutputStream.write(read);
+            read = inFile.read();
+        }
+
+        // Close the BrotliOutputStream. This also closes the FileOutputStream.
+        brotliOutputStream.close();
+        inFile.close();
+```
+
+## Decompressing a stream:
+```java
+        // Load the native library
+        Brotli4jLoader.ensureAvailability();
+
+        FileInputStream inFile = new FileInputStream(filePath);
+        FileOutputStream outFile = new FileOutputStream(decodedfilePath);
+
+        BrotliInputStream brotliInputStream = new BrotliInputStream(inFile);
+
+        int read = brotliInputStream.read();
+        while(read > -1) {
+            outFile.write(read);
+            read = brotliInputStream.read();
+        }
+
+        // Close the BrotliInputStream. This also closes the FileInputStream.
+        brotliInputStream.close();
+        outFile.close();
+```
