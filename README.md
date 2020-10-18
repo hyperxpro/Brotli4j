@@ -2,6 +2,7 @@
 Brotli4j provides Brotli compression and decompression for Java.
 
 # Maven
+[![Maven Central](https://img.shields.io/maven-central/v/com.aayushatharva.brotli4j/brotli4j-parent.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.aayushatharva.brotli4j%22%20AND%20a:%22brotli4j-parent%22)
 ```
         <dependency>
             <groupId>com.aayushatharva.brotli4j</groupId>
