@@ -1,7 +1,7 @@
 # Brotli4j
 Brotli4j provides Brotli compression and decompression for Java.
 
-# Maven
+## Maven
 [![Maven Central](https://img.shields.io/maven-central/v/com.aayushatharva.brotli4j/brotli4j-parent.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.aayushatharva.brotli4j%22%20AND%20a:%22brotli4j-parent%22)
 ```
         <dependency>
@@ -11,14 +11,14 @@ Brotli4j provides Brotli compression and decompression for Java.
         </dependency>
 ```
 
-# Supported Platforms:
+## Supported Platforms:
 Linux 64-Bit (Tested on CentOS 7, CentOS 8 and Ubuntu 20.04 LTS)
 
-# Loading native library:
+## Loading native library:
 Call `Brotli4jLoader.ensureAvailability()` in your application once before using Brotli4j.
 
-# Examples
-## Direct API
+## Examples
+### Direct API
 ```java
         // Load the native library
         Brotli4jLoader.ensureAvailability();
@@ -36,7 +36,7 @@ Call `Brotli4jLoader.ensureAvailability()` in your application once before using
         }
 ```
 
-## Compressing a stream:
+### Compressing a stream:
 ```java
         // Load the native library
         Brotli4jLoader.ensureAvailability();
@@ -59,7 +59,7 @@ Call `Brotli4jLoader.ensureAvailability()` in your application once before using
         inFile.close();
 ```
 
-## Decompressing a stream:
+### Decompressing a stream:
 ```java
         // Load the native library
         Brotli4jLoader.ensureAvailability();
