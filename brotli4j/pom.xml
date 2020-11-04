@@ -22,11 +22,10 @@ along with Brotli4j.  If not, see <https://www.gnu.org/licenses/>.
     <parent>
         <artifactId>brotli4j-parent</artifactId>
         <groupId>com.aayushatharva.brotli4j</groupId>
-        <version>1.0.0</version>
+        <version>1.1.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <version>1.0.0</version>
     <artifactId>brotli4j</artifactId>
     <packaging>jar</packaging>
 
@@ -43,7 +42,24 @@ along with Brotli4j.  If not, see <https://www.gnu.org/licenses/>.
                 <dependency>
                     <groupId>com.aayushatharva.brotli4j</groupId>
                     <artifactId>native-linux_x86-64</artifactId>
-                    <version>1.0.0</version>
+                    <version>1.1.0</version>
+                </dependency>
+            </dependencies>
+        </profile>
+
+	    <profile>
+            <id>windows_x86-64</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                    <arch>amd64</arch>
+                </os>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.aayushatharva.brotli4j</groupId>
+                    <artifactId>native-windows_x86-64</artifactId>
+                    <version>1.1.0</version>
                 </dependency>
             </dependencies>
         </profile>

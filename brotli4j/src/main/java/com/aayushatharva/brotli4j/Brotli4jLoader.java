@@ -91,6 +91,10 @@ public class Brotli4jLoader {
             if (archName.equalsIgnoreCase("amd64")) {
                 return "linux_x86-64";
             }
+        } else if (osName.startsWith("Windows")) {
+            if (archName.equalsIgnoreCase("amd64")) {
+                return "windows_x86-64";
+            }
         }
         throw new UnsupportedOperationException("Unsupported OS and Architecture: " + osName + ", " + archName);
     }

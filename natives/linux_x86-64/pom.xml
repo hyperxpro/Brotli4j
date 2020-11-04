@@ -22,11 +22,10 @@ along with Brotli4j.  If not, see <https://www.gnu.org/licenses/>.
     <parent>
         <artifactId>natives</artifactId>
         <groupId>com.aayushatharva.brotli4j</groupId>
-        <version>1.0.0</version>
+        <version>1.1.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <version>1.0.0</version>
     <artifactId>native-linux_x86-64</artifactId>
     <packaging>jar</packaging>
 
