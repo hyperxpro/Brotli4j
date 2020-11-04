@@ -7,11 +7,12 @@ Brotli4j provides Brotli compression and decompression for Java.
         <dependency>
             <groupId>com.aayushatharva.brotli4j</groupId>
             <artifactId>brotli4j</artifactId>
-            <version>1.0.0</version>
+            <version>1.1.0</version>
         </dependency>
 ```
 
 ## Supported Platforms:
+Windows 64-Bit (Tested on Windows 10 Pro) </br>
 Linux 64-Bit (Tested on CentOS 7, CentOS 8 and Ubuntu 20.04 LTS)
 
 ## Loading native library:
