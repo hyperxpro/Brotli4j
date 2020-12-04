@@ -80,3 +80,12 @@ Call `Brotli4jLoader.ensureAvailability()` in your application once before using
         brotliInputStream.close();
         outFile.close();
 ```
+__________________________________________________________________
+## Sponsors
+
+JProfiler is supporting Brotli4J with its full-featured Java Profiler. JProfiler's intuitive UI helps you resolve performance bottlenecks,
+pin down memory leaks and understand threading issues. Click below to know more:
+
+<a href="https://www.ej-technologies.com/products/jprofiler/overview.html" target="_blank" title="File Management">
+  <img src="https://www.ej-technologies.com/images/product_banners/jprofiler_large.png" alt="File Management">
+</a>
