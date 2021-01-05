@@ -46,13 +46,17 @@ along with Brotli4j.  If not, see <https://www.gnu.org/licenses/>.
                         <version>3.0.0</version>
                         <executions>
                             <execution>
-                                <id>Execute-Native-Compile</id>
+                                <id>build-native</id>
                                 <phase>process-classes</phase>
                                 <goals>
                                     <goal>exec</goal>
                                 </goals>
                                 <configuration>
-                                    <executable>${project.basedir}/build.sh</executable>
+                                    <executable>/bin/bash</executable>
+                                    <arguments>
+                                        <argument>build.sh</argument>
+                                    </arguments>
+                                    <workingDirectory>${project.basedir}</workingDirectory>
                                 </configuration>
                             </execution>
                         </executions>

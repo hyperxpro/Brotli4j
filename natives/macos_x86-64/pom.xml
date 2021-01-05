@@ -30,7 +30,6 @@
                         <version>3.0.0</version>
                         <executions>
                             <execution>
-                                <!-- this execution happens just after compiling the java classes, and builds the native code. -->
                                 <id>build-native</id>
                                 <phase>process-classes</phase>
                                 <goals>
