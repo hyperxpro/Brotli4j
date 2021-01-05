@@ -100,6 +100,8 @@ public class Brotli4jLoader {
     private static String getPlatform() {
         String osName = System.getProperty("os.name");
         String archName = System.getProperty("os.arch");
+        System.out.println(osName);
+        System.out.println(archName);
         if (osName.equalsIgnoreCase("Linux")) {
             if (archName.equalsIgnoreCase("amd64")) {
                 return "linux_x86-64";
