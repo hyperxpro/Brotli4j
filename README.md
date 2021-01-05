@@ -12,8 +12,10 @@ Brotli4j provides Brotli compression and decompression for Java.
 ```
 
 ## Supported Platforms:
-Windows 64-Bit (Tested on Windows 10 Pro) </br>
-Linux 64-Bit (Tested on CentOS 7, CentOS 8 and Ubuntu 20.04 LTS)
+Windows 64-Bit </br>
+Linux 64-Bit </br>
+macOS Catalina 10.15
+
 
 ## Loading native library:
 Call `Brotli4jLoader.ensureAvailability()` in your application once before using Brotli4j.
