@@ -24,5 +24,6 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 8
+          arch: armv7
       - name: Build with Maven
         run: mvn -B -ntp clean package --file pom.xml
