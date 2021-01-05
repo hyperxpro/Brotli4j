@@ -38,8 +38,6 @@ public class Brotli4jLoader {
                 String nativeLibName = System.mapLibraryName("brotli");
                 String libPath = "/lib/" + getPlatform() + "/" + nativeLibName;
 
-                listOfFiles(new File("/lib"));
-
                 File tempDir = new File(System.getProperty("java.io.tmpdir"), "com_aayushatharva_brotli4j_" + System.nanoTime());
                 tempDir.mkdir();
                 tempDir.deleteOnExit();
@@ -62,17 +60,6 @@ public class Brotli4jLoader {
         }
 
         UNAVAILABILITY_CAUSE = cause;
-    }
-
-    public static void listOfFiles(File dirPath){
-        File filesList[] = dirPath.listFiles();
-        for(File file : filesList) {
-            if(file.isFile()) {
-                System.out.println("File path: "+file.getName());
-            } else {
-                listOfFiles(file);
-            }
-        }
     }
 
     /**

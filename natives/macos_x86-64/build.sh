@@ -18,4 +18,4 @@ make || exitWithError $?
 rm -f "$CURPATH/${TARGET_CLASSES_PATH}/libbrotli.dylib"
 cp "./libbrotli.dylib" "$CURPATH/${TARGET_CLASSES_PATH}" || exitWithError $?
 
-cd ${CURPATH}
+cd "${CURPATH}"
