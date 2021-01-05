@@ -9,15 +9,18 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>macos_x86-64</artifactId>
+    <artifactId>native-macos_x86-64</artifactId>
     <packaging>jar</packaging>
 
     <profiles>
 
         <profile>
-            <id>default</id>
+            <id>macos_x86-64</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <os>
+                    <family>mac</family>
+                    <arch>amd64</arch>
+                </os>
             </activation>
             <build>
                 <plugins>

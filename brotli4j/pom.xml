@@ -63,6 +63,23 @@ along with Brotli4j.  If not, see <https://www.gnu.org/licenses/>.
                 </dependency>
             </dependencies>
         </profile>
+
+        <profile>
+            <id>macos_x86-64</id>
+            <activation>
+                <os>
+                    <family>Mac</family>
+                    <arch>amd64</arch>
+                </os>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.aayushatharva.brotli4j</groupId>
+                    <artifactId>native-macos_x86-64</artifactId>
+                    <version>1.1.0</version>
+                </dependency>
+            </dependencies>
+        </profile>
     </profiles>
 
 </project>
