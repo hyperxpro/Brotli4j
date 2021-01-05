@@ -55,9 +55,6 @@ along with Brotli4j.  If not, see <https://www.gnu.org/licenses/>.
     <modules>
         <module>natives</module>
         <module>brotli4j</module>
-        <module>macos_x86-64</module>
-        <module>macos_x86-64</module>
-        <module>macos_x86-64</module>
     </modules>
 
     <properties>
