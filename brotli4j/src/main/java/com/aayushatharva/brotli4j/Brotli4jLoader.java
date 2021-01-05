@@ -38,7 +38,7 @@ public class Brotli4jLoader {
                 String nativeLibName = System.mapLibraryName("brotli");
                 String libPath = "/lib/" + getPlatform() + "/" + nativeLibName;
 
-                System.out.println(libPath);
+                System.out.println(new File(libPath).exists());
 
                 File tempDir = new File(System.getProperty("java.io.tmpdir"), "com_aayushatharva_brotli4j_" + System.nanoTime());
                 tempDir.mkdir();
