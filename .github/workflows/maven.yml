@@ -19,17 +19,14 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - uses: actions/checkout@v2.1.0
-      - uses: uraimo/run-on-arch-action@v2.0.5
-        name: Run commands
-        id: runcmd
-        with:
-          arch: armv7
-          distro: ubuntu18.04
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v2
       - uses: actions/checkout@v2
       - name: Set up JDK 8
         uses: actions/setup-java@v1
         with:
           java-version: 8
+          name: my-artifact
+          path: /Users/runner/work/Brotli4j/
       - name: Build with Maven
         run: mvn -B -ntp clean package --file pom.xml
