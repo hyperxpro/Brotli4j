@@ -1,10 +1,10 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 CURPATH=$(pwd)
 TARGET_CLASSES_PATH="target/classes/lib/macos_x86-64"
 TARGET_PATH="target"
 
-exitWithError() {
+function exitWithError() {
   cd ${CURPATH}
   echo "*** An error occurred. Please check log messages. ***"
   exit $1
