@@ -22,7 +22,7 @@ along with Brotli4j.  If not, see <https://www.gnu.org/licenses/>.
     <parent>
         <groupId>com.aayushatharva.brotli4j</groupId>
         <artifactId>brotli4j-parent</artifactId>
-        <version>1.1.0</version>
+        <version>1.2.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -31,6 +31,7 @@ along with Brotli4j.  If not, see <https://www.gnu.org/licenses/>.
     <modules>
         <module>linux_x86-64</module>
 	    <module>windows_x86-64</module>
+        <module>macos_x86-64</module>
     </modules>
 
     <profiles>
@@ -47,7 +48,7 @@ along with Brotli4j.  If not, see <https://www.gnu.org/licenses/>.
             </modules>
         </profile>
 
-	<profile>
+        <profile>
             <id>windows_x86-64</id>
             <activation>
                 <os>
@@ -61,10 +62,24 @@ along with Brotli4j.  If not, see <https://www.gnu.org/licenses/>.
         </profile>
 
         <profile>
+            <id>macos_x86-64</id>
+            <activation>
+                <os>
+                    <family>Mac</family>
+                    <arch>x86_64</arch>
+                </os>
+            </activation>
+            <modules>
+                <module>macos_x86-64</module>
+            </modules>
+        </profile>
+
+        <profile>
             <id>release</id>
             <modules>
                 <module>linux_x86-64</module>
 		        <module>windows_x86-64</module>
+                <module>macos_x86-64</module>
             </modules>
         </profile>
     </profiles>

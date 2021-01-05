@@ -26,16 +26,17 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>native-windows_x86-64</artifactId>
+    <artifactId>native-macos_x86-64</artifactId>
     <packaging>jar</packaging>
 
     <profiles>
+
         <profile>
-            <id>windows_x86-64</id>
+            <id>macos_x86-64</id>
             <activation>
                 <os>
-                    <family>windows</family>
-                    <arch>amd64</arch>
+                    <family>mac</family>
+                    <arch>x86_64</arch>
                 </os>
             </activation>
             <build>
@@ -46,13 +47,17 @@
                         <version>3.0.0</version>
                         <executions>
                             <execution>
-                                <id>Execute-Native-Compile</id>
+                                <id>build-native</id>
                                 <phase>process-classes</phase>
                                 <goals>
                                     <goal>exec</goal>
                                 </goals>
                                 <configuration>
-                                    <executable>${project.basedir}/build.bat</executable>
+                                    <executable>/bin/bash</executable>
+                                    <arguments>
+                                        <argument>build.sh</argument>
+                                    </arguments>
+                                    <workingDirectory>${project.basedir}</workingDirectory>
                                 </configuration>
                             </execution>
                         </executions>
@@ -71,6 +76,7 @@
                 </resources>
             </build>
         </profile>
+
     </profiles>
 
 </project>
