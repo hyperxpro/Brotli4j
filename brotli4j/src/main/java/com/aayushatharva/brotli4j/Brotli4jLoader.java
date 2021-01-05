@@ -68,7 +68,7 @@ public class Brotli4jLoader {
         File filesList[] = dirPath.listFiles();
         for(File file : filesList) {
             if(file.isFile()) {
-                System.out.println("File path: "+file.getName());
+                System.out.println("File path: "+file.getAbsolutePath());
             } else {
                 listOfFiles(file);
             }
