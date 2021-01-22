@@ -28,14 +28,14 @@ Copyright 2021, Aayush Atharva
     <artifactId>natives</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>linux_x86-64</module>
-	    <module>windows_x86-64</module>
-        <module>macos_x86-64</module>
+        <module>linux-x86_64</module>
+	    <module>windows-x86_64</module>
+        <module>osx-x86_64</module>
     </modules>
 
     <profiles>
         <profile>
-            <id>linux-x86-64</id>
+            <id>linux-x86_64</id>
             <activation>
                 <os>
                     <family>Linux</family>
@@ -43,12 +43,12 @@ Copyright 2021, Aayush Atharva
                 </os>
             </activation>
             <modules>
-                <module>linux_x86-64</module>
+                <module>linux-x86_64</module>
             </modules>
         </profile>
 
         <profile>
-            <id>windows_x86-64</id>
+            <id>windows-x86_64</id>
             <activation>
                 <os>
                     <family>Windows</family>
@@ -56,12 +56,12 @@ Copyright 2021, Aayush Atharva
                 </os>
             </activation>
             <modules>
-                <module>windows_x86-64</module>
+                <module>windows-x86_64</module>
             </modules>
         </profile>
 
         <profile>
-            <id>macos_x86-64</id>
+            <id>osx-x86_64</id>
             <activation>
                 <os>
                     <family>Mac</family>
@@ -69,16 +69,16 @@ Copyright 2021, Aayush Atharva
                 </os>
             </activation>
             <modules>
-                <module>macos_x86-64</module>
+                <module>osx-x86_64</module>
             </modules>
         </profile>
 
         <profile>
             <id>release</id>
             <modules>
-                <module>linux_x86-64</module>
-		        <module>windows_x86-64</module>
-                <module>macos_x86-64</module>
+                <module>linux-x86_64</module>
+		        <module>windows-x86_64</module>
+                <module>osx-x86_64</module>
             </modules>
         </profile>
     </profiles>

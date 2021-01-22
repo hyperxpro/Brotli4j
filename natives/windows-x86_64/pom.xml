@@ -26,12 +26,12 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>native-windows_x86-64</artifactId>
+    <artifactId>native-windows-x86_64</artifactId>
     <packaging>jar</packaging>
 
     <profiles>
         <profile>
-            <id>windows_x86-64</id>
+            <id>windows-x86_64</id>
             <activation>
                 <os>
                     <family>windows</family>
