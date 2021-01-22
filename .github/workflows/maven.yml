@@ -8,9 +8,9 @@ on:
   workflow_dispatch:
     inputs:
       name:
-        description: 'macOS Deployment'
+        description: 'Github Actions'
         required: true
-        default: 'macOS Deployment'
+        default: 'Github Actions'
 
 
 jobs:
@@ -69,4 +69,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: WindowsBuild
-          path: D:\a\Brotli4j\
+          path: D:\Brotli4j\

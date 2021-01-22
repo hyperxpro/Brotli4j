@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 CURPATH=$(pwd)
-TARGET_CLASSES_PATH="target/classes/lib/macos_x86-64"
+TARGET_CLASSES_PATH="target/classes/lib/"
 TARGET_PATH="target"
 
 function exitWithError() {
