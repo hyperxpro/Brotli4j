@@ -17,7 +17,7 @@ cd "%~dp0"
 if not exist "%~dp0target" mkdir "%~dp0target"
 if not exist "%~dp0target\classes" mkdir "%~dp0target\classes"
 if not exist "%~dp0target\classes\lib" mkdir "%~dp0target\classes\lib"
-SET TARGET_CLASSES_PATH=%~dp0target\classes\lib\windows_x86-64
+SET TARGET_CLASSES_PATH=%~dp0target\classes\lib\windows-x86_64
 if not exist "%TARGET_CLASSES_PATH%" mkdir "%TARGET_CLASSES_PATH%"
 
 :PREPARE_MAKEFILES
@@ -37,5 +37,5 @@ goto :EOF
 
 :ERROR
 cd %~dp0
-echo "*** An error occured. Please check log messages. ***"
+echo "*** An error occurred. Please check log messages. ***"
 exit /b -1

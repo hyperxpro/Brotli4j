@@ -8,9 +8,9 @@ on:
   workflow_dispatch:
     inputs:
       name:
-        description: 'macOS Deployment'
+        description: 'Github Actions'
         required: true
-        default: 'macOS Deployment'
+        default: 'Github Actions'
 
 
 jobs:
