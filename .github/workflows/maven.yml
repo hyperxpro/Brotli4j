@@ -69,4 +69,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: WindowsBuild
-          path: D:\Brotli4j\
+          path: D:\a\Brotli4j\

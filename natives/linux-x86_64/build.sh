@@ -1,7 +1,7 @@
 #!/bin/sh
 
 CURPATH=$(pwd)
-TARGET_CLASSES_PATH="target/classes/lib/"
+TARGET_CLASSES_PATH="target/classes/lib/linux_x86-64"
 TARGET_PATH="target"
 
 exitWithError() {
