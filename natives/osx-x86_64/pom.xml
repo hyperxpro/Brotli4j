@@ -26,13 +26,13 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>native-macos_x86-64</artifactId>
+    <artifactId>native-osx-x86_64</artifactId>
     <packaging>jar</packaging>
 
     <profiles>
 
         <profile>
-            <id>macos_x86-64</id>
+            <id>osx-x86_64</id>
             <activation>
                 <os>
                     <family>mac</family>
