@@ -88,15 +88,15 @@ public class Brotli4jLoader {
         String archName = System.getProperty("os.arch");
         if (osName.equalsIgnoreCase("Linux")) {
             if (archName.equalsIgnoreCase("amd64")) {
-                return "linux_x86-64";
+                return "linux-x86_64";
             }
         } else if (osName.startsWith("Windows")) {
             if (archName.equalsIgnoreCase("amd64")) {
-                return "windows_x86-64";
+                return "windows-x86_64";
             }
         } else if (osName.startsWith("Mac")) {
             if (archName.equalsIgnoreCase("x86_64")) {
-                return "macos_x86-64";
+                return "osx-x86_64";
             }
         }
         throw new UnsupportedOperationException("Unsupported OS and Architecture: " + osName + ", " + archName);
