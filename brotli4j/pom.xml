@@ -47,6 +47,23 @@
             </dependencies>
         </profile>
 
+        <profile>
+            <id>linux-aarch64</id>
+            <activation>
+                <os>
+                    <family>linux</family>
+                    <arch>aarch64</arch>
+                </os>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.aayushatharva.brotli4j</groupId>
+                    <artifactId>native-linux-aarch64</artifactId>
+                    <version>1.3.0</version>
+                </dependency>
+            </dependencies>
+        </profile>
+
 	    <profile>
             <id>windows-x86_64</id>
             <activation>
