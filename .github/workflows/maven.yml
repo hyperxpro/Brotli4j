@@ -88,6 +88,11 @@ jobs:
           run: |
             JAVA_HOME=/usr/lib/jvm/java-11-openjdk-arm64 mvn -B -ntp clean package
             echo $PWD
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: LinuxBuild
+          path: /home/runner/work/Brotli4j/
 
   windows-x86_64-build:
 
