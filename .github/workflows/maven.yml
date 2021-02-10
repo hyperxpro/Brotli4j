@@ -84,7 +84,6 @@ jobs:
             apt-get install -q -y openjdk-8-jdk autoconf automake libtool make tar maven git cmake build-essential
           run: |
             JAVA_HOME=/usr/lib/jvm/java-8-openjdk-arm64 mvn -B -ntp clean package
-            echo $PWD
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v2
         with:
