@@ -14,6 +14,7 @@ Brotli4j provides Brotli compression and decompression for Java.
 ## Supported Platforms:
 Windows 64-Bit </br>
 Linux 64-Bit </br>
+Linux AArch64 </br>
 macOS Catalina 10.15
 
 
