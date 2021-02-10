@@ -14,10 +14,9 @@ on:
 
 
 jobs:
-  macOSBuild:
+  macos-x86_64-build:
 
     runs-on: macos-latest
-
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 8
@@ -29,14 +28,12 @@ jobs:
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v2
         with:
-          name: macOSBuild
+          name: macos-x86_64-build
           path: /Users/runner/work/Brotli4j/
 
-
-  LinuxBuild:
+  linux-x86_64-build:
 
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 8
@@ -48,13 +45,54 @@ jobs:
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v2
         with:
-          name: LinuxBuild
+          name: linux-x86_64-build
           path: /home/runner/work/Brotli4j/
 
-  WindowsBuild:
+  linux-aarch64-build:
+
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+
+      # Cache .m2/repository
+      - uses: actions/cache@v2
+        env:
+          cache-name: cache-m2-repository
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-pr-${{ env.cache-name }}-
+            ${{ runner.os }}-pr-
+      - uses: uraimo/run-on-arch-action@v2.0.5
+        name: Run commands
+        id: runcmd
+        with:
+          arch: aarch64
+          distro: ubuntu20.04
+
+          # Not required, but speeds up builds by storing container images in
+          # a GitHub package registry.
+          githubToken: ${{ github.token }}
+
+          # Mount the .m2/repository
+          dockerRunArgs: |
+            --volume "/home/runner/.m2/repository/:/root/.m2/repository"
+          # Install dependencies
+          install: |
+            apt-get update -q -y
+            apt-get install -q -y openjdk-8-jdk autoconf automake libtool make tar maven git cmake build-essential
+          run: |
+            JAVA_HOME=/usr/lib/jvm/java-8-openjdk-arm64 mvn -B -ntp clean package
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: linux-aarch64-build
+          path: /home/runner/work/Brotli4j/
+
+  windows-x86_64-build:
 
     runs-on: windows-latest
-
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 8
@@ -68,5 +106,5 @@ jobs:
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v2
         with:
-          name: WindowsBuild
+          name: windows-x86_64-build
           path: D:\a\Brotli4j\
