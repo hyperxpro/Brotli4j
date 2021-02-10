@@ -14,7 +14,7 @@ on:
 
 
 jobs:
-  macOSBuild:
+  macos-x86_64-build:
 
     runs-on: macos-latest
 
@@ -32,8 +32,7 @@ jobs:
           name: macOSBuild
           path: /Users/runner/work/Brotli4j/
 
-
-  LinuxBuild:
+  linux-x86_64-build:
 
     runs-on: ubuntu-latest
 
@@ -51,7 +50,46 @@ jobs:
           name: LinuxBuild
           path: /home/runner/work/Brotli4j/
 
-  WindowsBuild:
+  linux-aarch64-build:
+    name: linux-aarch64-verify-native
+    # The host should always be Linux
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+
+      # Cache .m2/repository
+      - uses: actions/cache@v2
+        env:
+          cache-name: build-pr-aarch64-cache-m2-repository
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-pr-${{ env.cache-name }}-
+            ${{ runner.os }}-pr-
+      - uses: uraimo/run-on-arch-action@v2.0.5
+        name: Run commands
+        id: runcmd
+        with:
+          arch: aarch64
+          distro: ubuntu20.04
+
+          # Not required, but speeds up builds by storing container images in
+          # a GitHub package registry.
+          githubToken: ${{ github.token }}
+
+          # Mount the .m2/repository
+          dockerRunArgs: |
+            --volume "/home/runner/.m2/repository/:/root/.m2/repository"
+          # Install dependencies
+          install: |
+            apt-get update -q -y
+            apt-get install -q -y openjdk-11-jdk autoconf automake libtool make tar maven git cmake build-essential
+          run: |
+            JAVA_HOME=/usr/lib/jvm/java-11-openjdk-arm64 mvn -B -ntp clean package
+            echo $PWD
+
+  windows-x86_64-build:
 
     runs-on: windows-latest
 
