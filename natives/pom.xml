@@ -29,7 +29,8 @@ Copyright 2021, Aayush Atharva
     <packaging>pom</packaging>
     <modules>
         <module>linux-x86_64</module>
-	    <module>windows-x86_64</module>
+        <module>linux-aarch64</module>
+        <module>windows-x86_64</module>
         <module>osx-x86_64</module>
     </modules>
 
@@ -44,6 +45,19 @@ Copyright 2021, Aayush Atharva
             </activation>
             <modules>
                 <module>linux-x86_64</module>
+            </modules>
+        </profile>
+
+        <profile>
+            <id>linux-aarch64</id>
+            <activation>
+                <os>
+                    <family>Linux</family>
+                    <arch>aarch64</arch>
+                </os>
+            </activation>
+            <modules>
+                <module>linux-aarch64</module>
             </modules>
         </profile>
 
@@ -77,7 +91,8 @@ Copyright 2021, Aayush Atharva
             <id>release</id>
             <modules>
                 <module>linux-x86_64</module>
-		        <module>windows-x86_64</module>
+                <module>linux-aarch64</module>
+                <module>windows-x86_64</module>
                 <module>osx-x86_64</module>
             </modules>
         </profile>

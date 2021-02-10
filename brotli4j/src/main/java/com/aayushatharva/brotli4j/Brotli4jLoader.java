@@ -89,6 +89,8 @@ public class Brotli4jLoader {
         if (osName.equalsIgnoreCase("Linux")) {
             if (archName.equalsIgnoreCase("amd64")) {
                 return "linux-x86_64";
+            } else if (archName.equalsIgnoreCase("aarch64")) {
+                return "linux-aarch64";
             }
         } else if (osName.startsWith("Windows")) {
             if (archName.equalsIgnoreCase("amd64")) {
