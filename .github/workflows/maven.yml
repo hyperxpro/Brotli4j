@@ -17,7 +17,6 @@ jobs:
   macos-x86_64-build:
 
     runs-on: macos-latest
-
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 8
@@ -29,13 +28,12 @@ jobs:
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v2
         with:
-          name: macOSBuild
+          name: macos-x86_64-build
           path: /Users/runner/work/Brotli4j/
 
   linux-x86_64-build:
 
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 8
@@ -47,12 +45,11 @@ jobs:
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v2
         with:
-          name: LinuxBuild
+          name: linux-x86_64-build
           path: /home/runner/work/Brotli4j/
 
   linux-aarch64-build:
-    name: linux-aarch64-verify-native
-    # The host should always be Linux
+
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -60,7 +57,7 @@ jobs:
       # Cache .m2/repository
       - uses: actions/cache@v2
         env:
-          cache-name: build-pr-aarch64-cache-m2-repository
+          cache-name: cache-m2-repository
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
@@ -84,20 +81,19 @@ jobs:
           # Install dependencies
           install: |
             apt-get update -q -y
-            apt-get install -q -y openjdk-11-jdk autoconf automake libtool make tar maven git cmake build-essential
+            apt-get install -q -y openjdk-8-jdk autoconf automake libtool make tar maven git cmake build-essential
           run: |
-            JAVA_HOME=/usr/lib/jvm/java-11-openjdk-arm64 mvn -B -ntp clean package
+            JAVA_HOME=/usr/lib/jvm/java-8-openjdk-arm64 mvn -B -ntp clean package
             echo $PWD
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v2
         with:
-          name: LinuxBuild
+          name: linux-aarch64-build
           path: /home/runner/work/Brotli4j/
 
   windows-x86_64-build:
 
     runs-on: windows-latest
-
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 8
@@ -111,5 +107,5 @@ jobs:
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v2
         with:
-          name: WindowsBuild
+          name: windows-x86_64-build
           path: D:\a\Brotli4j\
