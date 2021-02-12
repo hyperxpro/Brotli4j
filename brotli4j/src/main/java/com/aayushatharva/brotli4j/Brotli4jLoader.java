@@ -71,11 +71,13 @@ public class Brotli4jLoader {
     /**
      * Ensure Brotli native library is available.
      *
-     * @throws Throwable {@link UnsatisfiedLinkError} If unavailable.
+     * @throws UnsatisfiedLinkError If unavailable.
      */
-    public static void ensureAvailability() throws Throwable {
+    public static void ensureAvailability() {
         if (UNAVAILABILITY_CAUSE != null) {
-            throw new UnsatisfiedLinkError("Failed to load Brotli native library").initCause(UNAVAILABILITY_CAUSE);
+            UnsatisfiedLinkError error = new UnsatisfiedLinkError("Failed to load Brotli native library");
+            error.initCause(UNAVAILABILITY_CAUSE);
+            throw error;
         }
     }
 
