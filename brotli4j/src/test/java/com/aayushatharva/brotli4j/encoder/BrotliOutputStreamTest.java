@@ -31,12 +31,12 @@ class BrotliOutputStreamTest {
     private static final byte[] compressedData = new byte[]{-117, 1, -128, 77, 101, 111, 119, 3};
 
     @BeforeAll
-    static void load() throws Throwable {
+    static void load() {
         Brotli4jLoader.ensureAvailability();
     }
 
     @Test
-    public void compress() throws IOException {
+    void compress() throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         BrotliOutputStream brotliOutputStream = new BrotliOutputStream(baos);
         brotliOutputStream.write("Meow".getBytes());

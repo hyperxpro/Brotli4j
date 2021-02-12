@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class Brotli4jLoaderTest {
 
     @Test
-    public void load() {
+    void load() {
         assertDoesNotThrow(Brotli4jLoader::ensureAvailability);
     }
 }

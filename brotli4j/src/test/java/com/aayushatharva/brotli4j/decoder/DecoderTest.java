@@ -30,7 +30,7 @@ class DecoderTest {
     private static final byte[] compressedData = new byte[]{-117, 1, -128, 77, 101, 111, 119, 3};
 
     @BeforeAll
-    static void load() throws Throwable {
+    static void load() {
         Brotli4jLoader.ensureAvailability();
     }
 

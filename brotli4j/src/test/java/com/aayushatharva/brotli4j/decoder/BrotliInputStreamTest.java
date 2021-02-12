@@ -32,12 +32,12 @@ class BrotliInputStreamTest {
     private static final byte[] compressedData = new byte[]{-117, 1, -128, 77, 101, 111, 119, 3};
 
     @BeforeAll
-    static void load() throws Throwable {
+    static void load() {
         Brotli4jLoader.ensureAvailability();
     }
 
     @Test
-    public void decompress() throws IOException {
+    void decompress() throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ByteArrayInputStream bais = new ByteArrayInputStream(compressedData);
         BrotliInputStream brotliInputStream = new BrotliInputStream(bais);
@@ -52,6 +52,6 @@ class BrotliInputStreamTest {
         bais.close();
         brotliInputStream.close();
 
-        assertEquals("Meow", new String(baos.toByteArray()));
+        assertEquals("Meow", baos.toString());
     }
 }
