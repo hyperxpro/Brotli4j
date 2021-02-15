@@ -36,7 +36,7 @@ class BrotliInputStreamTest {
     }
 
     @Test
-    public void simpleDecompression() throws IOException {
+    void simpleDecompression() throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ByteArrayInputStream bais = new ByteArrayInputStream(compressedData);
         BrotliInputStream brotliInputStream = new BrotliInputStream(bais);
