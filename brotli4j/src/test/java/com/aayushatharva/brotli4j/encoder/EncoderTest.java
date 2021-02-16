@@ -21,9 +21,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.util.Arrays;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class EncoderTest {
 
@@ -42,5 +42,20 @@ class EncoderTest {
     @Test
     void compressWithQuality() throws IOException {
         assertArrayEquals(compressedData, Encoder.compress("Meow".getBytes(), new Encoder.Parameters().setQuality(6)));
+    }
+
+    @Test
+    void compressWithModes() throws IOException {
+        final byte[] text = "Some long text, very long text".getBytes();
+        final Encoder.Parameters parameters = new Encoder.Parameters();
+
+        final byte[] compressedGeneric = Encoder.compress(text, parameters.setMode(Encoder.Mode.GENERIC));
+        assertEquals(34, compressedGeneric.length);
+
+        final byte[] compressedText = Encoder.compress(text, parameters.setMode(Encoder.Mode.TEXT));
+        assertEquals(34, compressedText.length);
+
+        final byte[] compressedFont = Encoder.compress(text, parameters.setMode(Encoder.Mode.FONT));
+        assertEquals(31, compressedFont.length);
     }
 }

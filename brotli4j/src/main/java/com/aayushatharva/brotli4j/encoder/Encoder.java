@@ -10,11 +10,69 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.channels.WritableByteChannel;
 import java.util.ArrayList;
+import java.util.Locale;
 
 /**
  * Base class for OutputStream / Channel implementations.
  */
 public class Encoder {
+
+    /**
+     * https://www.brotli.org/encode.html#aa6f
+     * See encode.h, typedef enum BrotliEncoderMode
+     */
+    public enum Mode {
+        /**
+         * Default compression mode.
+         * In this mode compressor does not know anything in advance about the properties of the input.
+         */
+        GENERIC(0),
+        /**
+         * Compression mode for UTF-8 formatted text input.
+         */
+        TEXT(1),
+        /**
+         * Compression mode used in WOFF 2.0.
+         */
+        FONT(2);
+
+        private final int value;
+
+        Mode(int value) {
+            this.value = value;
+        }
+
+        public int value() {
+            return value;
+        }
+
+        public static Mode of(int value) {
+            switch (value) {
+                case 0:
+                    return GENERIC;
+                case 1:
+                    return TEXT;
+                case 2:
+                    return FONT;
+                default:
+                    throw new IllegalArgumentException("Unknown mode: " + value);
+            }
+        }
+
+        public static Mode of(String name) {
+            switch (name.toLowerCase(Locale.ROOT)) {
+                case "generic":
+                    return GENERIC;
+                case "text":
+                    return TEXT;
+                case "font":
+                    return FONT;
+                default:
+                    throw new IllegalArgumentException("Unknown mode: " + name);
+            }
+        }
+    }
+
     final ByteBuffer inputBuffer;
     private final WritableByteChannel destination;
     private final EncoderJNI.Wrapper encoder;
@@ -36,7 +94,7 @@ public class Encoder {
             throw new NullPointerException("destination can not be null");
         }
         this.destination = destination;
-        this.encoder = new EncoderJNI.Wrapper(inputBufferSize, params.quality, params.lgwin);
+        this.encoder = new EncoderJNI.Wrapper(inputBufferSize, params.quality, params.lgwin, params.mode);
         this.inputBuffer = this.encoder.getInputBuffer();
     }
 
@@ -50,7 +108,7 @@ public class Encoder {
             return empty;
         }
         /* data.length > 0 */
-        EncoderJNI.Wrapper encoder = new EncoderJNI.Wrapper(data.length, params.quality, params.lgwin);
+        EncoderJNI.Wrapper encoder = new EncoderJNI.Wrapper(data.length, params.quality, params.lgwin, params.mode);
         ArrayList<byte[]> output = new ArrayList<>();
         int totalOutputSize = 0;
         try {
@@ -170,6 +228,7 @@ public class Encoder {
     public static final class Parameters {
         private int quality = -1;
         private int lgwin = -1;
+        private Mode mode = Mode.GENERIC;
 
         public Parameters() {
         }
@@ -177,6 +236,7 @@ public class Encoder {
         private Parameters(Parameters other) {
             this.quality = other.quality;
             this.lgwin = other.lgwin;
+            this.mode = other.mode;
         }
 
         /**
@@ -198,6 +258,17 @@ public class Encoder {
                 throw new IllegalArgumentException("lgwin should be in range [10, 24], or -1");
             }
             this.lgwin = lgwin;
+            return this;
+        }
+
+        /**
+         * @param mode compression mode, or {@code null} for default
+         */
+        public Parameters setMode(Mode mode) {
+            if (mode == null) {
+                this.mode = Mode.GENERIC;
+            }
+            this.mode = mode;
             return this;
         }
     }

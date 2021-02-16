@@ -35,7 +35,7 @@ class BrotliOutputStreamTest {
     }
 
     @Test
-    public void compress() throws IOException {
+    void compress() throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         BrotliOutputStream brotliOutputStream = new BrotliOutputStream(baos);
         brotliOutputStream.write("Meow".getBytes());

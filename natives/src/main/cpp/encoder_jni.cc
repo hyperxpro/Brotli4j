@@ -95,6 +95,10 @@ JNIEXPORT jobject JNICALL Java_com_aayushatharva_brotli4j_encoder_EncoderJNI_nat
     if (lgwin >= 0) {
       BrotliEncoderSetParameter(handle->state, BROTLI_PARAM_LGWIN, lgwin);
     }
+    int mode = context[4];
+    if (mode >= 0) {
+      BrotliEncoderSetParameter(handle->state, BROTLI_PARAM_MODE, mode);
+    }
   }
 
   if (ok) {
