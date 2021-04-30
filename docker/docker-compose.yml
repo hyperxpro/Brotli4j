@@ -1,0 +1,25 @@
+version: "3"
+
+services:
+
+  runtime-setup:
+    image: brotli4j:default
+    build:
+      context: .
+      dockerfile: Dockerfile.centos6
+
+  common: &common
+    image: brotli4j:default
+    depends_on: [runtime-setup]
+    volumes:
+      - ~/.m2:/root/.m2
+      - ..:/code
+    working_dir: /code
+
+  build:
+    <<: *common
+    command: /bin/bash -cl "mvn -B -ntp clean package --file pom.xml -rf :native-linux-x86_64"
+
+  shell:
+    <<: *common
+    entrypoint: /bin/bash
