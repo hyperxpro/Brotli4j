@@ -121,8 +121,8 @@ jobs:
           name: windows-x86_64-build
           path: D:\a\Brotli4j\
       - name: Release Maven package
-          uses: samuelmeuli/action-maven-publish@v1
-          with:
+        uses: samuelmeuli/action-maven-publish@v1
+        with:
             gpg_private_key: ${{ secrets.gpg_private_key }}
             gpg_passphrase: ${{ secrets.gpg_passphrase }}
             nexus_username: ${{ secrets.nexus_username }}
