@@ -1,5 +1,5 @@
 /*
- *    Copyright 2021, Aayush Atharva
+ *    Copyright 2020-2021, Aayush Atharva
  *
  *    Brotli4j licenses this file to you under the
  *    Apache License, Version 2.0 (the "License");
