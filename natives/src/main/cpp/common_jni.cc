@@ -23,7 +23,7 @@
 
 #include <jni.h>
 
-#include "c/common/dictionary.h"
+#include "brotli/common/dictionary.h"
 
 #ifdef __cplusplus
 extern "C" {
