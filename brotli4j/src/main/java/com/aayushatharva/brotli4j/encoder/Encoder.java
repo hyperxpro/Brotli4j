@@ -10,69 +10,11 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.channels.WritableByteChannel;
 import java.util.ArrayList;
-import java.util.Locale;
 
 /**
  * Base class for OutputStream / Channel implementations.
  */
 public class Encoder {
-
-    /**
-     * https://www.brotli.org/encode.html#aa6f
-     * See encode.h, typedef enum BrotliEncoderMode
-     */
-    public enum Mode {
-        /**
-         * Default compression mode.
-         * In this mode compressor does not know anything in advance about the properties of the input.
-         */
-        GENERIC(0),
-        /**
-         * Compression mode for UTF-8 formatted text input.
-         */
-        TEXT(1),
-        /**
-         * Compression mode used in WOFF 2.0.
-         */
-        FONT(2);
-
-        private final int value;
-
-        Mode(int value) {
-            this.value = value;
-        }
-
-        public int value() {
-            return value;
-        }
-
-        public static Mode of(int value) {
-            switch (value) {
-                case 0:
-                    return GENERIC;
-                case 1:
-                    return TEXT;
-                case 2:
-                    return FONT;
-                default:
-                    throw new IllegalArgumentException("Unknown mode: " + value);
-            }
-        }
-
-        public static Mode of(String name) {
-            switch (name.toLowerCase(Locale.ROOT)) {
-                case "generic":
-                    return GENERIC;
-                case "text":
-                    return TEXT;
-                case "font":
-                    return FONT;
-                default:
-                    throw new IllegalArgumentException("Unknown mode: " + name);
-            }
-        }
-    }
-
     final ByteBuffer inputBuffer;
     private final WritableByteChannel destination;
     private final EncoderJNI.Wrapper encoder;
@@ -86,7 +28,8 @@ public class Encoder {
      * @param params          encoding parameters
      * @param inputBufferSize read buffer size
      */
-    Encoder(WritableByteChannel destination, Parameters params, int inputBufferSize) throws IOException {
+    Encoder(WritableByteChannel destination, Parameters params, int inputBufferSize)
+            throws IOException {
         if (inputBufferSize <= 0) {
             throw new IllegalArgumentException("buffer size must be positive");
         }
@@ -109,7 +52,7 @@ public class Encoder {
         }
         /* data.length > 0 */
         EncoderJNI.Wrapper encoder = new EncoderJNI.Wrapper(data.length, params.quality, params.lgwin, params.mode);
-        ArrayList<byte[]> output = new ArrayList<>();
+        ArrayList<byte[]> output = new ArrayList<byte[]>();
         int totalOutputSize = 0;
         try {
             encoder.getInputBuffer().put(data);
@@ -223,12 +166,39 @@ public class Encoder {
     }
 
     /**
+     * https://www.brotli.org/encode.html#aa6f
+     * See encode.h, typedef enum BrotliEncoderMode
+     *
+     * <strong>Important</strong>: The ordinal value of the
+     * modes should be the same as the constant values in encode.h
+     */
+    public enum Mode {
+        /**
+         * Default compression mode.
+         * In this mode compressor does not know anything in advance about the properties of the input.
+         */
+        GENERIC,
+        /**
+         * Compression mode for UTF-8 formatted text input.
+         */
+        TEXT,
+        /**
+         * Compression mode used in WOFF 2.0.
+         */
+        FONT;
+
+        public static Mode of(int value) {
+            return values()[value];
+        }
+    }
+
+    /**
      * Brotli encoder settings.
      */
     public static final class Parameters {
         private int quality = -1;
         private int lgwin = -1;
-        private Mode mode = Mode.GENERIC;
+        private Mode mode;
 
         public Parameters() {
         }
@@ -265,9 +235,6 @@ public class Encoder {
          * @param mode compression mode, or {@code null} for default
          */
         public Parameters setMode(Mode mode) {
-            if (mode == null) {
-                this.mode = Mode.GENERIC;
-            }
             this.mode = mode;
             return this;
         }

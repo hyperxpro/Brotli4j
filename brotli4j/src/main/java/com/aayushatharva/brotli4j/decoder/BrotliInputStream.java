@@ -26,7 +26,8 @@ public class BrotliInputStream extends InputStream {
      * @param source     underlying source
      * @param bufferSize intermediate buffer size
      */
-    public BrotliInputStream(InputStream source, int bufferSize) throws IOException {
+    public BrotliInputStream(InputStream source, int bufferSize)
+            throws IOException {
         this.decoder = new Decoder(Channels.newChannel(source), bufferSize);
     }
 
@@ -54,10 +55,13 @@ public class BrotliInputStream extends InputStream {
             throw new IOException("read after close");
         }
         int decoded;
-        // Iterate until at least one byte is decoded, or EOF reached.
-        do {
+        // Iterate until at leat one byte is decoded, or EOF reached.
+        while (true) {
             decoded = decoder.decode();
-        } while (decoded == 0);
+            if (decoded != 0) {
+                break;
+            }
+        }
 
         if (decoded == -1) {
             return -1;
