@@ -11,7 +11,7 @@ import java.nio.ByteBuffer;
 /**
  * JNI wrapper for brotli encoder.
  */
-public class EncoderJNI {
+class EncoderJNI {
     private static native ByteBuffer nativeCreate(long[] context);
 
     private static native void nativePush(long[] context, int length);
@@ -20,7 +20,7 @@ public class EncoderJNI {
 
     private static native void nativeDestroy(long[] context);
 
-    public enum Operation {
+    enum Operation {
         PROCESS,
         FLUSH,
         FINISH
@@ -29,15 +29,17 @@ public class EncoderJNI {
     static class Wrapper {
         protected final long[] context = new long[5];
         private final ByteBuffer inputBuffer;
+        private boolean fresh = true;
 
-        Wrapper(int inputBufferSize, int quality, int lgwin, final Encoder.Mode mode) throws IOException {
+        Wrapper(int inputBufferSize, int quality, int lgwin, Encoder.Mode mode)
+                throws IOException {
             if (inputBufferSize <= 0) {
                 throw new IOException("buffer size must be positive");
             }
             this.context[1] = inputBufferSize;
             this.context[2] = quality;
             this.context[3] = lgwin;
-            this.context[4] = mode.value();
+            this.context[4] = mode != null ? mode.ordinal() : -1;
             this.inputBuffer = nativeCreate(this.context);
             if (this.context[0] == 0) {
                 throw new IOException("failed to initialize native brotli encoder");
@@ -62,6 +64,7 @@ public class EncoderJNI {
                 throw new IllegalStateException("pushing input to encoder over previous input");
             }
             context[1] = op.ordinal();
+            fresh = false;
             nativePush(context, length);
         }
 
@@ -92,6 +95,7 @@ public class EncoderJNI {
             if (!isSuccess() || !hasMoreOutput()) {
                 throw new IllegalStateException("pulling while data is not ready");
             }
+            fresh = false;
             return nativePull(context);
         }
 
@@ -104,6 +108,15 @@ public class EncoderJNI {
             }
             nativeDestroy(context);
             context[0] = 0;
+        }
+
+        @Override
+        protected void finalize() throws Throwable {
+            if (context[0] != 0) {
+                /* TODO: log resource leak? */
+                destroy();
+            }
+            super.finalize();
         }
     }
 }

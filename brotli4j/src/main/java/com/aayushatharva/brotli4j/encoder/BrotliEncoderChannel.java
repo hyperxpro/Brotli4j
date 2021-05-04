@@ -29,16 +29,16 @@ public class BrotliEncoderChannel extends Encoder implements WritableByteChannel
      * @param params      encoding settings
      * @param bufferSize  intermediate buffer size
      */
-    public BrotliEncoderChannel(WritableByteChannel destination, Parameters params, int bufferSize) throws IOException {
+    public BrotliEncoderChannel(WritableByteChannel destination, Encoder.Parameters params, int bufferSize) throws IOException {
         super(destination, params, bufferSize);
     }
 
-    public BrotliEncoderChannel(WritableByteChannel destination, Parameters params) throws IOException {
+    public BrotliEncoderChannel(WritableByteChannel destination, Encoder.Parameters params) throws IOException {
         this(destination, params, DEFAULT_BUFFER_SIZE);
     }
 
     public BrotliEncoderChannel(WritableByteChannel destination) throws IOException {
-        this(destination, new Parameters());
+        this(destination, new Encoder.Parameters());
     }
 
     @Override

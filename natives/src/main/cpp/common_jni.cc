@@ -1,6 +1,6 @@
 /*
  * This file is part of Brotli4j.
- * Copyright (c) 2020 Aayush Atharva
+ * Copyright (c) 2020-2021 Aayush Atharva
  *
  * Brotli4j is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Brotli4j.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 /* Copyright 2017 Google Inc. All Rights Reserved.
 
    Distributed under MIT license.
@@ -36,7 +35,9 @@ extern "C" {
  * @param buffer direct ByteBuffer
  * @returns false if dictionary data was already set; otherwise true
  */
-JNIEXPORT jint JNICALL Java_com_aayushatharva_brotli4j_common_CommonJNI_nativeSetDictionaryData(JNIEnv* env, jobject /*jobj*/, jobject buffer) {
+JNIEXPORT jint JNICALL
+Java_com_aayushatharva_brotli4j_common_CommonJNI_nativeSetDictionaryData(
+    JNIEnv* env, jobject /*jobj*/, jobject buffer) {
   jobject buffer_ref = env->NewGlobalRef(buffer);
   if (!buffer_ref) {
     return false;

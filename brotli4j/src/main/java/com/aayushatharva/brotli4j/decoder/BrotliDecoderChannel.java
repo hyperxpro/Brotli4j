@@ -24,8 +24,8 @@ public class BrotliDecoderChannel extends Decoder implements ReadableByteChannel
     /**
      * Creates a BrotliDecoderChannel.
      *
-     * @param source     underlying source
-     * @param bufferSize intermediate buffer size
+     * @param source           underlying source
+     * @param bufferSize       intermediate buffer size
      */
     public BrotliDecoderChannel(ReadableByteChannel source, int bufferSize) throws IOException {
         super(source, bufferSize);

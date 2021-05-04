@@ -1,6 +1,6 @@
 /*
  * This file is part of Brotli4j.
- * Copyright (c) 2020 Aayush Atharva
+ * Copyright (c) 2020-2021 Aayush Atharva
  *
  * Brotli4j is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Brotli4j.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 /* Copyright 2017 Google Inc. All Rights Reserved.
 
    Distributed under MIT license.
@@ -58,7 +57,9 @@ extern "C" {
  * @param ctx {out_cookie, in_directBufferSize} tuple
  * @returns direct ByteBuffer if directBufferSize is not 0; otherwise null
  */
-JNIEXPORT jobject JNICALL Java_com_aayushatharva_brotli4j_decoder_DecoderJNI_nativeCreate(JNIEnv* env, jobject /*jobj*/, jlongArray ctx) {
+JNIEXPORT jobject JNICALL
+Java_com_aayushatharva_brotli4j_decoder_DecoderJNI_nativeCreate(
+    JNIEnv* env, jobject /*jobj*/, jlongArray ctx) {
   bool ok = true;
   DecoderHandle* handle = nullptr;
   jlong context[3];
@@ -119,7 +120,9 @@ JNIEXPORT jobject JNICALL Java_com_aayushatharva_brotli4j_decoder_DecoderJNI_nat
  * @param input_length number of bytes provided in input or direct input;
  *                     0 to process further previous input
  */
-JNIEXPORT void JNICALL Java_com_aayushatharva_brotli4j_decoder_DecoderJNI_nativePush(JNIEnv* env, jobject /*jobj*/, jlongArray ctx, jint input_length) {
+JNIEXPORT void JNICALL
+Java_com_aayushatharva_brotli4j_decoder_DecoderJNI_nativePush(
+    JNIEnv* env, jobject /*jobj*/, jlongArray ctx, jint input_length) {
   jlong context[3];
   env->GetLongArrayRegion(ctx, 0, 3, context);
   DecoderHandle* handle = getHandle(reinterpret_cast<void*>(context[0]));
@@ -140,7 +143,8 @@ JNIEXPORT void JNICALL Java_com_aayushatharva_brotli4j_decoder_DecoderJNI_native
   const uint8_t* in = handle->input_start + handle->input_offset;
   size_t in_size = handle->input_length - handle->input_offset;
   size_t out_size = 0;
-  BrotliDecoderResult status = BrotliDecoderDecompressStream(handle->state, &in_size, &in, &out_size, nullptr, nullptr);
+  BrotliDecoderResult status = BrotliDecoderDecompressStream(
+      handle->state, &in_size, &in, &out_size, nullptr, nullptr);
   handle->input_offset = handle->input_length - in_size;
   switch (status) {
     case BROTLI_DECODER_RESULT_SUCCESS:
@@ -171,7 +175,9 @@ JNIEXPORT void JNICALL Java_com_aayushatharva_brotli4j_decoder_DecoderJNI_native
  * @returns direct ByteBuffer; all the produced data MUST be consumed before
  *          any further invocation; null in case of error
  */
-JNIEXPORT jobject JNICALL Java_com_aayushatharva_brotli4j_decoder_DecoderJNI_nativePull( JNIEnv* env, jobject /*jobj*/, jlongArray ctx) {
+JNIEXPORT jobject JNICALL
+Java_com_aayushatharva_brotli4j_decoder_DecoderJNI_nativePull(
+    JNIEnv* env, jobject /*jobj*/, jlongArray ctx) {
   jlong context[3];
   env->GetLongArrayRegion(ctx, 0, 3, context);
   DecoderHandle* handle = getHandle(reinterpret_cast<void*>(context[0]));
@@ -197,7 +203,9 @@ JNIEXPORT jobject JNICALL Java_com_aayushatharva_brotli4j_decoder_DecoderJNI_nat
  *
  * @param ctx {in_cookie} tuple
  */
-JNIEXPORT void JNICALL Java_com_aayushatharva_brotli4j_decoder_DecoderJNI_nativeDestroy(JNIEnv* env, jobject /*jobj*/, jlongArray ctx) {
+JNIEXPORT void JNICALL
+Java_com_aayushatharva_brotli4j_decoder_DecoderJNI_nativeDestroy(
+    JNIEnv* env, jobject /*jobj*/, jlongArray ctx) {
   jlong context[3];
   env->GetLongArrayRegion(ctx, 0, 3, context);
   DecoderHandle* handle = getHandle(reinterpret_cast<void*>(context[0]));
