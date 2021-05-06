@@ -10,7 +10,6 @@ if (JNI_FOUND)
     message (STATUS "JNI_LIBRARIES=${JNI_LIBRARIES}")
 endif()
 include_directories(${JNI_INCLUDE_DIRS})
-include_directories(${JNI_LIBRARIES})
 
 SET (BROTLI_INCLUDE_DIRS "brotli/include" "brotli/common")
 include_directories(${BROTLI_INCLUDE_DIRS})
@@ -18,6 +17,9 @@ include_directories(${BROTLI_INCLUDE_DIRS})
 SET (LIB_TYPE SHARED)
 SET (CMAKE_JNI_TARGET TRUE)
 SET (CMAKE_CXX_FLAGS "-Wall -O3")
+
+SET (CMAKE_CXX_STANDARD 11)
+SET (CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(WIN32)
     SET(STATIC_LIBRARY_CXX_FLAGS /MD)

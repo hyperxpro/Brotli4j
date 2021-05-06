@@ -1,4 +1,6 @@
-FROM gatlingcorp/centos:6-gcc7
+FROM gatlingcorp/centos:6-gcc5
+
+RUN rm -vf /usr/lib64/libstdc++.so.6.0.24-gdb.py
 
 RUN yum -y install \
             git 
