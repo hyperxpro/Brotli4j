@@ -7,7 +7,7 @@ Brotli4j provides Brotli compression and decompression for Java.
 <dependency>
     <groupId>com.aayushatharva.brotli4j</groupId>
     <artifactId>brotli4j</artifactId>
-    <version>1.4.2</version>
+    <version>1.5.0</version>
 </dependency>
 ```
 
