@@ -31,8 +31,9 @@ public class BrotliCommon {
             32, -28, 46, -79, -75, 17, -62, 24, 6, -44, -46, 39, -48, 126, 93, -48,
             104, 119, -40, -50, 123, 58, -127, 127, 55, -113, 49, 54, 83, -13, 92, 112
     };
-    private static final Object mutex = new Object();
+
     private static boolean isDictionaryDataSet;
+    private static final Object mutex = new Object();
 
     /**
      * Checks if the given checksum matches MD5 checksum of the RFC dictionary.

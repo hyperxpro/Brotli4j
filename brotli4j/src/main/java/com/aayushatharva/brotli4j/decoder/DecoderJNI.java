@@ -1,3 +1,20 @@
+/*
+ * This file is part of Brotli4j.
+ * Copyright (c) 2020-2021 Aayush Atharva
+ *
+ * Brotli4j is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Brotli4j is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Brotli4j.  If not, see <https://www.gnu.org/licenses/>.
+ */
 /* Copyright 2017 Google Inc. All Rights Reserved.
 
    Distributed under MIT license.
@@ -20,6 +37,8 @@ public class DecoderJNI {
 
     private static native void nativeDestroy(long[] context);
 
+    private static native boolean nativeAttachDictionary(long[] context, ByteBuffer dictionary);
+
     public enum Status {
         ERROR,
         DONE,
@@ -40,6 +59,19 @@ public class DecoderJNI {
             if (this.context[0] == 0) {
                 throw new IOException("failed to initialize native brotli decoder");
             }
+        }
+
+        public boolean attachDictionary(ByteBuffer dictionary) {
+            if (!dictionary.isDirect()) {
+                throw new IllegalArgumentException("only direct buffers allowed");
+            }
+            if (context[0] == 0) {
+                throw new IllegalStateException("brotli decoder is already destroyed");
+            }
+            if (!fresh) {
+                throw new IllegalStateException("decoding is already started");
+            }
+            return nativeAttachDictionary(context, dictionary);
         }
 
         public void push(int length) {

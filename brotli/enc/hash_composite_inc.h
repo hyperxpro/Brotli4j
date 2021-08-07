@@ -48,7 +48,7 @@ static void FN(Initialize)(HasherCommon* common,
   self->hb_common = *self->common;
   self->fresh = BROTLI_TRUE;
   self->params = params;
-  /* TODO: Initialize of the hashers is defered to Prepare (and params
+  /* TODO: Initialize of the hashers is deferred to Prepare (and params
      remembered here) because we don't get the one_shot and input_size params
      here that are needed to know the memory size of them. Instead provide
      those params to all hashers FN(Initialize) */
@@ -82,7 +82,7 @@ static BROTLI_INLINE void FN(HashMemAllocInBytes)(
   size_t alloc_size_b[4] = {0};
   FN_A(HashMemAllocInBytes)(params, one_shot, input_size, alloc_size_a);
   FN_B(HashMemAllocInBytes)(params, one_shot, input_size, alloc_size_b);
-  // Should never happen.
+  /* Should never happen. */
   if (alloc_size_a[2] != 0 || alloc_size_a[3] != 0) exit(EXIT_FAILURE);
   if (alloc_size_b[2] != 0 || alloc_size_b[3] != 0) exit(EXIT_FAILURE);
   alloc_size[0] = alloc_size_a[0];
