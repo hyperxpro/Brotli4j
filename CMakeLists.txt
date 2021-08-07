@@ -36,7 +36,7 @@ else(WIN32)
 endif()
 
 add_library (brotli ${LIB_TYPE}
-                "brotli\common\constants.c"
+				"brotli\common\constants.c"
 				"brotli\common\context.c"
 				"brotli\common\dictionary.c"
 				"brotli\common\platform.c"
