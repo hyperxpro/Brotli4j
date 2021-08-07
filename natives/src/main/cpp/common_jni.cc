@@ -23,7 +23,7 @@
 
 #include <jni.h>
 
-#include "c/common/dictionary.h"
+#include "dictionary.h"
 
 #ifdef __cplusplus
 extern "C" {
