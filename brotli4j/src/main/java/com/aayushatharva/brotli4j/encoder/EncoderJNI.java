@@ -1,8 +1,26 @@
+/*
+ * This file is part of Brotli4j.
+ * Copyright (c) 2020-2021 Aayush Atharva
+ *
+ * Brotli4j is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Brotli4j is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Brotli4j.  If not, see <https://www.gnu.org/licenses/>.
+ */
 /* Copyright 2017 Google Inc. All Rights Reserved.
 
    Distributed under MIT license.
    See file LICENSE for detail or copy at https://opensource.org/licenses/MIT
 */
+
 package com.aayushatharva.brotli4j.encoder;
 
 import java.io.IOException;
@@ -20,10 +38,57 @@ class EncoderJNI {
 
     private static native void nativeDestroy(long[] context);
 
+    private static native boolean nativeAttachDictionary(long[] context, ByteBuffer dictionary);
+
+    private static native ByteBuffer nativePrepareDictionary(ByteBuffer dictionary, long type);
+
+    private static native void nativeDestroyDictionary(ByteBuffer dictionary);
+
     enum Operation {
         PROCESS,
         FLUSH,
         FINISH
+    }
+
+    private static class PreparedDictionaryImpl implements PreparedDictionary {
+        private ByteBuffer data;
+
+        private PreparedDictionaryImpl(ByteBuffer data) {
+            this.data = data;
+        }
+
+        @Override
+        public ByteBuffer getData() {
+            return data;
+        }
+
+        @Override
+        protected void finalize() throws Throwable {
+            try {
+                ByteBuffer data = this.data;
+                this.data = null;
+                nativeDestroyDictionary(data);
+            } finally {
+                super.finalize();
+            }
+        }
+    }
+
+    /**
+     * Prepares raw or serialized dictionary for being used by encoder.
+     *
+     * @param dictionary           raw / serialized dictionary data; MUST be direct
+     * @param sharedDictionaryType dictionary data type
+     */
+    static PreparedDictionary prepareDictionary(ByteBuffer dictionary, int sharedDictionaryType) {
+        if (!dictionary.isDirect()) {
+            throw new IllegalArgumentException("only direct buffers allowed");
+        }
+        ByteBuffer dictionaryData = nativePrepareDictionary(dictionary, sharedDictionaryType);
+        if (dictionaryData == null) {
+            throw new IllegalStateException("OOM");
+        }
+        return new PreparedDictionaryImpl(dictionaryData);
     }
 
     static class Wrapper {
@@ -48,6 +113,19 @@ class EncoderJNI {
             this.context[2] = 0;
             this.context[3] = 0;
             this.context[4] = 0;
+        }
+
+        boolean attachDictionary(ByteBuffer dictionary) {
+            if (!dictionary.isDirect()) {
+                throw new IllegalArgumentException("only direct buffers allowed");
+            }
+            if (context[0] == 0) {
+                throw new IllegalStateException("brotli decoder is already destroyed");
+            }
+            if (!fresh) {
+                throw new IllegalStateException("decoding is already started");
+            }
+            return nativeAttachDictionary(context, dictionary);
         }
 
         void push(Operation op, int length) {

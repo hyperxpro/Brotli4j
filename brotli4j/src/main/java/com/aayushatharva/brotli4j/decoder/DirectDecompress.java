@@ -54,7 +54,7 @@ public final class DirectDecompress {
     /**
      * Get decompressed data.
      *
-     * @return Byte Array if decompression was successful else {@code null}
+     * @return {@code byte} array if decompression was successful else {@code null}
      */
     public byte[] getDecompressedData() {
         return decompressedData;
