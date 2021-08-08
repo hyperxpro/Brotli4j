@@ -29,12 +29,12 @@ For maven, the natives will
 
 ### Gradle
 For gradle, we have to write som logic to import native automatically. 
-Of course, you can add native(s) as dependency manually.
+Of course, you can add native(s) as dependency manually also.
 
 #### Kotlin DSL
 
 ```kotlin
-val brotliVersion = "1.5.0"
+val brotliVersion = "1.6.0"
 val operatingSystem: OperatingSystem = DefaultNativePlatform.getCurrentOperatingSystem()
 
 repositories {
