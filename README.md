@@ -1,9 +1,25 @@
 # Brotli4j
+
+[![Maven Central](https://img.shields.io/maven-central/v/com.aayushatharva.brotli4j/brotli4j-parent.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.aayushatharva.brotli4j%22%20AND%20a:%22brotli4j-parent%22)
+
 Brotli4j provides Brotli compression and decompression for Java.
 
-## Maven
-[![Maven Central](https://img.shields.io/maven-central/v/com.aayushatharva.brotli4j/brotli4j-parent.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.aayushatharva.brotli4j%22%20AND%20a:%22brotli4j-parent%22)
-```
+## Supported Platforms:
+
+Windows 64-Bit  
+Linux 64-Bit  
+Linux Arch64  
+macOS Catalina 10.15
+
+## Download
+
+### Maven
+
+For maven, the natives will
+[import automatically by your system family and architecture](https://github.com/hyperxpro/Brotli4j/blob/main/natives/pom.xml#L37-L99).
+
+```xml
+
 <dependency>
     <groupId>com.aayushatharva.brotli4j</groupId>
     <artifactId>brotli4j</artifactId>
@@ -11,19 +27,68 @@ Brotli4j provides Brotli compression and decompression for Java.
 </dependency>
 ```
 
-## Supported Platforms:
-Windows 64-Bit </br>
-Linux 64-Bit </br>
-Linux AArch64 </br>
-macOS Catalina 10.15
+### Gradle
+For gradle, we have to write som logic to import native automatically. 
+Of course, you can add native(s) as dependency manually also.
 
+#### Kotlin DSL
 
-## Loading native library:
+```kotlin
+val brotliVersion = "1.6.0"
+val operatingSystem: OperatingSystem = DefaultNativePlatform.getCurrentOperatingSystem()
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation("com.aayushatharva.brotli4j:brotli4j:$brotliVersion")
+    implementation(
+        "com.aayushatharva.brotli4j:native-${
+            if (operatingSystem.isWindows) "windows-x86_64"
+            else if (operatingSystem.isMacOsX) "osx-x86_64"
+            else if (operatingSystem.isLinux)
+                if (DefaultNativePlatform.getCurrentArchitecture().isArm) "linux-aarch64"
+                else "native-linux-x86_64"
+            else ""
+        }:$brotliVersion"
+    )
+}
+```
+
+#### Groovy
+
+```groovy
+def brotliVersion = "1.6.0"
+def operatingSystem = DefaultNativePlatform.getCurrentOperatingSystem()
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation "com.aayushatharva.brotli4j:brotli4j:$brotliVersion"
+    implementation("com.aayushatharva.brotli4j:native-${
+        if (operatingSystem.isWindows()) "windows-x86_64"
+        else if (operatingSystem.isMacOsX()) "osx-x86_64"
+        else if (operatingSystem.isLinux())
+            if (DefaultNativePlatform.getCurrentArchitecture().isArm()) "linux-aarch64"
+            else "native-linux-x86_64"
+    }:$brotliVersion")
+}
+```
+
+## Usage
+
+### Loading native library:
+
 Call `Brotli4jLoader.ensureAvailability()` in your application once before using Brotli4j.
 
-## Examples
 ### Direct API
+
 ```java
+public class Example {
+    public static void main(String[] args) {
         // Load the native library
         Brotli4jLoader.ensureAvailability();
 
@@ -38,10 +103,15 @@ Call `Brotli4jLoader.ensureAvailability()` in your application once before using
         } else {
             System.out.println("Some Error Occurred While Decompressing");
         }
+    }
+}
 ```
 
 ### Compressing a stream:
+
 ```java
+public class Example {
+    public static void main(String[] args) {
         // Load the native library
         Brotli4jLoader.ensureAvailability();
 
@@ -49,11 +119,11 @@ Call `Brotli4jLoader.ensureAvailability()` in your application once before using
         FileOutputStream outFile = new FileOutputStream(filePath + ".br");
 
         Encoder.Parameters params = new Encoder.Parameters().setQuality(4);
-        
+
         BrotliOutputStream brotliOutputStream = new BrotliOutputStream(outFile, params);
 
         int read = inFile.read();
-        while(read > -1) {
+        while (read > -1) {
             brotliOutputStream.write(read);
             read = inFile.read();
         }
@@ -61,10 +131,15 @@ Call `Brotli4jLoader.ensureAvailability()` in your application once before using
         // Close the BrotliOutputStream. This also closes the FileOutputStream.
         brotliOutputStream.close();
         inFile.close();
+    }
+}
 ```
 
 ### Decompressing a stream:
+
 ```java
+public class Example {
+    public static void main(String[] args) {
         // Load the native library
         Brotli4jLoader.ensureAvailability();
 
@@ -74,7 +149,7 @@ Call `Brotli4jLoader.ensureAvailability()` in your application once before using
         BrotliInputStream brotliInputStream = new BrotliInputStream(inFile);
 
         int read = brotliInputStream.read();
-        while(read > -1) {
+        while (read > -1) {
             outFile.write(read);
             read = brotliInputStream.read();
         }
@@ -82,12 +157,16 @@ Call `Brotli4jLoader.ensureAvailability()` in your application once before using
         // Close the BrotliInputStream. This also closes the FileInputStream.
         brotliInputStream.close();
         outFile.close();
+    }
+}
 ```
+
 __________________________________________________________________
+
 ## Sponsors
 
-JProfiler is supporting Brotli4J with its full-featured Java Profiler. JProfiler's intuitive UI helps you resolve performance bottlenecks,
-pin down memory leaks and understand threading issues. Click below to know more:
+JProfiler is supporting Brotli4J with its full-featured Java Profiler. JProfiler's intuitive UI helps you resolve
+performance bottlenecks, pin down memory leaks and understand threading issues. Click below to know more:
 
 <a href="https://www.ej-technologies.com/products/jprofiler/overview.html" target="_blank" title="File Management">
   <img src="https://www.ej-technologies.com/images/product_banners/jprofiler_large.png" alt="File Management">
