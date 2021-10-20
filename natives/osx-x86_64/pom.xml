@@ -36,7 +36,6 @@
             <activation>
                 <os>
                     <family>mac</family>
-                    <arch>x86_64</arch>
                 </os>
             </activation>
             <build>
