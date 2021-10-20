@@ -8,15 +8,16 @@ Brotli4j provides Brotli compression and decompression for Java.
 
 Windows 64-Bit  
 Linux 64-Bit  
-Linux Arch64  
-macOS Catalina 10.15
+Linux Aarch64  
+macOS Catalina 10.15 Intel x86  
+macOS BigSur 11.0 Apple M1  
 
 ## Download
 
 ### Maven
 
 For maven, the natives will
-[import automatically by your system family and architecture](https://github.com/hyperxpro/Brotli4j/blob/main/natives/pom.xml#L37-L99).
+[import automatically by your system family and architecture](https://github.com/hyperxpro/Brotli4j/blob/main/natives/pom.xml#L38-L114).
 
 ```xml
 
@@ -46,10 +47,12 @@ dependencies {
     implementation(
         "com.aayushatharva.brotli4j:native-${
             if (operatingSystem.isWindows) "windows-x86_64"
-            else if (operatingSystem.isMacOsX) "osx-x86_64"
+            else if (operatingSystem.isMacOsX)
+                if (DefaultNativePlatform.getCurrentArchitecture().isArm) "osx-aarch64"
+                else "osx-x86_64"
             else if (operatingSystem.isLinux)
                 if (DefaultNativePlatform.getCurrentArchitecture().isArm) "linux-aarch64"
-                else "native-linux-x86_64"
+                else "linux-x86_64"
             else ""
         }:$brotliVersion"
     )
@@ -70,10 +73,12 @@ dependencies {
     implementation "com.aayushatharva.brotli4j:brotli4j:$brotliVersion"
     implementation("com.aayushatharva.brotli4j:native-${
         if (operatingSystem.isWindows()) "windows-x86_64"
-        else if (operatingSystem.isMacOsX()) "osx-x86_64"
+        else if (operatingSystem.isMacOsX())
+            if (DefaultNativePlatform.getCurrentArchitecture().isArm()) "osx-aarch64"
+            else "osx-x86_64"
         else if (operatingSystem.isLinux())
             if (DefaultNativePlatform.getCurrentArchitecture().isArm()) "linux-aarch64"
-            else "native-linux-x86_64"
+            else "linux-x86_64"
     }:$brotliVersion")
 }
 ```

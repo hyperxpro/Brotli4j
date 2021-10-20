@@ -97,6 +97,23 @@
                 </dependency>
             </dependencies>
         </profile>
+
+        <profile>
+            <id>osx-aarch64</id>
+            <activation>
+                <os>
+                    <family>Mac</family>
+                    <arch>aarch64</arch>
+                </os>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.aayushatharva.brotli4j</groupId>
+                    <artifactId>native-osx-aarch64</artifactId>
+                    <version>1.6.0</version>
+                </dependency>
+            </dependencies>
+        </profile>
     </profiles>
 
 </project>
