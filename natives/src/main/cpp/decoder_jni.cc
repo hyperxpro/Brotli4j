@@ -184,11 +184,11 @@ Java_com_aayushatharva_brotli4j_decoder_DecoderJNI_nativePush(
  */
 JNIEXPORT jobject JNICALL
 Java_com_aayushatharva_brotli4j_decoder_DecoderJNI_nativePull(
-    JNIEnv* env, jobject /*jobj*/, jlongArray ctx) {
+    JNIEnv* env, jobject /*jobj*/, jlongArray ctx, jint output_length) {
   jlong context[3];
   env->GetLongArrayRegion(ctx, 0, 3, context);
   DecoderHandle* handle = getHandle(reinterpret_cast<void*>(context[0]));
-  size_t data_length = 0;
+  size_t data_length = output_length;
   const uint8_t* data = BrotliDecoderTakeOutput(handle->state, &data_length);
   bool hasMoreOutput = !!BrotliDecoderHasMoreOutput(handle->state);
   if (hasMoreOutput) {

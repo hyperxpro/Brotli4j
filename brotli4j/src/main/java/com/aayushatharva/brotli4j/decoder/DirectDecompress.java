@@ -52,6 +52,18 @@ public final class DirectDecompress {
     }
 
     /**
+     * Initiate direct decompression of data which is of a known length
+     *
+     * @param compressedData Compressed data as byte array
+     * @param decompressedLength Expected length of the data after it has been decompressed
+     * @return {@link DirectDecompress} Instance containing the status and result of the decompression attempt
+     * @throws IOException In case of some error during decompression
+     */
+    public static DirectDecompress decompressKnownLength(byte[] compressedData, int decompressedLength) throws IOException {
+        return Decoder.decompressKnownLength(compressedData, decompressedLength);
+    }
+
+    /**
      * Get the result of decompression.
      *
      * @return {@link DecoderJNI.Status}
