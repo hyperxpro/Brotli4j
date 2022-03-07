@@ -21,6 +21,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -42,6 +44,18 @@ class EncoderTest {
     @Test
     void compressWithQuality() throws IOException {
         assertArrayEquals(compressedData, Encoder.compress("Meow".getBytes(), new Encoder.Parameters().setQuality(6)));
+    }
+
+    @Test
+    void compressWithQualityAndByteBuffer() throws IOException {
+        ByteBuffer src = ByteBuffer.wrap("Meow".getBytes(StandardCharsets.UTF_8));
+        ByteBuffer dst = ByteBuffer.allocate(16);
+        Encoder.compress(src, dst, new Encoder.Parameters());
+
+        byte[] arr = new byte[dst.remaining()];
+        dst.get(arr);
+
+        assertArrayEquals(compressedData, arr);
     }
 
     @Test

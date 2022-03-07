@@ -34,87 +34,12 @@ import java.util.List;
  * Base class for OutputStream / Channel implementations.
  */
 public class Encoder {
+    final ByteBuffer inputBuffer;
     private final WritableByteChannel destination;
     private final List<PreparedDictionary> dictionaries;
     private final EncoderJNI.Wrapper encoder;
-    private ByteBuffer buffer;
-    final ByteBuffer inputBuffer;
     boolean closed;
-
-    /**
-     * https://www.brotli.org/encode.html#aa6f
-     * See encode.h, typedef enum BrotliEncoderMode
-     *
-     * <strong>Important</strong>: The ordinal value of the
-     * modes should be the same as the constant values in encode.h
-     */
-    public enum Mode {
-        /**
-         * Default compression mode.
-         * In this mode compressor does not know anything in advance about the properties of the input.
-         */
-        GENERIC,
-        /**
-         * Compression mode for UTF-8 formatted text input.
-         */
-        TEXT,
-        /**
-         * Compression mode used in WOFF 2.0.
-         */
-        FONT;
-
-        public static Mode of(int value) {
-            return values()[value];
-        }
-    }
-
-    /**
-     * Brotli encoder settings.
-     */
-    public static final class Parameters {
-        private int quality = -1;
-        private int lgwin = -1;
-        private Mode mode;
-
-        public Parameters() {
-        }
-
-        private Parameters(Parameters other) {
-            this.quality = other.quality;
-            this.lgwin = other.lgwin;
-            this.mode = other.mode;
-        }
-
-        /**
-         * @param quality compression quality, or -1 for default
-         */
-        public Parameters setQuality(int quality) {
-            if (quality < -1 || quality > 11) {
-                throw new IllegalArgumentException("quality should be in range [0, 11], or -1");
-            }
-            this.quality = quality;
-            return this;
-        }
-
-        /**
-         * @param lgwin log2(LZ window size), or -1 for default
-         */
-        public Parameters setWindow(int lgwin) {
-            if ((lgwin != -1) && ((lgwin < 10) || (lgwin > 24))) {
-                throw new IllegalArgumentException("lgwin should be in range [10, 24], or -1");
-            }
-            this.lgwin = lgwin;
-            return this;
-        }
-
-        /**
-         * @param mode compression mode, or {@code null} for default
-         */
-        public Parameters setMode(Mode mode) {
-            this.mode = mode;
-            return this;
-        }
-    }
+    private ByteBuffer buffer;
 
     /**
      * Creates a Encoder wrapper.
@@ -135,6 +60,114 @@ public class Encoder {
         this.destination = destination;
         this.encoder = new EncoderJNI.Wrapper(inputBufferSize, params.quality, params.lgwin, params.mode);
         this.inputBuffer = this.encoder.getInputBuffer();
+    }
+
+    /**
+     * Encodes the given {@link ByteBuffer}
+     *
+     * @param src    {@link ByteBuffer} source
+     * @param dst    {@link ByteBuffer} destination
+     * @throws IOException Thrown in case of error during encoding
+     */
+    public static void compress(ByteBuffer src, ByteBuffer dst) throws IOException {
+        compress(src, dst, Parameters.DEFAULT);
+    }
+
+    /**
+     * Encodes the given {@link ByteBuffer}
+     *
+     * @param src    {@link ByteBuffer} source
+     * @param dst    {@link ByteBuffer} destination
+     * @param params {@link Parameters} instance
+     * @throws IOException Thrown in case of error during encoding
+     */
+    public static void compress(ByteBuffer src, ByteBuffer dst, Parameters params) throws IOException {
+        int size = src.remaining();
+        if (!src.hasRemaining()) {
+            return;
+        }
+
+        EncoderJNI.Wrapper encoder = new EncoderJNI.Wrapper(size, params.quality, params.lgwin, params.mode);
+        try {
+            encoder.getInputBuffer().put(src);
+            encoder.push(EncoderJNI.Operation.PROCESS, size);
+            while (true) {
+                if (!encoder.isSuccess()) {
+                    throw new IOException("encoding failed");
+                } else if (encoder.hasMoreOutput()) {
+                    ByteBuffer buffer = encoder.pull();
+                    dst.put(buffer);
+                    dst.flip();
+                } else if (!encoder.isFinished()) {
+                    encoder.push(EncoderJNI.Operation.FINISH, 0);
+                } else {
+                    break;
+                }
+            }
+        } finally {
+            encoder.destroy();
+        }
+    }
+
+    /**
+     * Encodes the given data buffer.
+     */
+    public static byte[] compress(byte[] data, Parameters params) throws IOException {
+        if (data.length == 0) {
+            byte[] empty = new byte[1];
+            empty[0] = 6;
+            return empty;
+        }
+        /* data.length > 0 */
+        EncoderJNI.Wrapper encoder = new EncoderJNI.Wrapper(data.length, params.quality, params.lgwin, params.mode);
+        ArrayList<byte[]> output = new ArrayList<byte[]>();
+        int totalOutputSize = 0;
+        try {
+            encoder.getInputBuffer().put(data);
+            encoder.push(EncoderJNI.Operation.FINISH, data.length);
+            while (true) {
+                if (!encoder.isSuccess()) {
+                    throw new IOException("encoding failed");
+                } else if (encoder.hasMoreOutput()) {
+                    ByteBuffer buffer = encoder.pull();
+                    byte[] chunk = new byte[buffer.remaining()];
+                    buffer.get(chunk);
+                    output.add(chunk);
+                    totalOutputSize += chunk.length;
+                } else if (!encoder.isFinished()) {
+                    encoder.push(EncoderJNI.Operation.FINISH, 0);
+                } else {
+                    break;
+                }
+            }
+        } finally {
+            encoder.destroy();
+        }
+        if (output.size() == 1) {
+            return output.get(0);
+        }
+        byte[] result = new byte[totalOutputSize];
+        int offset = 0;
+        for (byte[] chunk : output) {
+            System.arraycopy(chunk, 0, result, offset, chunk.length);
+            offset += chunk.length;
+        }
+        return result;
+    }
+
+    public static byte[] compress(byte[] data) throws IOException {
+        return compress(data, Parameters.DEFAULT);
+    }
+
+    /**
+     * Prepares raw or serialized dictionary for being used by encoder.
+     *
+     * @param dictionary           raw / serialized dictionary data; MUST be direct
+     * @param sharedDictionaryType dictionary data type
+     */
+    public static PreparedDictionary prepareDictionary(ByteBuffer dictionary,
+                                                       int sharedDictionaryType) {
+        return EncoderJNI.prepareDictionary(dictionary, sharedDictionaryType);
     }
 
     private void fail(String message) throws IOException {
@@ -220,63 +253,79 @@ public class Encoder {
     }
 
     /**
-     * Encodes the given data buffer.
+     * https://www.brotli.org/encode.html#aa6f
+     * See encode.h, typedef enum BrotliEncoderMode
+     *
+     * <strong>Important</strong>: The ordinal value of the
+     * modes should be the same as the constant values in encode.h
      */
-    public static byte[] compress(byte[] data, Parameters params) throws IOException {
-        if (data.length == 0) {
-            byte[] empty = new byte[1];
-            empty[0] = 6;
-            return empty;
-        }
-        /* data.length > 0 */
-        EncoderJNI.Wrapper encoder = new EncoderJNI.Wrapper(data.length, params.quality, params.lgwin, params.mode);
-        ArrayList<byte[]> output = new ArrayList<byte[]>();
-        int totalOutputSize = 0;
-        try {
-            encoder.getInputBuffer().put(data);
-            encoder.push(EncoderJNI.Operation.FINISH, data.length);
-            while (true) {
-                if (!encoder.isSuccess()) {
-                    throw new IOException("encoding failed");
-                } else if (encoder.hasMoreOutput()) {
-                    ByteBuffer buffer = encoder.pull();
-                    byte[] chunk = new byte[buffer.remaining()];
-                    buffer.get(chunk);
-                    output.add(chunk);
-                    totalOutputSize += chunk.length;
-                } else if (!encoder.isFinished()) {
-                    encoder.push(EncoderJNI.Operation.FINISH, 0);
-                } else {
-                    break;
-                }
-            }
-        } finally {
-            encoder.destroy();
-        }
-        if (output.size() == 1) {
-            return output.get(0);
-        }
-        byte[] result = new byte[totalOutputSize];
-        int offset = 0;
-        for (byte[] chunk : output) {
-            System.arraycopy(chunk, 0, result, offset, chunk.length);
-            offset += chunk.length;
-        }
-        return result;
-    }
+    public enum Mode {
+        /**
+         * Default compression mode.
+         * In this mode compressor does not know anything in advance about the properties of the input.
+         */
+        GENERIC,
+        /**
+         * Compression mode for UTF-8 formatted text input.
+         */
+        TEXT,
+        /**
+         * Compression mode used in WOFF 2.0.
+         */
+        FONT;
 
-    public static byte[] compress(byte[] data) throws IOException {
-        return compress(data, new Parameters());
+        public static Mode of(int value) {
+            return values()[value];
+        }
     }
 
     /**
-     * Prepares raw or serialized dictionary for being used by encoder.
-     *
-     * @param dictionary           raw / serialized dictionary data; MUST be direct
-     * @param sharedDictionaryType dictionary data type
+     * Brotli encoder settings.
      */
-    public static PreparedDictionary prepareDictionary(ByteBuffer dictionary,
-                                                       int sharedDictionaryType) {
-        return EncoderJNI.prepareDictionary(dictionary, sharedDictionaryType);
+    public static final class Parameters {
+        public static final Parameters DEFAULT = new Parameters();
+
+        private int quality = -1;
+        private int lgwin = -1;
+        private Mode mode;
+
+        public Parameters() {
+        }
+
+        private Parameters(Parameters other) {
+            this.quality = other.quality;
+            this.lgwin = other.lgwin;
+            this.mode = other.mode;
+        }
+
+        /**
+         * @param quality compression quality, or -1 for default
+         */
+        public Parameters setQuality(int quality) {
+            if (quality < -1 || quality > 11) {
+                throw new IllegalArgumentException("quality should be in range [0, 11], or -1");
+            }
+            this.quality = quality;
+            return this;
+        }
+
+        /**
+         * @param lgwin log2(LZ window size), or -1 for default
+         */
+        public Parameters setWindow(int lgwin) {
+            if ((lgwin != -1) && ((lgwin < 10) || (lgwin > 24))) {
+                throw new IllegalArgumentException("lgwin should be in range [10, 24], or -1");
+            }
+            this.lgwin = lgwin;
+            return this;
+        }
+
+        /**
+         * @param mode compression mode, or {@code null} for default
+         */
+        public Parameters setMode(Mode mode) {
+            this.mode = mode;
+            return this;
+        }
     }
 }
