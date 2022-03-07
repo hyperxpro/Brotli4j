@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class DecoderTest {
 
     private static final byte[] COMPRESSED_DATA = new byte[]{-117, 1, -128, 77, 101, 111, 119, 3};
-    private static final int ORIGINAL_DATA_LENGTH = 4;
+    private static final int ORIGINAL_DATA_LENGTH = 4; // 'Meow' length
 
     @BeforeAll
     static void load() {
@@ -61,16 +61,12 @@ class DecoderTest {
     }
 
     @Test
-    void decompressKnownLengthDataTooBig() throws IOException {
-        assertThrows(IllegalArgumentException.class, () -> {
-                        Decoder.decompressKnownLength(COMPRESSED_DATA, ORIGINAL_DATA_LENGTH - 1);
-                    });
+    void decompressKnownLengthDataTooBig() {
+        assertThrows(IllegalArgumentException.class, () -> Decoder.decompressKnownLength(COMPRESSED_DATA, ORIGINAL_DATA_LENGTH - 1));
     }
 
     @Test
-    void decompressKnownLengthDataTooSmall() throws IOException {
-        assertThrows(IllegalArgumentException.class, () -> {
-                         Decoder.decompressKnownLength(COMPRESSED_DATA, ORIGINAL_DATA_LENGTH + 1);
-                     });
+    void decompressKnownLengthDataTooSmall() {
+        assertThrows(IllegalArgumentException.class, () -> Decoder.decompressKnownLength(COMPRESSED_DATA, ORIGINAL_DATA_LENGTH + 1));
     }
 }

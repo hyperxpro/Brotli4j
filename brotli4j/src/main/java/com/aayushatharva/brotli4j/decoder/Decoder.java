@@ -150,7 +150,7 @@ public class Decoder {
                     buffer.get(output, outputRead, readLen);
                     outputRead += readLen;
                     if (buffer.remaining() > 0 && outputRead == decompressedLength) {
-                        throw new IllegalArgumentException("Output length exceeded expected.");
+                        throw new IllegalArgumentException("Output length has exceeded expected length");
                     }
                     break;
 
@@ -171,7 +171,7 @@ public class Decoder {
             decoder.destroy();
         }
         if (outputRead < decompressedLength) {
-            throw new IllegalArgumentException("Output length less than expected.");
+            throw new IllegalArgumentException("Output length has less than expected length");
         }
         return new DirectDecompress(decoder.getStatus(), output);
     }
