@@ -89,7 +89,10 @@ public class Encoder {
     @Local
     public static void compress(ByteBuffer src, ByteBuffer dst, Parameters params) throws IOException {
         int size = src.remaining();
+        int dstPosition = dst.position();
+        int dstRemaining = dst.remaining();
         if (!src.hasRemaining()) {
+            dst.put((byte) 6);
             return;
         }
 
@@ -103,7 +106,6 @@ public class Encoder {
                 } else if (encoder.hasMoreOutput()) {
                     ByteBuffer buffer = encoder.pull();
                     dst.put(buffer);
-                    dst.flip();
                 } else if (!encoder.isFinished()) {
                     encoder.push(EncoderJNI.Operation.FINISH, 0);
                 } else {
@@ -112,6 +114,11 @@ public class Encoder {
             }
         } finally {
             encoder.destroy();
+
+            // Only flip when position is changed
+            if (dstPosition != dst.position()) {
+                dst.flip();
+            }
         }
     }
 
