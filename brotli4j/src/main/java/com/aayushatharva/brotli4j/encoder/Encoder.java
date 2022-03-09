@@ -1,6 +1,6 @@
 /*
  * This file is part of Brotli4j.
- * Copyright (c) 2020-2021 Aayush Atharva
+ * Copyright (c) 2020-2022 Aayush Atharva
  *
  * Brotli4j is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,8 +20,10 @@
    Distributed under MIT license.
    See file LICENSE for detail or copy at https://opensource.org/licenses/MIT
 */
-
 package com.aayushatharva.brotli4j.encoder;
+
+import com.aayushatharva.brotli4j.common.annotations.Local;
+import com.aayushatharva.brotli4j.common.annotations.Upstream;
 
 import java.io.IOException;
 import java.nio.Buffer;
@@ -33,6 +35,8 @@ import java.util.List;
 /**
  * Base class for OutputStream / Channel implementations.
  */
+@Upstream
+@Local
 public class Encoder {
     final ByteBuffer inputBuffer;
     private final WritableByteChannel destination;
@@ -69,6 +73,7 @@ public class Encoder {
      * @param dst    {@link ByteBuffer} destination
      * @throws IOException Thrown in case of error during encoding
      */
+    @Local
     public static void compress(ByteBuffer src, ByteBuffer dst) throws IOException {
         compress(src, dst, Parameters.DEFAULT);
     }
@@ -81,6 +86,7 @@ public class Encoder {
      * @param params {@link Parameters} instance
      * @throws IOException Thrown in case of error during encoding
      */
+    @Local
     public static void compress(ByteBuffer src, ByteBuffer dst, Parameters params) throws IOException {
         int size = src.remaining();
         if (!src.hasRemaining()) {
@@ -155,6 +161,7 @@ public class Encoder {
         return result;
     }
 
+    @Local
     public static byte[] compress(byte[] data) throws IOException {
         return compress(data, Parameters.DEFAULT);
     }
@@ -282,6 +289,8 @@ public class Encoder {
     /**
      * Brotli encoder settings.
      */
+    @Upstream
+    @Local
     public static final class Parameters {
         public static final Parameters DEFAULT = new Parameters();
 
