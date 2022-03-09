@@ -90,7 +90,6 @@ public class Encoder {
     public static void compress(ByteBuffer src, ByteBuffer dst, Parameters params) throws IOException {
         int size = src.remaining();
         int dstPosition = dst.position();
-        int dstRemaining = dst.remaining();
         if (!src.hasRemaining()) {
             dst.put((byte) 6);
             return;
