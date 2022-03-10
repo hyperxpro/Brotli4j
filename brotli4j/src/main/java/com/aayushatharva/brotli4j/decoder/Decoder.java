@@ -66,6 +66,52 @@ public class Decoder {
      * Decodes the given data buffer.
      */
     @Local
+    public static DirectDecompress decompress(ByteBuffer compressed, ByteBuffer decompressed) throws IOException {
+        int compressedRemaining = compressed.remaining();
+        int decompressedPosition = decompressed.position();
+        DecoderJNI.Wrapper decoder = new DecoderJNI.Wrapper(compressedRemaining);
+        try {
+            decoder.getInputBuffer().put(compressed);
+            decoder.push(compressedRemaining);
+            while (decoder.getStatus() != DecoderJNI.Status.DONE) {
+                switch (decoder.getStatus()) {
+                    case OK:
+                        decoder.push(0);
+                        break;
+
+                    case NEEDS_MORE_OUTPUT:
+                        ByteBuffer buffer = decoder.pull();
+                        decompressed.put(buffer);
+                        break;
+
+                    case NEEDS_MORE_INPUT:
+                        // Give decoder a chance to process the remaining of the buffered byte.
+                        decoder.push(0);
+                        // If decoder still needs input, this means that stream is truncated.
+                        if (decoder.getStatus() == DecoderJNI.Status.NEEDS_MORE_INPUT) {
+                            return new DirectDecompress(decoder.getStatus(), null, null);
+                        }
+                        break;
+
+                    default:
+                        return new DirectDecompress(decoder.getStatus(), null, null);
+                }
+            }
+        } finally {
+            decoder.destroy();
+
+            // Only flip when position is changed
+            if (decompressedPosition != decompressed.position()) {
+                decompressed.flip();
+            }
+        }
+        return new DirectDecompress(decoder.getStatus(), null, decompressed);
+    }
+
+    /**
+     * Decodes the given data buffer.
+     */
+    @Local
     public static DirectDecompress decompress(byte[] data) throws IOException {
         DecoderJNI.Wrapper decoder = new DecoderJNI.Wrapper(data.length);
         ArrayList<byte[]> output = new ArrayList<>();
@@ -92,19 +138,19 @@ public class Decoder {
                         decoder.push(0);
                         // If decoder still needs input, this means that stream is truncated.
                         if (decoder.getStatus() == DecoderJNI.Status.NEEDS_MORE_INPUT) {
-                            return new DirectDecompress(decoder.getStatus(), null);
+                            return new DirectDecompress(decoder.getStatus(), null, null);
                         }
                         break;
 
                     default:
-                        return new DirectDecompress(decoder.getStatus(), null);
+                        return new DirectDecompress(decoder.getStatus(), null, null);
                 }
             }
         } finally {
             decoder.destroy();
         }
         if (output.size() == 1) {
-            return new DirectDecompress(decoder.getStatus(), output.get(0));
+            return new DirectDecompress(decoder.getStatus(), output.get(0), null);
         }
         byte[] result = new byte[totalOutputSize];
         int offset = 0;
@@ -112,7 +158,7 @@ public class Decoder {
             System.arraycopy(chunk, 0, result, offset, chunk.length);
             offset += chunk.length;
         }
-        return new DirectDecompress(decoder.getStatus(), result);
+        return new DirectDecompress(decoder.getStatus(), result, null);
     }
 
     private void fail(String message) throws IOException {

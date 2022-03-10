@@ -20,6 +20,7 @@ package com.aayushatharva.brotli4j.decoder;
 import com.aayushatharva.brotli4j.common.annotations.Local;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 /**
  * Directly decompresses data using {@link Decoder#decompress(byte[])}
@@ -27,11 +28,13 @@ import java.io.IOException;
 @Local
 public final class DirectDecompress {
     private final DecoderJNI.Status resultStatus;
-    private final byte[] decompressedData;
+    private byte[] decompressedData;
+    private ByteBuffer byteBuffer;
 
-    DirectDecompress(DecoderJNI.Status resultStatus, byte[] decompressedData) {
+    DirectDecompress(DecoderJNI.Status resultStatus, byte[] decompressedData, ByteBuffer byteBuffer) {
         this.resultStatus = resultStatus;
         this.decompressedData = decompressedData;
+        this.byteBuffer = byteBuffer;
     }
 
     /**
@@ -60,6 +63,25 @@ public final class DirectDecompress {
      * @return {@code byte} array if decompression was successful else {@code null}
      */
     public byte[] getDecompressedData() {
+        // If byte array is null but bytebuffer is not null
+        // then convert bytebuffer to byte array and return.
+        if (decompressedData == null && byteBuffer != null) {
+            byte[] data = new byte[byteBuffer.remaining()];
+            byteBuffer.get(data);
+            this.decompressedData = data;
+        }
         return decompressedData;
+    }
+
+    /**
+     * Get decompressed data.
+     *
+     * @return {@link ByteBuffer} if decompression was successful else {@code null}
+     */
+    public ByteBuffer getDecompressedDataByteBuffer() {
+        if (byteBuffer == null && decompressedData != null) {
+            this.byteBuffer = ByteBuffer.wrap(decompressedData);
+        }
+        return byteBuffer;
     }
 }

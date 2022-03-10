@@ -21,6 +21,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -36,6 +37,16 @@ class DecoderTest {
     @Test
     void decompress() throws IOException {
         DirectDecompress directDecompress = Decoder.decompress(compressedData);
+        assertEquals(DecoderJNI.Status.DONE, directDecompress.getResultStatus());
+        assertEquals("Meow", new String(directDecompress.getDecompressedData()));
+    }
+
+    @Test
+    void decompressWithByteBuffer() throws IOException {
+        ByteBuffer src = ByteBuffer.wrap(compressedData);
+        ByteBuffer dst = ByteBuffer.allocateDirect(16);
+
+        DirectDecompress directDecompress = Decoder.decompress(src, dst);
         assertEquals(DecoderJNI.Status.DONE, directDecompress.getResultStatus());
         assertEquals("Meow", new String(directDecompress.getDecompressedData()));
     }
