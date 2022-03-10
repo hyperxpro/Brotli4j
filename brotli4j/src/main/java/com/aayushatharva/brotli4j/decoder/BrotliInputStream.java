@@ -1,6 +1,6 @@
 /*
  * This file is part of Brotli4j.
- * Copyright (c) 2020-2021 Aayush Atharva
+ * Copyright (c) 2020-2022 Aayush Atharva
  *
  * Brotli4j is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,8 @@
 */
 package com.aayushatharva.brotli4j.decoder;
 
+import com.aayushatharva.brotli4j.common.annotations.Upstream;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -30,6 +32,7 @@ import java.nio.channels.Channels;
 /**
  * InputStream that wraps native brotli decoder.
  */
+@Upstream
 public class BrotliInputStream extends InputStream {
     /**
      * The default internal buffer size used by the decoder.

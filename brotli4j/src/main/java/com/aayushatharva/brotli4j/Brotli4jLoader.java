@@ -16,6 +16,8 @@
  */
 package com.aayushatharva.brotli4j;
 
+import com.aayushatharva.brotli4j.common.annotations.Local;
+
 import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -24,6 +26,7 @@ import java.nio.file.StandardCopyOption;
 /**
  * Loads Brotli Native Library
  */
+@Local
 public class Brotli4jLoader {
 
     private static final Throwable UNAVAILABILITY_CAUSE;

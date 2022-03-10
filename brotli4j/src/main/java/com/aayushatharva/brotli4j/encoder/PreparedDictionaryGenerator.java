@@ -1,6 +1,6 @@
 /*
  * This file is part of Brotli4j.
- * Copyright (c) 2020-2021 Aayush Atharva
+ * Copyright (c) 2020-2022 Aayush Atharva
  *
  * Brotli4j is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,8 @@
 */
 package com.aayushatharva.brotli4j.encoder;
 
+import com.aayushatharva.brotli4j.common.annotations.Upstream;
+
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -31,6 +33,7 @@ import java.nio.ShortBuffer;
 /**
  * Java prepared (raw) dictionary producer.
  */
+@Upstream
 public class PreparedDictionaryGenerator {
 
     private static final int MAGIC = 0xDEBCEDE0;

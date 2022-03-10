@@ -1,6 +1,6 @@
 /*
  * This file is part of Brotli4j.
- * Copyright (c) 2020-2021 Aayush Atharva
+ * Copyright (c) 2020-2022 Aayush Atharva
  *
  * Brotli4j is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,8 +20,9 @@
    Distributed under MIT license.
    See file LICENSE for detail or copy at https://opensource.org/licenses/MIT
 */
-
 package com.aayushatharva.brotli4j.encoder;
+
+import com.aayushatharva.brotli4j.common.annotations.Upstream;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -29,6 +30,7 @@ import java.nio.ByteBuffer;
 /**
  * JNI wrapper for brotli encoder.
  */
+@Upstream
 class EncoderJNI {
     private static native ByteBuffer nativeCreate(long[] context);
 
