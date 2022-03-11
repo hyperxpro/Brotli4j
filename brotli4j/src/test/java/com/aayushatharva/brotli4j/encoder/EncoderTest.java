@@ -84,8 +84,8 @@ class EncoderTest {
 
     @Test
     void doesNotThrowExceptionOnHeapBuffer() {
-        ByteBuffer src = ByteBuffer.allocateDirect(0);
-        ByteBuffer dst = ByteBuffer.allocateDirect(0);
+        ByteBuffer src = ByteBuffer.allocateDirect(1);
+        ByteBuffer dst = ByteBuffer.allocateDirect(1);
 
         Assertions.assertDoesNotThrow(() -> Encoder.compress(src, dst));
     }
