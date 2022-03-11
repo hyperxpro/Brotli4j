@@ -17,6 +17,7 @@
 package com.aayushatharva.brotli4j.encoder;
 
 import com.aayushatharva.brotli4j.Brotli4jLoader;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -71,5 +72,21 @@ class EncoderTest {
 
         final byte[] compressedFont = Encoder.compress(text, parameters.setMode(Encoder.Mode.FONT));
         assertEquals(31, compressedFont.length);
+    }
+
+    @Test
+    void throwExceptionOnHeapBuffer() {
+        ByteBuffer src = ByteBuffer.allocate(0);
+        ByteBuffer dst = ByteBuffer.allocate(0);
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> Encoder.compress(src, dst));
+    }
+
+    @Test
+    void doesNotThrowExceptionOnHeapBuffer() {
+        ByteBuffer src = ByteBuffer.allocateDirect(0);
+        ByteBuffer dst = ByteBuffer.allocateDirect(0);
+
+        Assertions.assertDoesNotThrow(() -> Encoder.compress(src, dst));
     }
 }

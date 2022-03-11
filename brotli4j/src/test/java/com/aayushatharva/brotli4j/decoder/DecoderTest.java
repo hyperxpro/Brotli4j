@@ -17,6 +17,8 @@
 package com.aayushatharva.brotli4j.decoder;
 
 import com.aayushatharva.brotli4j.Brotli4jLoader;
+import com.aayushatharva.brotli4j.encoder.Encoder;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -49,5 +51,21 @@ class DecoderTest {
         DirectDecompress directDecompress = Decoder.decompress(src, dst);
         assertEquals(DecoderJNI.Status.DONE, directDecompress.getResultStatus());
         assertEquals("Meow", new String(directDecompress.getDecompressedData()));
+    }
+
+    @Test
+    void throwExceptionOnHeapBuffer() {
+        ByteBuffer src = ByteBuffer.allocate(0);
+        ByteBuffer dst = ByteBuffer.allocate(0);
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> Decoder.decompress(src, dst));
+    }
+
+    @Test
+    void doesNotThrowExceptionOnHeapBuffer() {
+        ByteBuffer src = ByteBuffer.allocateDirect(0);
+        ByteBuffer dst = ByteBuffer.allocateDirect(0);
+
+        Assertions.assertDoesNotThrow(() -> Decoder.decompress(src, dst));
     }
 }

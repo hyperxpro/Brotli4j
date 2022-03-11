@@ -88,6 +88,14 @@ public class Encoder {
      */
     @Local
     public static void compress(ByteBuffer src, ByteBuffer dst, Parameters params) throws IOException {
+        if (!src.isDirect()) {
+            throw new IllegalArgumentException("Source ByteBuffer must be direct");
+        }
+
+        if (!dst.isDirect()) {
+            throw new IllegalArgumentException("Destination ByteBuffer must be direct");
+        }
+
         int size = src.remaining();
         int dstPosition = dst.position();
         if (!src.hasRemaining()) {

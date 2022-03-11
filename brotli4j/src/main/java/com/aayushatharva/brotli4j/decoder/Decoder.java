@@ -67,6 +67,14 @@ public class Decoder {
      */
     @Local
     public static DirectDecompress decompress(ByteBuffer compressed, ByteBuffer decompressed) throws IOException {
+        if (!compressed.isDirect()) {
+            throw new IllegalArgumentException("Compressed ByteBuffer must be direct");
+        }
+
+        if (!decompressed.isDirect()) {
+            throw new IllegalArgumentException("Decompressed ByteBuffer must be direct");
+        }
+
         int compressedRemaining = compressed.remaining();
         int decompressedPosition = decompressed.position();
         DecoderJNI.Wrapper decoder = new DecoderJNI.Wrapper(compressedRemaining);
