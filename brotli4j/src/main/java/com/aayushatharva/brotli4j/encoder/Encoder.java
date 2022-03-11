@@ -67,62 +67,12 @@ public class Encoder {
     }
 
     /**
-     * Encodes the given {@link ByteBuffer}
-     *
-     * @param src    {@link ByteBuffer} source
-     * @param dst    {@link ByteBuffer} destination
-     * @throws IOException Thrown in case of error during encoding
-     */
-    @Local
-    public static void compress(ByteBuffer src, ByteBuffer dst) throws IOException {
-        compress(src, dst, Parameters.DEFAULT);
-    }
-
-    /**
-     * Encodes the given {@link ByteBuffer}
-     *
-     * @param src    {@link ByteBuffer} source
-     * @param dst    {@link ByteBuffer} destination
-     * @param params {@link Parameters} instance
-     * @throws IOException Thrown in case of error during encoding
-     */
-    @Local
-    public static void compress(ByteBuffer src, ByteBuffer dst, Parameters params) throws IOException {
-        int size = src.remaining();
-        int dstPosition = dst.position();
-        if (!src.hasRemaining()) {
-            dst.put((byte) 6);
-            return;
-        }
-
-        EncoderJNI.Wrapper encoder = new EncoderJNI.Wrapper(size, params.quality, params.lgwin, params.mode);
-        try {
-            encoder.getInputBuffer().put(src);
-            encoder.push(EncoderJNI.Operation.PROCESS, size);
-            while (true) {
-                if (!encoder.isSuccess()) {
-                    throw new IOException("encoding failed");
-                } else if (encoder.hasMoreOutput()) {
-                    ByteBuffer buffer = encoder.pull();
-                    dst.put(buffer);
-                } else if (!encoder.isFinished()) {
-                    encoder.push(EncoderJNI.Operation.FINISH, 0);
-                } else {
-                    break;
-                }
-            }
-        } finally {
-            encoder.destroy();
-
-            // Only flip when position is changed
-            if (dstPosition != dst.position()) {
-                dst.flip();
-            }
-        }
-    }
-
-    /**
      * Encodes the given data buffer.
+     *
+     * @param data   byte array to be compressed
+     * @param params {@link Parameters} instance
+     * @return compressed byte array
+     * @throws IOException If any failure during encoding
      */
     public static byte[] compress(byte[] data, Parameters params) throws IOException {
         if (data.length == 0) {
@@ -177,6 +127,7 @@ public class Encoder {
      *
      * @param dictionary           raw / serialized dictionary data; MUST be direct
      * @param sharedDictionaryType dictionary data type
+     * @return {@link PreparedDictionary} instance
      */
     public static PreparedDictionary prepareDictionary(ByteBuffer dictionary,
                                                        int sharedDictionaryType) {
@@ -315,6 +266,7 @@ public class Encoder {
 
         /**
          * @param quality compression quality, or -1 for default
+         * @return this instance
          */
         public Parameters setQuality(int quality) {
             if (quality < -1 || quality > 11) {
@@ -326,6 +278,7 @@ public class Encoder {
 
         /**
          * @param lgwin log2(LZ window size), or -1 for default
+         * @return this instance
          */
         public Parameters setWindow(int lgwin) {
             if ((lgwin != -1) && ((lgwin < 10) || (lgwin > 24))) {
@@ -337,10 +290,23 @@ public class Encoder {
 
         /**
          * @param mode compression mode, or {@code null} for default
+         * @return this instance
          */
         public Parameters setMode(Mode mode) {
             this.mode = mode;
             return this;
+        }
+
+        public int quality() {
+            return quality;
+        }
+
+        public int lgwin() {
+            return lgwin;
+        }
+
+        public Mode mode() {
+            return mode;
         }
     }
 }

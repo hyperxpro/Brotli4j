@@ -17,12 +17,13 @@
 package com.aayushatharva.brotli4j.encoder;
 
 import com.aayushatharva.brotli4j.Brotli4jLoader;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
+import io.netty.buffer.Unpooled;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -48,14 +49,11 @@ class EncoderTest {
 
     @Test
     void compressWithQualityAndByteBuffer() throws IOException {
-        ByteBuffer src = ByteBuffer.wrap("Meow".getBytes(StandardCharsets.UTF_8));
-        ByteBuffer dst = ByteBuffer.allocate(16);
-        Encoder.compress(src, dst, new Encoder.Parameters());
+        ByteBuf src = Unpooled.wrappedBuffer("Meow".getBytes());
+        ByteBuf dst = Unpooled.directBuffer();
+        Encoders.compress(src, dst);
 
-        byte[] arr = new byte[dst.remaining()];
-        dst.get(arr);
-
-        assertArrayEquals(compressedData, arr);
+        assertArrayEquals(compressedData, ByteBufUtil.getBytes(dst));
     }
 
     @Test

@@ -24,6 +24,7 @@ package com.aayushatharva.brotli4j.decoder;
 
 import com.aayushatharva.brotli4j.common.annotations.Local;
 import com.aayushatharva.brotli4j.common.annotations.Upstream;
+import io.netty.buffer.ByteBuf;
 
 import java.io.IOException;
 import java.nio.Buffer;
@@ -49,6 +50,7 @@ public class Decoder {
      *
      * @param source          underlying source
      * @param inputBufferSize read buffer size
+     * @throws IOException If any failure during initialization
      */
     public Decoder(ReadableByteChannel source, int inputBufferSize)
             throws IOException {
@@ -64,52 +66,10 @@ public class Decoder {
 
     /**
      * Decodes the given data buffer.
-     */
-    @Local
-    public static DirectDecompress decompress(ByteBuffer compressed, ByteBuffer decompressed) throws IOException {
-        int compressedRemaining = compressed.remaining();
-        int decompressedPosition = decompressed.position();
-        DecoderJNI.Wrapper decoder = new DecoderJNI.Wrapper(compressedRemaining);
-        try {
-            decoder.getInputBuffer().put(compressed);
-            decoder.push(compressedRemaining);
-            while (decoder.getStatus() != DecoderJNI.Status.DONE) {
-                switch (decoder.getStatus()) {
-                    case OK:
-                        decoder.push(0);
-                        break;
-
-                    case NEEDS_MORE_OUTPUT:
-                        ByteBuffer buffer = decoder.pull();
-                        decompressed.put(buffer);
-                        break;
-
-                    case NEEDS_MORE_INPUT:
-                        // Give decoder a chance to process the remaining of the buffered byte.
-                        decoder.push(0);
-                        // If decoder still needs input, this means that stream is truncated.
-                        if (decoder.getStatus() == DecoderJNI.Status.NEEDS_MORE_INPUT) {
-                            return new DirectDecompress(decoder.getStatus(), null, null);
-                        }
-                        break;
-
-                    default:
-                        return new DirectDecompress(decoder.getStatus(), null, null);
-                }
-            }
-        } finally {
-            decoder.destroy();
-
-            // Only flip when position is changed
-            if (decompressedPosition != decompressed.position()) {
-                decompressed.flip();
-            }
-        }
-        return new DirectDecompress(decoder.getStatus(), null, decompressed);
-    }
-
-    /**
-     * Decodes the given data buffer.
+     *
+     * @param data byte array of data to be decoded
+     * @return {@link DirectDecompress} instance
+     * @throws IOException If an error occurs during decoding
      */
     @Local
     public static DirectDecompress decompress(byte[] data) throws IOException {

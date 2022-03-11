@@ -17,13 +17,14 @@
 package com.aayushatharva.brotli4j.decoder;
 
 import com.aayushatharva.brotli4j.Brotli4jLoader;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class DecoderTest {
 
@@ -43,10 +44,10 @@ class DecoderTest {
 
     @Test
     void decompressWithByteBuffer() throws IOException {
-        ByteBuffer src = ByteBuffer.wrap(compressedData);
-        ByteBuffer dst = ByteBuffer.allocateDirect(16);
+        ByteBuf src = Unpooled.wrappedBuffer(compressedData);
+        ByteBuf dst = Unpooled.directBuffer();
 
-        DirectDecompress directDecompress = Decoder.decompress(src, dst);
+        DirectDecompress directDecompress = Decoders.decompress(src, dst);
         assertEquals(DecoderJNI.Status.DONE, directDecompress.getResultStatus());
         assertEquals("Meow", new String(directDecompress.getDecompressedData()));
     }
