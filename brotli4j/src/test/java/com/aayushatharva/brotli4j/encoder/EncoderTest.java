@@ -50,7 +50,7 @@ class EncoderTest {
     @Test
     void compressWithQualityAndByteBuffer() throws IOException {
         ByteBuffer src = ByteBuffer.wrap("Meow".getBytes(StandardCharsets.UTF_8));
-        ByteBuffer dst = ByteBuffer.allocate(16);
+        ByteBuffer dst = ByteBuffer.allocateDirect(16);
         Encoder.compress(src, dst, new Encoder.Parameters());
 
         byte[] arr = new byte[dst.remaining()];
