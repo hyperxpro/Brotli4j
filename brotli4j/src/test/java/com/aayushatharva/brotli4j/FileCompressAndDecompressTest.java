@@ -44,7 +44,7 @@ class FileCompressAndDecompressTest {
     }
 
     @Test
-    void bigFileCompressionAndDecompressionTest() {
+    void bigFileCompressionAndDecompressionTest() throws IOException {
         String fileName = "sample_data.txt";
 
         try (InputStream in = getClass().getClassLoader().getResourceAsStream(fileName)) {
@@ -69,8 +69,6 @@ class FileCompressAndDecompressTest {
             Decoders.decompress(compressedData, uncompressedResultData);
 
             assertArrayEquals(data, ByteBufUtil.getBytes(uncompressedResultData));
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
         }
     }
 
