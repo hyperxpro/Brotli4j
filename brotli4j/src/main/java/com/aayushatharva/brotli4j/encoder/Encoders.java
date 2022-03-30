@@ -27,7 +27,10 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 /**
- * Multiple encoding methods
+ * Multiple encoding methods using Netty Buffer
+ * Make sure to add it as dependency before using this class
+ * </p>
+ * @see <a href="https://search.maven.org/artifact/io.netty/netty-buffer/">Netty Buffer</a>
  */
 @Local
 public final class Encoders {
