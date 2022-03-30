@@ -53,8 +53,8 @@ class FileCompressAndDecompressTest {
                     .lines()
                     .collect(Collectors.joining("\n"));
 
-            // Amplify the data 1024 times
-            int amplification = 1024;
+            // Amplify the data 1536 times
+            int amplification = 1536;
             StringBuilder sb = new StringBuilder(result.length() * amplification);
             for (int i = 0; i < amplification; i++) {
                 sb.append(result);

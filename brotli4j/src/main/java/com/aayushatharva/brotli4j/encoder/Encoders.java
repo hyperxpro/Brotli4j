@@ -109,7 +109,7 @@ public final class Encoders {
     }
 
     /**
-     * Encodes the given {@link ByteBuffer}
+     * Encodes the given {@link ByteBuf}
      *
      * @param src    {@link ByteBuffer} source
      * @param dst    {@link ByteBuffer} destination
