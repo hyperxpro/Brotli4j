@@ -10,7 +10,7 @@ import java.nio.ByteBuffer;
 /**
  * Multiple decoding methods using Netty Buffer.
  * Make sure to add it as dependency before using this class
- * </p>
+ *
  * @see <a href="https://search.maven.org/artifact/io.netty/netty-buffer/">Netty Buffer</a>
  */
 @Local
