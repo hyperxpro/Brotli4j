@@ -54,7 +54,6 @@ public final class Decoders {
         try {
             decoder.getInputBuffer().put(compressed.nioBuffer());
             decoder.push(compressedBytes);
-            int a = 0;
             while (decoder.getStatus() != DecoderJNI.Status.DONE) {
                 switch (decoder.getStatus()) {
                     case OK:
@@ -63,7 +62,6 @@ public final class Decoders {
 
                     case NEEDS_MORE_OUTPUT:
                         ByteBuffer buffer = decoder.pull();
-                        System.out.println("D: " + a++);
                         decompressed.writeBytes(buffer);
                         break;
 

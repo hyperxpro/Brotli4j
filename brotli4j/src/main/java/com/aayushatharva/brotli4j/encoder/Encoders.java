@@ -127,13 +127,11 @@ public final class Encoders {
         try {
             encoder.getInputBuffer().put(src.nioBuffer());
             encoder.push(EncoderJNI.Operation.PROCESS, readableBytes);
-            int a = 0;
             while (true) {
                 if (!encoder.isSuccess()) {
                     throw new IOException("encoding failed");
                 } else if (encoder.hasMoreOutput()) {
                     ByteBuffer buffer = encoder.pull();
-                    System.out.println("E: " + a++);
                     dst.writeBytes(buffer);
                 } else if (!encoder.isFinished()) {
                     encoder.push(EncoderJNI.Operation.FINISH, 0);
