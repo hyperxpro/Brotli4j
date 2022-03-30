@@ -18,9 +18,12 @@
 package com.aayushatharva.brotli4j.decoder;
 
 import com.aayushatharva.brotli4j.common.annotations.Local;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
+import io.netty.buffer.PooledByteBufAllocator;
+import io.netty.buffer.Unpooled;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 
 /**
  * Directly decompresses data using {@link Decoder#decompress(byte[])}
@@ -29,12 +32,12 @@ import java.nio.ByteBuffer;
 public final class DirectDecompress {
     private final DecoderJNI.Status resultStatus;
     private byte[] decompressedData;
-    private ByteBuffer byteBuffer;
+    private ByteBuf byteBuf;
 
-    DirectDecompress(DecoderJNI.Status resultStatus, byte[] decompressedData, ByteBuffer byteBuffer) {
+    DirectDecompress(DecoderJNI.Status resultStatus, byte[] decompressedData, ByteBuf byteBuf) {
         this.resultStatus = resultStatus;
         this.decompressedData = decompressedData;
-        this.byteBuffer = byteBuffer;
+        this.byteBuf = byteBuf;
     }
 
     /**
@@ -65,10 +68,8 @@ public final class DirectDecompress {
     public byte[] getDecompressedData() {
         // If byte array is null but bytebuffer is not null
         // then convert bytebuffer to byte array and return.
-        if (decompressedData == null && byteBuffer != null) {
-            byte[] data = new byte[byteBuffer.remaining()];
-            byteBuffer.get(data);
-            this.decompressedData = data;
+        if (decompressedData == null && byteBuf != null) {
+            this.decompressedData = ByteBufUtil.getBytes(byteBuf);
         }
         return decompressedData;
     }
@@ -76,12 +77,12 @@ public final class DirectDecompress {
     /**
      * Get decompressed data.
      *
-     * @return {@link ByteBuffer} if decompression was successful else {@code null}
+     * @return {@link ByteBuf} if decompression was successful else {@code null}
      */
-    public ByteBuffer getDecompressedDataByteBuffer() {
-        if (byteBuffer == null && decompressedData != null) {
-            this.byteBuffer = ByteBuffer.wrap(decompressedData);
+    public ByteBuf getDecompressedDataByteBuf() {
+        if (byteBuf == null && decompressedData != null) {
+            this.byteBuf = Unpooled.wrappedBuffer(decompressedData);
         }
-        return byteBuffer;
+        return byteBuf;
     }
 }

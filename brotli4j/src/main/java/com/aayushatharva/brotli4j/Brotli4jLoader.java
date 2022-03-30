@@ -65,7 +65,7 @@ public class Brotli4jLoader {
     }
 
     /**
-     * Returns {@code true} if the Brotli native library is available else {@code false}.
+     * @return {@code true} if the Brotli native library is available else {@code false}.
      */
     public static boolean isAvailable() {
         return UNAVAILABILITY_CAUSE == null;

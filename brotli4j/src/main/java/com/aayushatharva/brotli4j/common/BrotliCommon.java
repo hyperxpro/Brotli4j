@@ -57,6 +57,8 @@ public class BrotliCommon {
 
     /**
      * Checks if the given checksum matches MD5 checksum of the RFC dictionary.
+     * @param digest digest byte array
+     * @return {@code true} if check was successful else {@code false}
      */
     public static boolean checkDictionaryDataMd5(byte[] digest) {
         return Arrays.equals(RFC_DICTIONARY_MD5, digest);
@@ -64,6 +66,8 @@ public class BrotliCommon {
 
     /**
      * Checks if the given checksum matches SHA-1 checksum of the RFC dictionary.
+     * @param digest digest byte array
+     * @return {@code true} if check was successful else {@code false}
      */
     public static boolean checkDictionaryDataSha1(byte[] digest) {
         return Arrays.equals(RFC_DICTIONARY_SHA_1, digest);
@@ -71,6 +75,8 @@ public class BrotliCommon {
 
     /**
      * Checks if the given checksum matches SHA-256 checksum of the RFC dictionary.
+     * @param digest digest byte array
+     * @return {@code true} if check was successful else {@code false}
      */
     public static boolean checkDictionaryDataSha256(byte[] digest) {
         return Arrays.equals(RFC_DICTIONARY_SHA_256, digest);
@@ -80,6 +86,9 @@ public class BrotliCommon {
      * Copy bytes to a new direct ByteBuffer.
      * <p>
      * Direct byte buffers are used to supply native code with large data chunks.
+     *
+     * @param data byte array of data
+     * @return {@link ByteBuffer} instance
      */
     public static ByteBuffer makeNative(byte[] data) {
         ByteBuffer result = ByteBuffer.allocateDirect(data.length);
@@ -89,6 +98,7 @@ public class BrotliCommon {
 
     /**
      * Copies data and sets it to be brotli dictionary.
+     * @param data byte array of data
      */
     public static void setDictionaryData(byte[] data) {
         if (data.length != RFC_DICTIONARY_SIZE) {
@@ -104,6 +114,8 @@ public class BrotliCommon {
 
     /**
      * Reads data and sets it to be brotli dictionary.
+     * @param src {@link InputStream} of dictionary data
+     * @throws IOException In case of error during processing dictionary
      */
     public static void setDictionaryData(InputStream src) throws IOException {
         synchronized (mutex) {
@@ -128,6 +140,8 @@ public class BrotliCommon {
 
     /**
      * Sets data to be brotli dictionary.
+     *
+     * @param data {@link ByteBuffer} dictionary data
      */
     public static void setDictionaryData(ByteBuffer data) {
         if (!data.isDirect()) {

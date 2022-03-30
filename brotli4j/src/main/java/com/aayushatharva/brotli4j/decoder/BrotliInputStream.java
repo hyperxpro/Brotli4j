@@ -42,20 +42,32 @@ public class BrotliInputStream extends InputStream {
     private final Decoder decoder;
 
     /**
-     * Creates a BrotliInputStream.
+     * Creates a BrotliInputStream
      *
      * @param source     underlying source
      * @param bufferSize intermediate buffer size
+     * @throws IOException If any failure during initialization
      */
     public BrotliInputStream(InputStream source, int bufferSize)
             throws IOException {
         this.decoder = new Decoder(Channels.newChannel(source), bufferSize);
     }
 
+    /**
+     * Creates a BrotliInputStream
+     *
+     * @param source     underlying source
+     * @throws IOException If any failure during initialization
+     */
     public BrotliInputStream(InputStream source) throws IOException {
         this(source, DEFAULT_BUFFER_SIZE);
     }
 
+    /**
+     * Creates a BrotliInputStream
+     *
+     * @throws IOException If any failure during initialization
+     */
     public void attachDictionary(ByteBuffer dictionary) throws IOException {
         decoder.attachDictionary(dictionary);
     }

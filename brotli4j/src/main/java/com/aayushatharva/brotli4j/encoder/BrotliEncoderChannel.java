@@ -43,22 +43,36 @@ public class BrotliEncoderChannel extends Encoder implements WritableByteChannel
     private final Object mutex = new Object();
 
     /**
-     * Creates a BrotliEncoderChannel.
+     * Creates a BrotliEncoderChannel
      *
      * @param destination underlying destination
      * @param params      encoding settings
      * @param bufferSize  intermediate buffer size
+     * @throws IOException If any failure during initialization
      */
     public BrotliEncoderChannel(WritableByteChannel destination, Encoder.Parameters params,
                                 int bufferSize) throws IOException {
         super(destination, params, bufferSize);
     }
 
+    /**
+     * Creates a BrotliEncoderChannel
+     *
+     * @param destination underlying destination
+     * @param params encoding settings
+     * @throws IOException If any failure during initialization
+     */
     public BrotliEncoderChannel(WritableByteChannel destination, Encoder.Parameters params)
             throws IOException {
         this(destination, params, DEFAULT_BUFFER_SIZE);
     }
 
+    /**
+     * Creates a BrotliEncoderChannel
+     *
+     * @param destination underlying destination
+     * @throws IOException If any failure during initialization
+     */
     public BrotliEncoderChannel(WritableByteChannel destination) throws IOException {
         this(destination, new Encoder.Parameters());
     }
