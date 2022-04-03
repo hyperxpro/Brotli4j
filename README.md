@@ -36,7 +36,7 @@ Of course, you can add native(s) as dependency manually also.
 #### Kotlin DSL
 
 ```kotlin
-val brotliVersion = "1.7.0"
+val brotliVersion = "1.7.1"
 val operatingSystem: OperatingSystem = DefaultNativePlatform.getCurrentOperatingSystem()
 
 repositories {
@@ -61,7 +61,7 @@ dependencies {
 #### Groovy
 
 ```groovy
-def brotliVersion = "1.7.0"
+def brotliVersion = "1.7.1"
 def operatingSystem = DefaultNativePlatform.getCurrentOperatingSystem()
 
 repositories {
