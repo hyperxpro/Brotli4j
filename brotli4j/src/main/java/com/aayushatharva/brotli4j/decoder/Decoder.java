@@ -24,7 +24,6 @@ package com.aayushatharva.brotli4j.decoder;
 
 import com.aayushatharva.brotli4j.common.annotations.Local;
 import com.aayushatharva.brotli4j.common.annotations.Upstream;
-import io.netty.buffer.ByteBuf;
 
 import java.io.IOException;
 import java.nio.Buffer;
@@ -159,12 +158,12 @@ public class Decoder {
                     decoder.push(0);
                     // If decoder still needs more, input buffer was incomplete.
                     if (decoder.getStatus() == DecoderJNI.Status.NEEDS_MORE_INPUT) {
-                        return new DirectDecompress(decoder.getStatus(), null);
+                        return new DirectDecompress(decoder.getStatus(), null, null);
                     }
                     break;
 
                 default:
-                    return new DirectDecompress(decoder.getStatus(), null);
+                    return new DirectDecompress(decoder.getStatus(), null, null);
                 }
             }
         } finally {
@@ -173,7 +172,7 @@ public class Decoder {
         if (outputRead < decompressedLength) {
             throw new IllegalArgumentException("Output length has less than expected length");
         }
-        return new DirectDecompress(decoder.getStatus(), output);
+        return new DirectDecompress(decoder.getStatus(), output, null);
     }
 
     private void fail(String message) throws IOException {

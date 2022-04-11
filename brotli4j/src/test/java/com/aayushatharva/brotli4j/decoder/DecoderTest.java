@@ -24,11 +24,11 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 class DecoderTest {
 
-    private static final byte[] COMPRESSED_DATA = new byte[]{-117, 1, -128, 77, 101, 111, 119, 3};
+    private static final byte[] COMPRESSED_DATA = {-117, 1, -128, 77, 101, 111, 119, 3};
     private static final int ORIGINAL_DATA_LENGTH = 4; // 'Meow' length
 
     @BeforeAll
@@ -45,7 +45,7 @@ class DecoderTest {
 
     @Test
     void decompressWithByteBuffer() throws IOException {
-        ByteBuf src = Unpooled.wrappedBuffer(compressedData);
+        ByteBuf src = Unpooled.wrappedBuffer(COMPRESSED_DATA);
         ByteBuf dst = Unpooled.directBuffer();
 
         DirectDecompress directDecompress = Decoders.decompress(src, dst);
@@ -62,11 +62,13 @@ class DecoderTest {
 
     @Test
     void decompressKnownLengthDataTooBig() {
-        assertThrows(IllegalArgumentException.class, () -> Decoder.decompressKnownLength(COMPRESSED_DATA, ORIGINAL_DATA_LENGTH - 1));
+        assertThrows(IllegalArgumentException.class,
+                     () -> Decoder.decompressKnownLength(COMPRESSED_DATA, ORIGINAL_DATA_LENGTH - 1));
     }
 
     @Test
     void decompressKnownLengthDataTooSmall() {
-        assertThrows(IllegalArgumentException.class, () -> Decoder.decompressKnownLength(COMPRESSED_DATA, ORIGINAL_DATA_LENGTH + 1));
+        assertThrows(IllegalArgumentException.class,
+                     () -> Decoder.decompressKnownLength(COMPRESSED_DATA, ORIGINAL_DATA_LENGTH + 1));
     }
 }
