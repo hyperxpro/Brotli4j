@@ -56,7 +56,7 @@ public class BrotliInputStream extends InputStream {
     /**
      * Creates a BrotliInputStream
      *
-     * @param source     underlying source
+     * @param source underlying source
      * @throws IOException If any failure during initialization
      */
     public BrotliInputStream(InputStream source) throws IOException {
@@ -66,6 +66,7 @@ public class BrotliInputStream extends InputStream {
     /**
      * Creates a BrotliInputStream
      *
+     * @param dictionary {@link ByteBuffer} containing dictionary
      * @throws IOException If any failure during initialization
      */
     public void attachDictionary(ByteBuffer dictionary) throws IOException {

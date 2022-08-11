@@ -4,13 +4,13 @@
    See file LICENSE for detail or copy at https://opensource.org/licenses/MIT
 */
 
-#include "./static_dict.h"
+#include "static_dict.h"
 
 #include "../common/dictionary.h"
 #include "../common/platform.h"
 #include "../common/transform.h"
-#include "./encoder_dict.h"
-#include "./find_match_length.h"
+#include "encoder_dict.h"
+#include "find_match_length.h"
 
 #if defined(__cplusplus) || defined(c_plusplus)
 extern "C" {
@@ -527,7 +527,7 @@ BROTLI_BOOL BrotliFindAllStaticDictionaryMatches(
         uint32_t skipdist = (uint32_t)((uint32_t)(1 << dictionary->words->
             size_bits_by_length[len_code]) & ~1u) *
             (uint32_t)dictionary->num_transforms;
-        /* TODO: check for dist overflow */
+        /* TODO(lode): check for dist overflow */
         dist += skipdist;
         AddMatch(dist, (size_t)l, len_code, matches);
       }

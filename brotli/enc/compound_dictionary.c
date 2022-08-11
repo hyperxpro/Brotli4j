@@ -4,12 +4,12 @@
    See file LICENSE for detail or copy at https://opensource.org/licenses/MIT
 */
 
-#include "./compound_dictionary.h"
+#include "compound_dictionary.h"
 
 #include "../common/platform.h"
 #include <brotli/types.h>
-#include "./memory.h"
-#include "./quality.h"
+#include "memory.h"
+#include "quality.h"
 
 static PreparedDictionary* CreatePreparedDictionaryWithParams(MemoryManager* m,
     const uint8_t* source, size_t source_size, uint32_t bucket_bits,
@@ -52,7 +52,7 @@ static PreparedDictionary* CreatePreparedDictionaryWithParams(MemoryManager* m,
   next_bucket = (uint32_t*)(&bucket_heads[num_buckets]);
   memset(num, 0, num_buckets * sizeof(num[0]));
 
-  /* TODO: apply custom "store" order. */
+  /* TODO(eustas): apply custom "store" order. */
   for (i = 0; i + 7 < source_size; ++i) {
     const uint64_t h = (BROTLI_UNALIGNED_LOAD64LE(&source[i]) & hash_mask) *
         kPreparedDictionaryHashMul64Long;
