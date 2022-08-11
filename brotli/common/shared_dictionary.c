@@ -12,9 +12,9 @@
 #include <stdlib.h>  /* malloc, free */
 #include <stdio.h>
 
-#include "./dictionary.h"
-#include "./platform.h"
-#include "./shared_dictionary_internal.h"
+#include "dictionary.h"
+#include "platform.h"
+#include "shared_dictionary_internal.h"
 
 #if defined(__cplusplus) || defined(c_plusplus)
 extern "C" {
@@ -416,7 +416,7 @@ static BROTLI_BOOL ParseDictionary(const uint8_t* encoded, size_t size,
    BrotliSharedDictionary already contains data, compound dictionaries
    will be appended, but an error will be returned if it already has
    custom words or transforms.
-   TODO: link to RFC for shared brotli once published. */
+   TODO(lode): link to RFC for shared brotli once published. */
 static BROTLI_BOOL DecodeSharedDictionary(
     const uint8_t* encoded, size_t size, BrotliSharedDictionary* dict) {
   uint32_t num_prefix = 0;
@@ -460,7 +460,7 @@ void BrotliSharedDictionaryDestroyInstance(
 
 BROTLI_BOOL BrotliSharedDictionaryAttach(
     BrotliSharedDictionary* dict, BrotliSharedDictionaryType type,
-    size_t data_size, const uint8_t* data) {
+    size_t data_size, const uint8_t data[BROTLI_ARRAY_PARAM(data_size)]) {
   if (!dict) {
     return BROTLI_FALSE;
   }
@@ -492,7 +492,7 @@ BrotliSharedDictionary* BrotliSharedDictionaryCreateInstance(
     return 0;
   }
 
-  /* TODO: explicitly initialize all the fields? */
+  /* TODO(eustas): explicitly initialize all the fields? */
   memset(dict, 0, sizeof(BrotliSharedDictionary));
 
   dict->context_based = BROTLI_FALSE;
