@@ -102,6 +102,8 @@ public class Brotli4jLoader {
         } else if (osName.startsWith("Mac")) {
             if (archName.equalsIgnoreCase("x86_64")) {
                 return "osx-x86_64";
+            } else if (archName.equalsIgnoreCase("aarch64")) {
+                return "osx-aarch64";
             }
         }
         throw new UnsupportedOperationException("Unsupported OS and Architecture: " + osName + ", " + archName);

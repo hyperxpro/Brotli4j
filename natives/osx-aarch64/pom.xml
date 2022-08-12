@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright (c) 2020-2022, Aayush Atharva
+  Copyright 2021, Aayush Atharva
 
   Brotli4j licenses this file to you under the
   Apache License, Version 2.0 (the "License");
@@ -26,13 +26,13 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>native-osx-x86_64</artifactId>
+    <artifactId>native-osx-aarch64</artifactId>
     <packaging>jar</packaging>
 
     <profiles>
 
         <profile>
-            <id>osx-x86_64</id>
+            <id>osx-aarch64</id>
             <activation>
                 <os>
                     <family>Mac</family>

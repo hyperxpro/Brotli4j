@@ -34,7 +34,7 @@
             <id>linux-x86_64</id>
             <activation>
                 <os>
-                    <family>linux</family>
+                    <family>Linux</family>
                     <arch>amd64</arch>
                 </os>
             </activation>
