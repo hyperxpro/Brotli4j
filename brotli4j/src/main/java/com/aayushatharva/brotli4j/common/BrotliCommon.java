@@ -1,9 +1,28 @@
+/*
+ * This file is part of Brotli4j.
+ * Copyright (c) 2020-2022 Aayush Atharva
+ *
+ * Brotli4j is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Brotli4j is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Brotli4j.  If not, see <https://www.gnu.org/licenses/>.
+ */
 /* Copyright 2017 Google Inc. All Rights Reserved.
 
    Distributed under MIT license.
    See file LICENSE for detail or copy at https://opensource.org/licenses/MIT
 */
 package com.aayushatharva.brotli4j.common;
+
+import com.aayushatharva.brotli4j.common.annotations.Upstream;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,6 +32,7 @@ import java.util.Arrays;
 /**
  * JNI wrapper for brotli common.
  */
+@Upstream
 public class BrotliCommon {
     public static final int RFC_DICTIONARY_SIZE = 122784;
 
@@ -37,6 +57,8 @@ public class BrotliCommon {
 
     /**
      * Checks if the given checksum matches MD5 checksum of the RFC dictionary.
+     * @param digest digest byte array
+     * @return {@code true} if check was successful else {@code false}
      */
     public static boolean checkDictionaryDataMd5(byte[] digest) {
         return Arrays.equals(RFC_DICTIONARY_MD5, digest);
@@ -44,6 +66,8 @@ public class BrotliCommon {
 
     /**
      * Checks if the given checksum matches SHA-1 checksum of the RFC dictionary.
+     * @param digest digest byte array
+     * @return {@code true} if check was successful else {@code false}
      */
     public static boolean checkDictionaryDataSha1(byte[] digest) {
         return Arrays.equals(RFC_DICTIONARY_SHA_1, digest);
@@ -51,6 +75,8 @@ public class BrotliCommon {
 
     /**
      * Checks if the given checksum matches SHA-256 checksum of the RFC dictionary.
+     * @param digest digest byte array
+     * @return {@code true} if check was successful else {@code false}
      */
     public static boolean checkDictionaryDataSha256(byte[] digest) {
         return Arrays.equals(RFC_DICTIONARY_SHA_256, digest);
@@ -60,6 +86,9 @@ public class BrotliCommon {
      * Copy bytes to a new direct ByteBuffer.
      * <p>
      * Direct byte buffers are used to supply native code with large data chunks.
+     *
+     * @param data byte array of data
+     * @return {@link ByteBuffer} instance
      */
     public static ByteBuffer makeNative(byte[] data) {
         ByteBuffer result = ByteBuffer.allocateDirect(data.length);
@@ -69,6 +98,7 @@ public class BrotliCommon {
 
     /**
      * Copies data and sets it to be brotli dictionary.
+     * @param data byte array of data
      */
     public static void setDictionaryData(byte[] data) {
         if (data.length != RFC_DICTIONARY_SIZE) {
@@ -84,6 +114,8 @@ public class BrotliCommon {
 
     /**
      * Reads data and sets it to be brotli dictionary.
+     * @param src {@link InputStream} of dictionary data
+     * @throws IOException In case of error during processing dictionary
      */
     public static void setDictionaryData(InputStream src) throws IOException {
         synchronized (mutex) {
@@ -108,6 +140,8 @@ public class BrotliCommon {
 
     /**
      * Sets data to be brotli dictionary.
+     *
+     * @param data {@link ByteBuffer} dictionary data
      */
     public static void setDictionaryData(ByteBuffer data) {
         if (!data.isDirect()) {

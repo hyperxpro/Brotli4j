@@ -1,6 +1,6 @@
 /*
  * This file is part of Brotli4j.
- * Copyright (c) 2020-2021 Aayush Atharva
+ * Copyright (c) 2020-2022 Aayush Atharva
  *
  * Brotli4j is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,8 +20,9 @@
    Distributed under MIT license.
    See file LICENSE for detail or copy at https://opensource.org/licenses/MIT
 */
-
 package com.aayushatharva.brotli4j.encoder;
+
+import com.aayushatharva.brotli4j.common.annotations.Upstream;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -30,6 +31,7 @@ import java.nio.channels.Channels;
 /**
  * Output stream that wraps native brotli encoder.
  */
+@Upstream
 public class BrotliOutputStream extends OutputStream {
     /**
      * The default internal buffer size used by the encoder.
@@ -44,17 +46,31 @@ public class BrotliOutputStream extends OutputStream {
      * @param destination underlying destination
      * @param params      encoding settings
      * @param bufferSize  intermediate buffer size
+     * @throws IOException If any failure during initialization
      */
     public BrotliOutputStream(OutputStream destination, Encoder.Parameters params, int bufferSize)
             throws IOException {
         this.encoder = new Encoder(Channels.newChannel(destination), params, bufferSize);
     }
 
+    /**
+     * Creates a BrotliOutputStream.
+     *
+     * @param destination underlying destination
+     * @param params      encoding settings
+     * @throws IOException If any failure during initialization
+     */
     public BrotliOutputStream(OutputStream destination, Encoder.Parameters params)
             throws IOException {
         this(destination, params, DEFAULT_BUFFER_SIZE);
     }
 
+    /**
+     * Creates a BrotliOutputStream.
+     *
+     * @param destination underlying destination
+     * @throws IOException If any failure during initialization
+     */
     public BrotliOutputStream(OutputStream destination) throws IOException {
         this(destination, new Encoder.Parameters());
     }

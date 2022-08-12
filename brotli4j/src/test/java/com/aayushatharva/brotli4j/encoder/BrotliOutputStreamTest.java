@@ -1,5 +1,5 @@
 /*
- *   Copyright 2021, Aayush Atharva
+ *   Copyright (c) 2020-2022, Aayush Atharva
  *
  *   Brotli4j licenses this file to you under the
  *   Apache License, Version 2.0 (the "License");
@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 class BrotliOutputStreamTest {
 
@@ -36,12 +36,13 @@ class BrotliOutputStreamTest {
 
     @Test
     void compress() throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        BrotliOutputStream brotliOutputStream = new BrotliOutputStream(baos);
-        brotliOutputStream.write("Meow".getBytes());
-        brotliOutputStream.close();
-        baos.close();
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+             BrotliOutputStream brotliOutputStream = new BrotliOutputStream(byteArrayOutputStream)) {
+            brotliOutputStream.write("Meow".getBytes());
+            brotliOutputStream.close();
+            byteArrayOutputStream.close();
 
-        assertArrayEquals(compressedData, baos.toByteArray());
+            assertArrayEquals(compressedData, byteArrayOutputStream.toByteArray());
+        }
     }
 }

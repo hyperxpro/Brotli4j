@@ -1,5 +1,5 @@
 /*
- *   Copyright 2021, Aayush Atharva
+ *   Copyright (c) 2020-2022, Aayush Atharva
  *
  *   Brotli4j licenses this file to you under the
  *   Apache License, Version 2.0 (the "License");
@@ -17,6 +17,9 @@
 package com.aayushatharva.brotli4j.encoder;
 
 import com.aayushatharva.brotli4j.Brotli4jLoader;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
+import io.netty.buffer.Unpooled;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -42,6 +45,15 @@ class EncoderTest {
     @Test
     void compressWithQuality() throws IOException {
         assertArrayEquals(compressedData, Encoder.compress("Meow".getBytes(), new Encoder.Parameters().setQuality(6)));
+    }
+
+    @Test
+    void compressWithQualityAndByteBuffer() throws IOException {
+        ByteBuf src = Unpooled.wrappedBuffer("Meow".getBytes());
+        ByteBuf dst = Unpooled.directBuffer();
+        Encoders.compress(src, dst);
+
+        assertArrayEquals(compressedData, ByteBufUtil.getBytes(dst));
     }
 
     @Test

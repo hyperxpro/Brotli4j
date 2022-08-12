@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright 2021, Aayush Atharva
+  Copyright (c) 2020-2022, Aayush Atharva
 
   Brotli4j licenses this file to you under the
   Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@
     <parent>
         <artifactId>natives</artifactId>
         <groupId>com.aayushatharva.brotli4j</groupId>
-        <version>1.6.0</version>
+        <version>1.7.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 

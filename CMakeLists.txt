@@ -68,9 +68,9 @@ add_library (brotli ${LIB_TYPE}
 				"brotli/enc/static_dict.c"
 				"brotli/enc/utf8_util.c"
 				"brotli/tools/brotli.c"
-                "natives/src/main/cpp/common_jni.cc"
-                "natives/src/main/cpp/decoder_jni.cc"
-                "natives/src/main/cpp/encoder_jni.cc"
+                		"natives/src/main/cpp/common_jni.cc"
+                		"natives/src/main/cpp/decoder_jni.cc"
+                		"natives/src/main/cpp/encoder_jni.cc"
                 )
 
 SET_TARGET_PROPERTIES (brotli PROPERTIES LINKER_LANGUAGE CXX)

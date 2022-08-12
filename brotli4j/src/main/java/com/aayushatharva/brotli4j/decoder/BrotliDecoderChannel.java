@@ -1,6 +1,6 @@
 /*
  * This file is part of Brotli4j.
- * Copyright (c) 2020-2021 Aayush Atharva
+ * Copyright (c) 2020-2022 Aayush Atharva
  *
  * Brotli4j is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,8 @@
 */
 package com.aayushatharva.brotli4j.decoder;
 
+import com.aayushatharva.brotli4j.common.annotations.Upstream;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
@@ -30,6 +32,7 @@ import java.nio.channels.ReadableByteChannel;
 /**
  * ReadableByteChannel that wraps native brotli decoder.
  */
+@Upstream
 public class BrotliDecoderChannel extends Decoder implements ReadableByteChannel {
     /**
      * The default internal buffer size used by the decoder.
@@ -41,15 +44,22 @@ public class BrotliDecoderChannel extends Decoder implements ReadableByteChannel
     /**
      * Creates a BrotliDecoderChannel.
      *
-     * @param source           underlying source
-     * @param bufferSize       intermediate buffer size
+     * @param source underlying source
+     * @throws IOException If any failure during initialization
+     */
+    public BrotliDecoderChannel(ReadableByteChannel source) throws IOException {
+        this(source, DEFAULT_BUFFER_SIZE);
+    }
+
+    /**
+     * Creates a BrotliDecoderChannel.
+     *
+     * @param source     underlying source
+     * @param bufferSize intermediate buffer size
+     * @throws IOException If any failure during initialization
      */
     public BrotliDecoderChannel(ReadableByteChannel source, int bufferSize) throws IOException {
         super(source, bufferSize);
-    }
-
-    public BrotliDecoderChannel(ReadableByteChannel source) throws IOException {
-        this(source, DEFAULT_BUFFER_SIZE);
     }
 
     @Override

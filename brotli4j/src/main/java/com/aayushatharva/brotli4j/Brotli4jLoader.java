@@ -1,5 +1,5 @@
 /*
- *    Copyright 2020-2021, Aayush Atharva
+ *    Copyright (c) 2020-2022, Aayush Atharva
  *
  *    Brotli4j licenses this file to you under the
  *    Apache License, Version 2.0 (the "License");
@@ -16,6 +16,8 @@
  */
 package com.aayushatharva.brotli4j;
 
+import com.aayushatharva.brotli4j.common.annotations.Local;
+
 import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -24,6 +26,7 @@ import java.nio.file.StandardCopyOption;
 /**
  * Loads Brotli Native Library
  */
+@Local
 public class Brotli4jLoader {
 
     private static final Throwable UNAVAILABILITY_CAUSE;
@@ -51,8 +54,6 @@ public class Brotli4jLoader {
                 }
 
                 System.load(tempFile.getAbsolutePath());
-
-                cause = null;
             } catch (Throwable throwable) {
                 cause = throwable;
             }
@@ -62,7 +63,7 @@ public class Brotli4jLoader {
     }
 
     /**
-     * Returns {@code true} if the Brotli native library is available else {@code false}.
+     * @return {@code true} if the Brotli native library is available else {@code false}.
      */
     public static boolean isAvailable() {
         return UNAVAILABILITY_CAUSE == null;

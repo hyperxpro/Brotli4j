@@ -1,5 +1,5 @@
 /*
- *   Copyright 2021, Aayush Atharva
+ *   Copyright (c) 2020-2022, Aayush Atharva
  *
  *   Brotli4j licenses this file to you under the
  *   Apache License, Version 2.0 (the "License");
@@ -16,15 +16,25 @@
  */
 package com.aayushatharva.brotli4j;
 
+import com.aayushatharva.brotli4j.decoder.Decoders;
 import com.aayushatharva.brotli4j.encoder.Encoder;
+import com.aayushatharva.brotli4j.encoder.Encoders;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
+import io.netty.buffer.PooledByteBufAllocator;
+import io.netty.buffer.Unpooled;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayOutputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Random;
+import java.util.stream.Collectors;
+
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 class FileCompressAndDecompressTest {
 
@@ -34,12 +44,32 @@ class FileCompressAndDecompressTest {
     }
 
     @Test
-    void alphabeticalWordsTest() throws IOException {
-        InputStream in = Brotli4jLoader.class.getResourceAsStream("/Words.txt");
-        byte[] words = getBytes(in);
-        byte[] compressed = Encoder.compress(words, new Encoder.Parameters().setQuality(4));
+    void bigFileCompressionAndDecompressionTest() throws IOException {
+        String fileName = "sample_data.txt";
 
-        Assertions.assertTrue(compressed.length < 2000);
+        try (InputStream in = getClass().getClassLoader().getResourceAsStream(fileName)) {
+            assert in != null;
+            String result = new BufferedReader(new InputStreamReader(in))
+                    .lines()
+                    .collect(Collectors.joining("\n"));
+
+            // Amplify the data 1536 times
+            int amplification = 1536;
+            StringBuilder sb = new StringBuilder(result.length() * amplification);
+            for (int i = 0; i < amplification; i++) {
+                sb.append(result);
+            }
+
+            byte[] data = sb.toString().getBytes();
+            ByteBuf originalData = Unpooled.wrappedBuffer(data);
+            ByteBuf compressedData = PooledByteBufAllocator.DEFAULT.directBuffer();
+            ByteBuf uncompressedResultData = PooledByteBufAllocator.DEFAULT.directBuffer(data.length);
+
+            Encoders.compress(originalData, compressedData);
+            Decoders.decompress(compressedData, uncompressedResultData);
+
+            assertArrayEquals(data, ByteBufUtil.getBytes(uncompressedResultData));
+        }
     }
 
     @Test
@@ -51,15 +81,5 @@ class FileCompressAndDecompressTest {
 
         byte[] compressed = Encoder.compress(chars, new Encoder.Parameters().setQuality(4));
         Assertions.assertTrue(chars.length < compressed.length);
-    }
-
-    static byte[] getBytes(InputStream is) throws IOException {
-        try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
-            byte[] buffer = new byte[0xFFFF];
-            for (int len = is.read(buffer); len != -1; len = is.read(buffer)) {
-                os.write(buffer, 0, len);
-            }
-            return os.toByteArray();
-        }
     }
 }

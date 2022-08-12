@@ -15,21 +15,19 @@
  * You should have received a copy of the GNU General Public License
  * along with Brotli4j.  If not, see <https://www.gnu.org/licenses/>.
  */
-/* Copyright 2018 Google Inc. All Rights Reserved.
+package com.aayushatharva.brotli4j.common.annotations;
 
-   Distributed under MIT license.
-   See file LICENSE for detail or copy at https://opensource.org/licenses/MIT
-*/
-package com.aayushatharva.brotli4j.encoder;
-
-import com.aayushatharva.brotli4j.common.annotations.Upstream;
-
-import java.nio.ByteBuffer;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Prepared dictionary data provider.
+ * Class and methods annotated with {@link Upstream} are
+ * directly pulled from Google Brotli upstream repository
+ * without any change in function and parameters.
  */
-@Upstream
-public interface PreparedDictionary {
-    ByteBuffer getData();
+@Target({ElementType.TYPE, ElementType.METHOD})
+@Retention(RetentionPolicy.SOURCE)
+public @interface Upstream {
 }

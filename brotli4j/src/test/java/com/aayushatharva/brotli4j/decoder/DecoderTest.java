@@ -1,5 +1,5 @@
 /*
- *   Copyright 2021, Aayush Atharva
+ *   Copyright (c) 2020-2022, Aayush Atharva
  *
  *   Brotli4j licenses this file to you under the
  *   Apache License, Version 2.0 (the "License");
@@ -17,12 +17,14 @@
 package com.aayushatharva.brotli4j.decoder;
 
 import com.aayushatharva.brotli4j.Brotli4jLoader;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class DecoderTest {
 
@@ -36,6 +38,16 @@ class DecoderTest {
     @Test
     void decompress() throws IOException {
         DirectDecompress directDecompress = Decoder.decompress(compressedData);
+        assertEquals(DecoderJNI.Status.DONE, directDecompress.getResultStatus());
+        assertEquals("Meow", new String(directDecompress.getDecompressedData()));
+    }
+
+    @Test
+    void decompressWithByteBuffer() throws IOException {
+        ByteBuf src = Unpooled.wrappedBuffer(compressedData);
+        ByteBuf dst = Unpooled.directBuffer();
+
+        DirectDecompress directDecompress = Decoders.decompress(src, dst);
         assertEquals(DecoderJNI.Status.DONE, directDecompress.getResultStatus());
         assertEquals("Meow", new String(directDecompress.getDecompressedData()));
     }

@@ -16,13 +16,13 @@
 #include "../common/constants.h"
 #include "../common/platform.h"
 #include <brotli/types.h>
-#include "./entropy_encode.h"
+#include "entropy_encode.h"
 
 #if defined(__cplusplus) || defined(c_plusplus)
 extern "C" {
 #endif
 
-/* TODO: turn to macro. */
+/* TODO(eustas): turn to macro. */
 static const size_t kCompressFragmentTwoPassBlockSize = 1 << 17;
 
 typedef struct BrotliTwoPassArena {

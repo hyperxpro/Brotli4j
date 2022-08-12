@@ -1,6 +1,6 @@
 /*
  * This file is part of Brotli4j.
- * Copyright (c) 2020-2021 Aayush Atharva
+ * Copyright (c) 2020-2022 Aayush Atharva
  *
  * Brotli4j is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,10 @@
 */
 package com.aayushatharva.brotli4j.decoder;
 
+import com.aayushatharva.brotli4j.common.annotations.Local;
+import com.aayushatharva.brotli4j.common.annotations.Upstream;
+import io.netty.buffer.ByteBuf;
+
 import java.io.IOException;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
@@ -31,6 +35,8 @@ import java.util.ArrayList;
 /**
  * Base class for InputStream / Channel implementations.
  */
+@Upstream
+@Local
 public class Decoder {
     private static final ByteBuffer EMPTY_BUFFER = ByteBuffer.allocate(0);
     private final ReadableByteChannel source;
@@ -44,6 +50,7 @@ public class Decoder {
      *
      * @param source          underlying source
      * @param inputBufferSize read buffer size
+     * @throws IOException If any failure during initialization
      */
     public Decoder(ReadableByteChannel source, int inputBufferSize)
             throws IOException {
@@ -55,6 +62,63 @@ public class Decoder {
         }
         this.source = source;
         this.decoder = new DecoderJNI.Wrapper(inputBufferSize);
+    }
+
+    /**
+     * Decodes the given data buffer.
+     *
+     * @param data byte array of data to be decoded
+     * @return {@link DirectDecompress} instance
+     * @throws IOException If an error occurs during decoding
+     */
+    @Local
+    public static DirectDecompress decompress(byte[] data) throws IOException {
+        DecoderJNI.Wrapper decoder = new DecoderJNI.Wrapper(data.length);
+        ArrayList<byte[]> output = new ArrayList<>();
+        int totalOutputSize = 0;
+        try {
+            decoder.getInputBuffer().put(data);
+            decoder.push(data.length);
+            while (decoder.getStatus() != DecoderJNI.Status.DONE) {
+                switch (decoder.getStatus()) {
+                    case OK:
+                        decoder.push(0);
+                        break;
+
+                    case NEEDS_MORE_OUTPUT:
+                        ByteBuffer buffer = decoder.pull();
+                        byte[] chunk = new byte[buffer.remaining()];
+                        buffer.get(chunk);
+                        output.add(chunk);
+                        totalOutputSize += chunk.length;
+                        break;
+
+                    case NEEDS_MORE_INPUT:
+                        // Give decoder a chance to process the remaining of the buffered byte.
+                        decoder.push(0);
+                        // If decoder still needs input, this means that stream is truncated.
+                        if (decoder.getStatus() == DecoderJNI.Status.NEEDS_MORE_INPUT) {
+                            return new DirectDecompress(decoder.getStatus(), null, null);
+                        }
+                        break;
+
+                    default:
+                        return new DirectDecompress(decoder.getStatus(), null, null);
+                }
+            }
+        } finally {
+            decoder.destroy();
+        }
+        if (output.size() == 1) {
+            return new DirectDecompress(decoder.getStatus(), output.get(0), null);
+        }
+        byte[] result = new byte[totalOutputSize];
+        int offset = 0;
+        for (byte[] chunk : output) {
+            System.arraycopy(chunk, 0, result, offset, chunk.length);
+            offset += chunk.length;
+        }
+        return new DirectDecompress(decoder.getStatus(), result, null);
     }
 
     private void fail(String message) throws IOException {
@@ -152,57 +216,5 @@ public class Decoder {
         closed = true;
         decoder.destroy();
         source.close();
-    }
-
-    /**
-     * Decodes the given data buffer.
-     */
-    public static DirectDecompress decompress(byte[] data) throws IOException {
-        DecoderJNI.Wrapper decoder = new DecoderJNI.Wrapper(data.length);
-        ArrayList<byte[]> output = new ArrayList<>();
-        int totalOutputSize = 0;
-        try {
-            decoder.getInputBuffer().put(data);
-            decoder.push(data.length);
-            while (decoder.getStatus() != DecoderJNI.Status.DONE) {
-                switch (decoder.getStatus()) {
-                    case OK:
-                        decoder.push(0);
-                        break;
-
-                    case NEEDS_MORE_OUTPUT:
-                        ByteBuffer buffer = decoder.pull();
-                        byte[] chunk = new byte[buffer.remaining()];
-                        buffer.get(chunk);
-                        output.add(chunk);
-                        totalOutputSize += chunk.length;
-                        break;
-
-                    case NEEDS_MORE_INPUT:
-                        // Give decoder a chance to process the remaining of the buffered byte.
-                        decoder.push(0);
-                        // If decoder still needs input, this means that stream is truncated.
-                        if (decoder.getStatus() == DecoderJNI.Status.NEEDS_MORE_INPUT) {
-                            return new DirectDecompress(decoder.getStatus(), null);
-                        }
-                        break;
-
-                    default:
-                        return new DirectDecompress(decoder.getStatus(), null);
-                }
-            }
-        } finally {
-            decoder.destroy();
-        }
-        if (output.size() == 1) {
-            return new DirectDecompress(decoder.getStatus(), output.get(0));
-        }
-        byte[] result = new byte[totalOutputSize];
-        int offset = 0;
-        for (byte[] chunk : output) {
-            System.arraycopy(chunk, 0, result, offset, chunk.length);
-            offset += chunk.length;
-        }
-        return new DirectDecompress(decoder.getStatus(), result);
     }
 }

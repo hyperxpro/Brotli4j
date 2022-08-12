@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright 2021, Aayush Atharva
+  Copyright 2020-2022, Aayush Atharva
 
   Brotli4j licenses this file to you under the
   Apache License, Version 2.0 (the "License");
@@ -24,7 +24,7 @@
     <groupId>com.aayushatharva.brotli4j</groupId>
     <artifactId>brotli4j-parent</artifactId>
     <packaging>pom</packaging>
-    <version>1.6.0</version>
+    <version>1.7.1</version>
 
     <name>Brotli4j</name>
     <description>Brotli4j provides Brotli compression and decompression for Java.</description>
@@ -77,11 +77,20 @@
     </distributionManagement>
 
     <dependencies>
+        <!-- https://mvnrepository.com/artifact/io.netty/netty-buffer -->
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-buffer</artifactId>
+            <version>4.1.75.Final</version>
+            <scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
+
         <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>5.7.0</version>
+            <version>5.8.2</version>
             <scope>test</scope>
         </dependency>
 
@@ -89,7 +98,7 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.7.0</version>
+            <version>5.8.2</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
