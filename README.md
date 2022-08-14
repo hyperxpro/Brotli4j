@@ -10,7 +10,7 @@ Windows (Windows Server 2022) x64
 Linux (CentOS 6) x64  
 Linux (CentOS 6) Aarch64  
 macOS (Catalina) x64  
-macOS (BigSur) Aarch64 (Apple Silicon: M1)
+macOS (Catalina) Aarch64 (Apple Silicon: M1)
 
 #### *Install Microsoft Visual C++ Redistributable before running this library on Windows
 
