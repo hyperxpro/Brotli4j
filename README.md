@@ -6,11 +6,11 @@ Brotli4j provides Brotli compression and decompression for Java.
 
 ## Supported Platforms:
 
-Windows 64-Bit*  
-Linux 64-Bit  
-Linux Aarch64  
-macOS Catalina 10.15 Intel x86  
-macOS BigSur 11.0 Apple M1  
+Windows (Windows Server 2022) x64
+Linux (CentOS 6) x64  
+Linux (CentOS 6) Aarch64  
+macOS (Catalina) x64  
+macOS (BigSur) Aarch64 (Apple Silicon: M1)
 
 #### *Install Microsoft Visual C++ Redistributable before running this library on Windows
 
@@ -25,7 +25,7 @@ For maven, the natives will
 <dependency>
     <groupId>com.aayushatharva.brotli4j</groupId>
     <artifactId>brotli4j</artifactId>
-    <version>1.7.1</version>
+    <version>1.8.0</version>
 </dependency>
 ```
 
@@ -36,7 +36,7 @@ Of course, you can add native(s) as dependency manually also.
 #### Kotlin DSL
 
 ```kotlin
-val brotliVersion = "1.7.1"
+val brotliVersion = "1.8.0"
 val operatingSystem: OperatingSystem = DefaultNativePlatform.getCurrentOperatingSystem()
 
 repositories {
@@ -63,7 +63,7 @@ dependencies {
 #### Groovy
 
 ```groovy
-def brotliVersion = "1.7.1"
+def brotliVersion = "1.8.0"
 def operatingSystem = DefaultNativePlatform.getCurrentOperatingSystem()
 
 repositories {
