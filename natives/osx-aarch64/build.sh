@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 CURPATH=$(pwd)
-TARGET_CLASSES_PATH="target/classes/lib/osx-x86_64"
+TARGET_CLASSES_PATH="target/classes/lib/osx-aarch64"
 TARGET_PATH="target"
 
 function exitWithError() {
@@ -13,7 +13,7 @@ function exitWithError() {
 mkdir -p "$TARGET_CLASSES_PATH"
 
 cd "$TARGET_PATH"
-cmake -DCMAKE_OSX_ARCHITECTURES=x86_64 ../../../ || exitWithError $?
+cmake -DCMAKE_OSX_ARCHITECTURES=arm64 ../../../ || exitWithError $?
 make || exitWithError $?
 rm -f "$CURPATH/${TARGET_CLASSES_PATH}/libbrotli.dylib"
 cp "./libbrotli.dylib" "$CURPATH/${TARGET_CLASSES_PATH}" || exitWithError $?

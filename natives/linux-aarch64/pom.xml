@@ -34,7 +34,7 @@
             <id>linux-aarch64</id>
             <activation>
                 <os>
-                    <family>linux</family>
+                    <family>Linux</family>
                     <arch>aarch64</arch>
                 </os>
             </activation>

@@ -34,7 +34,7 @@
             <id>windows-x86_64</id>
             <activation>
                 <os>
-                    <family>windows</family>
+                    <family>Windows</family>
                     <arch>amd64</arch>
                 </os>
             </activation>
