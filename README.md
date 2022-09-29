@@ -30,7 +30,7 @@ For maven, the natives will
 ```
 
 ### Gradle
-For gradle, we have to write som logic to import native automatically. 
+For gradle, we have to write some logic to import native automatically. 
 Of course, you can add native(s) as dependency manually also.
 
 #### Kotlin DSL
