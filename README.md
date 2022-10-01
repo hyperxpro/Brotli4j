@@ -45,7 +45,7 @@ repositories {
 
 dependencies {
     implementation("com.aayushatharva.brotli4j:brotli4j:$brotliVersion")
-    implementation(
+    runtimeOnly(
         "com.aayushatharva.brotli4j:native-${
             if (operatingSystem.isWindows) "windows-x86_64"
             else if (operatingSystem.isMacOsX)
@@ -72,7 +72,7 @@ repositories {
 
 dependencies {
     implementation "com.aayushatharva.brotli4j:brotli4j:$brotliVersion"
-    implementation("com.aayushatharva.brotli4j:native-${
+    runtimeOnly("com.aayushatharva.brotli4j:native-${
         if (operatingSystem.isWindows()) "windows-x86_64"
         else if (operatingSystem.isMacOsX())
             if (DefaultNativePlatform.getCurrentArchitecture().isArm()) "osx-aarch64"
