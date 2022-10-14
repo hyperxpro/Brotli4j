@@ -25,5 +25,7 @@ class Brotli4jLoaderTest {
     @Test
     void load() {
         assertDoesNotThrow(Brotli4jLoader::ensureAvailability);
+        assertTrue(Brotli4jLoader.isAvailable());
+        assertNull(Brotli4jLoader.getUnavailabilityCause());
     }
 }
