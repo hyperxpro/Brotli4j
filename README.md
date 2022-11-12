@@ -12,7 +12,7 @@ Linux (CentOS 6) Aarch64
 macOS (Catalina) x64  
 macOS (Catalina) Aarch64 (Apple Silicon: M1)
 
-#### *Install Microsoft Visual C++ Redistributable before running this library on Windows
+#### *Install [Microsoft Visual C++ Redistributable](https://learn.microsoft.com/en-US/cpp/windows/latest-supported-vc-redist?view=msvc-170) before running this library on Windows
 
 ## Download
 
