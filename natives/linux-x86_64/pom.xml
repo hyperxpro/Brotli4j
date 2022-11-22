@@ -38,7 +38,7 @@
             <plugin>
                 <groupId>org.moditect</groupId>
                 <artifactId>moditect-maven-plugin</artifactId>
-                <version>1.0.0.RC1</version>
+                <version>1.0.0.RC2</version>
                 <executions>
                     <execution>
                         <id>add-module-infos</id>
@@ -51,6 +51,9 @@
                             <module>
                                 <moduleInfo>
                                     <name>${javaModuleName}</name>
+                                    <exports>
+                                        ${javaModuleName} to com.aayushatharva.brotli4j;
+                                    </exports>
                                 </moduleInfo>
                             </module>
                             <jdepsExtraArgs>
