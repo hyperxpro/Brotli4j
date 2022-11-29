@@ -29,6 +29,47 @@
     <artifactId>brotli4j</artifactId>
     <packaging>jar</packaging>
 
+    <properties>
+        <javaModuleName>com.aayushatharva.brotli4j</javaModuleName>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.moditect</groupId>
+                <artifactId>moditect-maven-plugin</artifactId>
+                <version>1.0.0.RC2</version>
+                <executions>
+                    <execution>
+                        <id>add-module-infos</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>add-module-info</goal>
+                        </goals>
+                        <configuration>
+                            <jvmVersion>9</jvmVersion>
+                            <module>
+                                <moduleInfo>
+                                    <name>${javaModuleName}</name>
+                                    <exports>
+                                        com.aayushatharva.brotli4j;
+                                        com.aayushatharva.brotli4j.common;
+                                        com.aayushatharva.brotli4j.decoder;
+                                        com.aayushatharva.brotli4j.encoder;
+                                    </exports>
+                                </moduleInfo>
+                            </module>
+                            <jdepsExtraArgs>
+                                <arg>--multi-release</arg>
+                                <arg>9</arg>
+                            </jdepsExtraArgs>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
     <profiles>
         <profile>
             <id>linux-x86_64</id>

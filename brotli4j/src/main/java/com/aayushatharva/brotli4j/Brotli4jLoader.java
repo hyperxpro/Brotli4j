@@ -38,7 +38,8 @@ public class Brotli4jLoader {
         } catch (Throwable t) {
             try {
                 String nativeLibName = System.mapLibraryName("brotli");
-                String libPath = "/lib/" + getPlatform() + "/" + nativeLibName;
+                String platform = getPlatform();
+                String libPath = "/lib/" + platform + "/" + nativeLibName;
 
                 File tempDir = new File(System.getProperty("java.io.tmpdir"), "com_aayushatharva_brotli4j_" + System.nanoTime());
                 tempDir.mkdir();
@@ -46,7 +47,8 @@ public class Brotli4jLoader {
 
                 File tempFile = new File(tempDir, nativeLibName);
 
-                try (InputStream in = Brotli4jLoader.class.getResourceAsStream(libPath)) {
+                Class<?> loaderClassToUse = Class.forName("com.aayushatharva.brotli4j." + platform.replace('-', '.') + ".NativeLoader");
+                try (InputStream in = loaderClassToUse.getResourceAsStream(libPath)) {
                     Files.copy(in, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 } catch (Throwable throwable) {
                     tempFile.delete();
