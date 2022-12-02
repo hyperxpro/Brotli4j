@@ -57,6 +57,9 @@
                                         com.aayushatharva.brotli4j.decoder;
                                         com.aayushatharva.brotli4j.encoder;
                                     </exports>
+                                    <uses>
+                                        com.aayushatharva.brotli4j.BrotliNativeProvider
+                                    </uses>
                                 </moduleInfo>
                             </module>
                             <jdepsExtraArgs>

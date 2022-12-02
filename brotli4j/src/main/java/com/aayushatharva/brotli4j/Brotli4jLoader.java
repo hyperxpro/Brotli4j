@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.ServiceLoader;
 
 /**
  * Loads Brotli Native Library
@@ -47,7 +48,15 @@ public class Brotli4jLoader {
 
                 File tempFile = new File(tempDir, nativeLibName);
 
-                Class<?> loaderClassToUse = Class.forName("com.aayushatharva.brotli4j." + platform.replace('-', '.') + ".NativeLoader");
+                Class<?> loaderClassToUse = Brotli4jLoader.class; // Use this as a fallback for non-JPMS contexts
+                // In Java9+ with JPMS enabled, we need a class in the jar that contains the file to be able to access its content
+                ServiceLoader<BrotliNativeProvider> nativeProviders = ServiceLoader.load(BrotliNativeProvider.class, Brotli4jLoader.class.getClassLoader());
+                for (BrotliNativeProvider nativeProvider : nativeProviders) {
+                    if (nativeProvider.platformName().equals(platform)) {
+                        loaderClassToUse = nativeProvider.getClass();
+                        break;
+                    }
+                }
                 try (InputStream in = loaderClassToUse.getResourceAsStream(libPath)) {
                     Files.copy(in, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 } catch (Throwable throwable) {

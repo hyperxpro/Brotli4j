@@ -1,7 +1,14 @@
 package com.aayushatharva.brotli4j.macos.aarch64;
 
+import com.aayushatharva.brotli4j.BrotliNativeProvider;
+
 /**
- * Empty class to access the native lib in a JPMS context
+ * Service class to access the native lib in a JPMS context
  */
-public class NativeLoader {
+public class NativeLoader implements BrotliNativeProvider {
+
+    @Override
+    public String platformName() {
+        return "osx-aarch64";
+    }
 }

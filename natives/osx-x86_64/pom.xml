@@ -54,6 +54,9 @@
                                     <exports>
                                         ${javaModuleName} to com.aayushatharva.brotli4j;
                                     </exports>
+                                    <provides>
+                                        com.aayushatharva.brotli4j.BrotliNativeProvider with ${javaModuleName}.NativeLoader
+                                    </provides>
                                 </moduleInfo>
                             </module>
                             <jdepsExtraArgs>
