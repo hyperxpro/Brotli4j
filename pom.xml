@@ -55,6 +55,7 @@
     <modules>
         <module>natives</module>
         <module>brotli4j</module>
+        <module>brotli4j-tests</module>
     </modules>
 
     <properties>

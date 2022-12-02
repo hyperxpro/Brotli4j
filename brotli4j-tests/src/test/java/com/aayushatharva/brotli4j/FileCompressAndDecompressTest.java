@@ -34,8 +34,6 @@ import java.io.InputStreamReader;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-
 class FileCompressAndDecompressTest {
 
     @BeforeAll
@@ -68,7 +66,7 @@ class FileCompressAndDecompressTest {
             Encoders.compress(originalData, compressedData);
             Decoders.decompress(compressedData, uncompressedResultData);
 
-            assertArrayEquals(data, ByteBufUtil.getBytes(uncompressedResultData));
+            Assertions.assertArrayEquals(data, ByteBufUtil.getBytes(uncompressedResultData));
         }
     }
 
