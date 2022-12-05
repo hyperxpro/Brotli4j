@@ -49,18 +49,15 @@
                         <configuration>
                             <jvmVersion>9</jvmVersion>
                             <module>
-                                <moduleInfo>
-                                    <name>${javaModuleName}</name>
-                                    <exports>
-                                        com.aayushatharva.brotli4j;
-                                        com.aayushatharva.brotli4j.common;
-                                        com.aayushatharva.brotli4j.decoder;
-                                        com.aayushatharva.brotli4j.encoder;
-                                    </exports>
-                                    <uses>
-                                        com.aayushatharva.brotli4j.BrotliNativeProvider
-                                    </uses>
-                                </moduleInfo>
+                                <moduleInfoSource>
+                                    module ${javaModuleName} {
+                                        exports com.aayushatharva.brotli4j;
+                                        exports com.aayushatharva.brotli4j.common;
+                                        exports com.aayushatharva.brotli4j.decoder;
+                                        exports com.aayushatharva.brotli4j.encoder;
+                                        uses com.aayushatharva.brotli4j.BrotliNativeProvider;
+                                    }
+                                </moduleInfoSource>
                             </module>
                             <jdepsExtraArgs>
                                 <arg>--multi-release</arg>
