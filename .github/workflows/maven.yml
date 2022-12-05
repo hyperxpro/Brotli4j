@@ -43,11 +43,6 @@ jobs:
           architecture: x64
       - name: Build with Maven
         run: mvn -B -ntp clean package --file pom.xml
-      - name: Upload the build
-        uses: actions/upload-artifact@v3
-        with:
-          name: macos-build
-          path: /Users/runner/work/Brotli4j/
 
   MacOSJDK17:
     runs-on: macos-latest
@@ -61,11 +56,6 @@ jobs:
           architecture: x64
       - name: Build with Maven
         run: mvn -B -ntp clean package --file pom.xml
-      - name: Upload the build
-        uses: actions/upload-artifact@v3
-        with:
-          name: macos-build
-          path: /Users/runner/work/Brotli4j/
 
   linux-x86_64-build:
     runs-on: ubuntu-latest
@@ -120,7 +110,7 @@ jobs:
           path: /home/runner/work/Brotli4j/
 
 
-  windows-x86_64-build:
+  Windows-x86_64-Build-JDK8:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
@@ -140,3 +130,34 @@ jobs:
           name: windows-x86_64-build
           path: D:\a\Brotli4j\
           
+
+  Windows-x86_64-Build-JDK11:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'corretto'
+          java-version: 11
+          architecture: x64
+      - name: Enable Developer Command Prompt
+        uses: ilammy/msvc-dev-cmd@v1.5.0
+      - name: Build with Maven
+        run: mvn -B -ntp clean package --file pom.xml
+          
+
+  Windows-x86_64-Build-JDK17:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'corretto'
+          java-version: 17
+          architecture: x64
+      - name: Enable Developer Command Prompt
+        uses: ilammy/msvc-dev-cmd@v1.5.0
+      - name: Build with Maven
+        run: mvn -B -ntp clean package --file pom.xml
