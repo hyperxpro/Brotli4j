@@ -178,9 +178,9 @@ jobs:
           cache-name: cache-m2-repository
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
+          key: ${{ runner.os }}-pr-${{ env.cache-name }}-jdk17-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
-            ${{ runner.os }}-pr-${{ env.cache-name }}-
+            ${{ runner.os }}-pr-${{ env.cache-name }}-jdk17-
             ${{ runner.os }}-pr-
       - uses: uraimo/run-on-arch-action@v2.0.5
         name: Run commands
