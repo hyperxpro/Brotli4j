@@ -119,7 +119,7 @@ jobs:
             apt-get update -q -y
             apt-get install -q -y java-1.8.0-amazon-corretto-jdk autoconf automake libtool make tar maven git cmake build-essential
           run: |
-            JAVA_HOME=/usr/lib/jvm/java-8-openjdk-arm64 mvn -B -ntp clean package
+            JAVA_HOME=/usr/lib/jvm/java-1.8.0-amazon-corretto mvn -B -ntp clean package
       - name: Upload the build
         uses: actions/upload-artifact@v3
         with:
