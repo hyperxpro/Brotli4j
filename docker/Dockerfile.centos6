@@ -5,7 +5,7 @@ RUN rm -vf /usr/lib64/libstdc++.so.6.0.24-gdb.py
 RUN yum -y install \
             git 
 
-RUN export java_version=adopt@1.8.0-275 && \
+RUN export java_version=amazon-corretto@1.8.292-10.1 && \
     export JAVA_VERSION=$java_version && \
     curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | JABBA_COMMAND="install $JAVA_VERSION -o /jdk" bash && \
     echo 'export JAVA_HOME="/jdk"' >> ~/.bashrc && \
