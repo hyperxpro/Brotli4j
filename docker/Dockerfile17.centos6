@@ -1,0 +1,45 @@
+FROM gatlingcorp/centos:6-gcc5
+
+RUN rm -vf /usr/lib64/libstdc++.so.6.0.24-gdb.py
+
+RUN yum -y install \
+            git 
+
+RUN export java_version=amazon-corretto@1.17.0-0.35.1 && \
+    export JAVA_VERSION=$java_version && \
+    curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | JABBA_COMMAND="install $JAVA_VERSION -o /jdk" bash && \
+    echo 'export JAVA_HOME="/jdk"' >> ~/.bashrc && \
+    echo 'PATH=/jdk/bin:$PATH' >> ~/.bashrc 
+
+ENV JAVA_HOME "/jdk"
+ENV PATH      "/jdk/bin:$PATH"
+ 
+RUN mkdir -p  /workspace
+
+RUN mkdir -p /opt && \
+    cd /opt  && \
+    wget --no-verbose https://www-eu.apache.org/dist/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz && \
+    tar xzf apache-maven-3.6.3-bin.tar.gz && \
+    ln -s apache-maven-3.6.3 maven && \
+    ln -s /opt/maven/bin/mvn /usr/bin/mvn
+
+RUN cd /opt && \
+    wget --no-verbose https://github.com/Kitware/CMake/releases/download/v3.20.1/cmake-3.20.1-linux-x86_64.sh && \
+    chmod a+x cmake-3.20.1-linux-x86_64.sh && \
+    yes | ./cmake-3.20.1-linux-x86_64.sh  
+
+ENV MAVEN_HOME 	"/opt/maven"
+ENV PATH 	"/opt/maven/bin:$PATH"
+ENV PATH 	"/opt/cmake-3.20.1-linux-x86_64/bin:$PATH" 
+
+RUN mkdir /workspace/Brotli4j
+RUN cd /workspace/Brotli4j
+
+RUN echo "/jdk/lib/amd64" >> /etc/ld.so.conf
+RUN echo "/jdk/jre/lib/amd64/" >> /etc/ld.so.conf
+
+RUN ldconfig
+
+RUN echo "export MAVEN_HOME=/opt/maven" >> ~/.bashrc
+RUN echo "export PATH=/opt/maven/bin:\$PATH  " >>  ~/.bashrc
+RUN echo "export PATH=/opt/cmake-3.20.1-linux-x86_64/bin:\$PATH " >>  ~/.bashrc
