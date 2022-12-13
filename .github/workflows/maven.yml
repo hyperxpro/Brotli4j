@@ -113,7 +113,7 @@ jobs:
           # Install dependencies
           install: |
             apt-get update -q -y
-            apt-get install wget -q -y
+            apt-get install wget gnupg2 -q -y
             wget -O- https://apt.corretto.aws/corretto.key | apt-key add - 
             add-apt-repository 'deb https://apt.corretto.aws stable main'
             apt-get update -q -y
