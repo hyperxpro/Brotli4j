@@ -126,13 +126,6 @@ jobs:
           name: Linux-Aarch64-Build-JDK8
           path: /home/runner/work/Brotli4j/
 
-  Linux-x86_64-Build-JDK17:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: build centos6
-        run: docker-compose -f docker/docker-compose17.yml run build
-
   Linux-Aarch64-Build-JDK11:
     runs-on: ubuntu-latest
     steps:
