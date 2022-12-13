@@ -13,7 +13,7 @@ on:
 
 jobs:
 
-  MacOSJDK8:
+  MacOS-x86_64-Build-JDK8:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
@@ -28,10 +28,10 @@ jobs:
       - name: Upload the build
         uses: actions/upload-artifact@v3
         with:
-          name: macos-build
+          name: MacOS-x86_64-Build-JDK8
           path: /Users/runner/work/Brotli4j/
 
-  MacOSJDK11:
+  MacOS-x86_64-Build-JDK11:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
@@ -44,7 +44,7 @@ jobs:
       - name: Build with Maven
         run: mvn -B -ntp clean package --file pom.xml
 
-  MacOSJDK17:
+  MacOS-x86_64-Build-JDK17:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
@@ -66,21 +66,22 @@ jobs:
       - name: Upload the build
         uses: actions/upload-artifact@v3
         with:
-          name: linux-x86_64-build
+          name: Linux-x86_64-Build-JDK8
           path: /home/runner/work/Brotli4j/
           
-  Linux-x86_64-Build-JDK17:
+  Linux-x86_64-Build-JDK11:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: build centos6
         run: docker-compose -f docker/docker-compose11.yml run build
-      - name: Upload the build
-        uses: actions/upload-artifact@v3
-        with:
-          name: linux-x86_64-build
-          path: /home/runner/work/Brotli4j/
 
+  Linux-x86_64-Build-JDK17:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: build centos6
+        run: docker-compose -f docker/docker-compose17.yml run build
 
   linux-aarch64-build:
     runs-on: ubuntu-latest
@@ -139,7 +140,7 @@ jobs:
       - name: Upload the build
         uses: actions/upload-artifact@v3
         with:
-          name: windows-x86_64-build
+          name: Windows-x86_64-Build-JDK8
           path: D:\a\Brotli4j\
           
 
