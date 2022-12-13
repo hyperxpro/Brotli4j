@@ -112,7 +112,9 @@ jobs:
             --volume "/home/runner/.m2/repository/:/root/.m2/repository"
           # Install dependencies
           install: |
-            wget -O- https://apt.corretto.aws/corretto.key | sudo apt-key add - 
+            apt-get update -q -y
+            apt-get install wget -q -y
+            wget -O- https://apt.corretto.aws/corretto.key | apt-key add - 
             add-apt-repository 'deb https://apt.corretto.aws stable main'
             apt-get update -q -y
             apt-get install -q -y java-1.8.0-amazon-corretto-jdk autoconf automake libtool make tar maven git cmake build-essential
