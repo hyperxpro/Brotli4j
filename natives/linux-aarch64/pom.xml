@@ -52,7 +52,7 @@
                                     <goal>exec</goal>
                                 </goals>
                                 <configuration>
-                                    <executable>/usr/bin/bash</executable>
+                                    <executable>/bin/bash</executable>
                                     <arguments>
                                         <argument>build.sh</argument>
                                     </arguments>
