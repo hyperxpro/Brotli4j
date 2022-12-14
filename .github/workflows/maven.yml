@@ -87,15 +87,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/cache@v3
-        env:
-          cache-name: cache-m2-repository
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-pr-${{ env.cache-name }}-
-            ${{ runner.os }}-pr-
       - uses: uraimo/run-on-arch-action@v2.3.0
         name: Run commands
         id: runcmd
@@ -103,13 +94,6 @@ jobs:
           arch: aarch64
           distro: ubuntu20.04
 
-          # Not required, but speeds up builds by storing container images in
-          # a GitHub package registry.
-          githubToken: ${{ github.token }}
-
-          # Mount the .m2/repository
-          dockerRunArgs: |
-            --volume "/home/runner/.m2/repository/:/root/.m2/repository"
           # Install dependencies
           install: |
             apt-get update -q -y
@@ -130,29 +114,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/cache@v3
-        env:
-          cache-name: cache-m2-repository
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-pr-${{ env.cache-name }}-
-            ${{ runner.os }}-pr-
       - uses: uraimo/run-on-arch-action@v2.3.0
         name: Run commands
         id: runcmd
         with:
           arch: aarch64
           distro: ubuntu20.04
-
-          # Not required, but speeds up builds by storing container images in
-          # a GitHub package registry.
-          githubToken: ${{ github.token }}
-
-          # Mount the .m2/repository
-          dockerRunArgs: |
-            --volume "/home/runner/.m2/repository/:/root/.m2/repository"
+          
           # Install dependencies
           install: |
             apt-get update -q -y
@@ -173,15 +141,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/cache@v3
-        env:
-          cache-name: cache-m2-repository
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-pr-${{ env.cache-name }}-
-            ${{ runner.os }}-pr-
       - uses: uraimo/run-on-arch-action@v2.3.0
         name: Run commands
         id: runcmd
@@ -189,14 +148,6 @@ jobs:
           arch: aarch64
           distro: ubuntu20.04
 
-          # Not required, but speeds up builds by storing container images in
-          # a GitHub package registry.
-          githubToken: ${{ github.token }}
-
-          # Mount the .m2/repository
-          dockerRunArgs: |
-            --platform linux/arm64
-            --volume "/home/runner/.m2/repository/:/root/.m2/repository"
           # Install dependencies
           install: |
             apt-get update -q -y
