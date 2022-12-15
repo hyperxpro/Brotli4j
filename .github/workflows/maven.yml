@@ -196,12 +196,12 @@ jobs:
 
           # Mount the .m2/repository
           dockerRunArgs: |
-            -e JAVA_OPTS="-Djdk.lang.Process.launchMechanism=vfork"
             --platform linux/arm64
             --volume "/home/runner/.m2/repository/:/root/.m2/repository"
 
           # Install dependencies
           install: |
+            export JAVA_OPTS="-Djdk.lang.Process.launchMechanism=vfork"
             apt-get update -q -y
             apt-get install wget gnupg2 software-properties-common -q -y
             wget -O- https://apt.corretto.aws/corretto.key | apt-key add - 
