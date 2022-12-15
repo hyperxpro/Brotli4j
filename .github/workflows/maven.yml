@@ -121,7 +121,7 @@ jobs:
             apt-get install -q -y java-1.8.0-amazon-corretto-jdk autoconf automake libtool make tar git cmake build-essential
           run: |
             chmod +x ./mvnw
-            JAVA_HOME=/usr/lib/jvm/java-1.8.0-amazon-corretto ./mvnw -B -ntp clean package
+            ./mvnw -B -ntp clean package
       - name: Upload the build
         uses: actions/upload-artifact@v3
         with:
@@ -166,12 +166,7 @@ jobs:
             apt-get install -q -y java-11-amazon-corretto-jdk autoconf automake libtool make tar git cmake build-essential
           run: |
             chmod +x ./mvnw
-            JAVA_HOME=/usr/lib/jvm/java-11-amazon-corretto ./mvnw -B -ntp clean package
-      - name: Upload the build
-        uses: actions/upload-artifact@v3
-        with:
-          name: Linux-Aarch64-Build-JDK11
-          path: /home/runner/work/Brotli4j/
+            ./mvnw -B -ntp clean package
 
   Linux-Aarch64-Build-JDK17:
     runs-on: ubuntu-latest
@@ -191,7 +186,7 @@ jobs:
         id: runcmd
         with:
           arch: aarch64
-          distro: ubuntu_latest
+          distro: ubuntu20.04
 
           # Not required, but speeds up builds by storing container images in
           # a GitHub package registry.
@@ -211,15 +206,10 @@ jobs:
             wget -O- https://apt.corretto.aws/corretto.key | apt-key add - 
             add-apt-repository 'deb https://apt.corretto.aws stable main'
             apt-get update -q -y
-            apt-get install -q -y java-17-amazon-corretto-jdk autoconf automake maven libtool make tar git cmake build-essential
+            apt-get install -q -y java-17-amazon-corretto-jdk autoconf automake libtool make tar git cmake build-essential
           run: |
             chmod 775 ./mvnw
-            mvn -B -ntp clean package
-      - name: Upload the build
-        uses: actions/upload-artifact@v3
-        with:
-          name: Linux-Aarch64-Build-JDK17
-          path: /home/runner/work/Brotli4j/
+            ./mvnw -B -ntp clean package
 
   Windows-x86_64-Build-JDK8:
     runs-on: windows-latest
