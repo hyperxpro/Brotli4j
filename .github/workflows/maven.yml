@@ -2,9 +2,7 @@ name: Java CI with Maven
 
 on:
   push:
-  
   pull_request:
-    branches: [ "4.1"]
     
   workflow_dispatch:
     inputs:
@@ -15,7 +13,7 @@ on:
 
 jobs:
 
-  macos-build:
+  MacOS-x86_64-Build-JDK8:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
@@ -30,11 +28,36 @@ jobs:
       - name: Upload the build
         uses: actions/upload-artifact@v3
         with:
-          name: macos-build
+          name: MacOS-x86_64-Build-JDK8
           path: /Users/runner/work/Brotli4j/
 
+  MacOS-x86_64-Build-JDK11:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'corretto'
+          java-version: 11
+          architecture: x64
+      - name: Build with Maven
+        run: mvn -B -ntp clean package --file pom.xml
 
-  linux-x86_64-build:
+  MacOS-x86_64-Build-JDK17:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'corretto'
+          java-version: 17
+          architecture: x64
+      - name: Build with Maven
+        run: mvn -B -ntp clean package --file pom.xml
+
+  Linux-x86_64-Build-JDK8:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -43,11 +66,24 @@ jobs:
       - name: Upload the build
         uses: actions/upload-artifact@v3
         with:
-          name: linux-x86_64-build
+          name: Linux-x86_64-Build-JDK8
           path: /home/runner/work/Brotli4j/
+          
+  Linux-x86_64-Build-JDK11:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: build centos6
+        run: docker-compose -f docker/docker-compose11.yml run build
 
+  Linux-x86_64-Build-JDK17:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: build centos6
+        run: docker-compose -f docker/docker-compose17.yml run build
 
-  linux-aarch64-build:
+  Linux-Aarch64-Build-JDK8:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -60,7 +96,92 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pr-${{ env.cache-name }}-
             ${{ runner.os }}-pr-
-      - uses: uraimo/run-on-arch-action@v2.0.5
+      - uses: uraimo/run-on-arch-action@v2.3.0
+        name: Run commands
+        id: runcmd
+        with:
+          arch: aarch64
+          distro: ubuntu20.04
+          
+          # Not required, but speeds up builds by storing container images in
+          # a GitHub package registry.
+          githubToken: ${{ github.token }}
+
+          # Mount the .m2/repository
+          dockerRunArgs: |
+            --volume "/home/runner/.m2/repository/:/root/.m2/repository"
+
+          # Install dependencies
+          install: |
+            apt-get update -q -y
+            apt-get install wget gnupg2 software-properties-common -q -y
+            wget -O- https://apt.corretto.aws/corretto.key | apt-key add - 
+            add-apt-repository 'deb https://apt.corretto.aws stable main'
+            apt-get update -q -y
+            apt-get install -q -y java-1.8.0-amazon-corretto-jdk autoconf automake libtool make tar git cmake build-essential
+          run: |
+            chmod +x ./mvnw
+            ./mvnw -B -ntp clean package
+      - name: Upload the build
+        uses: actions/upload-artifact@v3
+        with:
+          name: Linux-Aarch64-Build-JDK8
+          path: /home/runner/work/Brotli4j/
+
+  Linux-Aarch64-Build-JDK11:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/cache@v3
+        env:
+          cache-name: cache-m2-repository
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-pr-${{ env.cache-name }}-
+            ${{ runner.os }}-pr-
+      - uses: uraimo/run-on-arch-action@v2.3.0
+        name: Run commands
+        id: runcmd
+        with:
+          arch: aarch64
+          distro: ubuntu20.04
+          
+            # Not required, but speeds up builds by storing container images in
+          # a GitHub package registry.
+          githubToken: ${{ github.token }}
+
+          # Mount the .m2/repository
+          dockerRunArgs: |
+            --volume "/home/runner/.m2/repository/:/root/.m2/repository"
+          
+          # Install dependencies
+          install: |
+            apt-get update -q -y
+            apt-get install wget gnupg2 software-properties-common -q -y
+            wget -O- https://apt.corretto.aws/corretto.key | apt-key add - 
+            add-apt-repository 'deb https://apt.corretto.aws stable main'
+            apt-get update -q -y
+            apt-get install -q -y java-11-amazon-corretto-jdk autoconf automake libtool make tar git cmake build-essential
+          run: |
+            chmod +x ./mvnw
+            ./mvnw -B -ntp clean package
+
+  Linux-Aarch64-Build-JDK17:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/cache@v3
+        env:
+          cache-name: cache-m2-repository
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-pr-${{ env.cache-name }}-
+            ${{ runner.os }}-pr-
+      - uses: uraimo/run-on-arch-action@v2.3.0
         name: Run commands
         id: runcmd
         with:
@@ -70,24 +191,28 @@ jobs:
           # Not required, but speeds up builds by storing container images in
           # a GitHub package registry.
           githubToken: ${{ github.token }}
+          
+          shell: /bin/bash
 
           # Mount the .m2/repository
           dockerRunArgs: |
+            --platform linux/arm64
             --volume "/home/runner/.m2/repository/:/root/.m2/repository"
+
           # Install dependencies
           install: |
             apt-get update -q -y
-            apt-get install -q -y openjdk-8-jdk autoconf automake libtool make tar maven git cmake build-essential
+            apt-get install wget gnupg2 software-properties-common -q -y
+            wget -O- https://apt.corretto.aws/corretto.key | apt-key add - 
+            add-apt-repository 'deb https://apt.corretto.aws stable main'
+            apt-get update -q -y
+            apt-get install -q -y java-17-amazon-corretto-jdk autoconf automake libtool make tar git cmake build-essential
           run: |
-            JAVA_HOME=/usr/lib/jvm/java-8-openjdk-arm64 mvn -B -ntp clean package
-      - name: Upload the build
-        uses: actions/upload-artifact@v3
-        with:
-          name: linux-aarch64-build
-          path: /home/runner/work/Brotli4j/
+            export MAVEN_OPTS="-Djdk.lang.Process.launchMechanism=vfork"
+            chmod 775 ./mvnw
+            ./mvnw -B -ntp clean package
 
-
-  windows-x86_64-build:
+  Windows-x86_64-Build-JDK8:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
@@ -104,5 +229,38 @@ jobs:
       - name: Upload the build
         uses: actions/upload-artifact@v3
         with:
-          name: windows-x86_64-build
+          name: Windows-x86_64-Build-JDK8
           path: D:\a\Brotli4j\
+          
+
+  Windows-x86_64-Build-JDK11:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'corretto'
+          java-version: 11
+          architecture: x64
+      - name: Enable Developer Command Prompt
+        uses: ilammy/msvc-dev-cmd@v1.5.0
+      - name: Build with Maven
+        run: mvn -B -ntp clean package --file pom.xml
+          
+
+  Windows-x86_64-Build-JDK17:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'corretto'
+          java-version: 17
+          architecture: x64
+      - name: Enable Developer Command Prompt
+        uses: ilammy/msvc-dev-cmd@v1.5.0
+      - name: Build with Maven
+        run: mvn -B -ntp clean package --file pom.xml
+  
