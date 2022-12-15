@@ -207,7 +207,7 @@ jobs:
             wget -O- https://apt.corretto.aws/corretto.key | apt-key add - 
             add-apt-repository 'deb https://apt.corretto.aws stable main'
             apt-get update -q -y
-            apt-get install -q -y java-17-amazon-corretto-jdk autoconf automake libtool make tar git cmake build-essential bash
+            apt-get install -q -y java-17-amazon-corretto-jdk autoconf automake libtool make tar git cmake build-essential
           run: |
             chmod +x ./mvnw
             JAVA_HOME=/usr/lib/jvm/java-17-amazon-corretto ./mvnw -B -ntp clean package
