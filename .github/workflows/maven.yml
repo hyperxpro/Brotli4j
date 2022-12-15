@@ -196,7 +196,6 @@ jobs:
 
           # Mount the .m2/repository
           dockerRunArgs: |
-            -e java_opts=-Djdk.lang.Process.launchMechanism=vfork
             --platform linux/arm64
             --volume "/home/runner/.m2/repository/:/root/.m2/repository"
 
