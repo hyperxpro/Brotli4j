@@ -191,7 +191,7 @@ jobs:
         id: runcmd
         with:
           arch: aarch64
-          distro: ubuntu20.04
+          distro: ubuntu_latest
 
           # Not required, but speeds up builds by storing container images in
           # a GitHub package registry.
@@ -211,10 +211,10 @@ jobs:
             wget -O- https://apt.corretto.aws/corretto.key | apt-key add - 
             add-apt-repository 'deb https://apt.corretto.aws stable main'
             apt-get update -q -y
-            apt-get install -q -y java-17-amazon-corretto-jdk autoconf automake libtool make tar git cmake build-essential
+            apt-get install -q -y java-17-amazon-corretto-jdk autoconf automake maven libtool make tar git cmake build-essential
           run: |
             chmod 775 ./mvnw
-            ./mvnw -B -ntp clean package
+            mvn -B -ntp clean package
       - name: Upload the build
         uses: actions/upload-artifact@v3
         with:
