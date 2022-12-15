@@ -52,7 +52,10 @@
                                     <goal>exec</goal>
                                 </goals>
                                 <configuration>
-                                    <executable>ls</executable>
+                                    <executable>/bin/bash</executable>
+                                    <arguments>
+                                        <argument>build.sh</argument>
+                                    </arguments>
                                     <workingDirectory>${project.basedir}</workingDirectory>
                                 </configuration>
                             </execution>
