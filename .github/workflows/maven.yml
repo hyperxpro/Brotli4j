@@ -214,7 +214,7 @@ jobs:
             apt-get install -q -y java-17-amazon-corretto-jdk autoconf automake libtool make tar git cmake build-essential
           run: |
             chmod 775 ./mvnw
-            JAVA_HOME=/usr/lib/jvm/java-17-amazon-corretto ./mvnw -B -ntp clean package
+            ./mvnw -B -ntp clean package
       - name: Upload the build
         uses: actions/upload-artifact@v3
         with:
