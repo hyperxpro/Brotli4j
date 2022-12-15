@@ -208,7 +208,7 @@ jobs:
             apt-get update -q -y
             apt-get install -q -y java-17-amazon-corretto-jdk autoconf automake libtool make tar git cmake build-essential
           run: |
-            export JAVA_OPTS="-Djdk.lang.Process.launchMechanism=vfork"
+            export MAVEN_OPTS="-Djdk.lang.Process.launchMechanism=vfork"
             chmod 775 ./mvnw
             ./mvnw -B -ntp clean package
 
