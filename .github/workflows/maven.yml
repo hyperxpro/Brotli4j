@@ -205,7 +205,11 @@ jobs:
           # Install dependencies
           install: |
             apt-get update -q -y
-            apt-get install -q -y temurin-17-jdk autoconf automake libtool make tar git cmake build-essential
+            apt install -q -y wget apt-transport-https
+            wget -O - https://packages.adoptium.net/artifactory/api/gpg/key/public | apt-key add -
+            echo "deb https://packages.adoptium.net/artifactory/deb $(awk -F= '/^VERSION_CODENAME/{print$2}' /etc/os-release) main" | tee /etc/apt/sources.list.d/adoptium.list
+            apt-get update -q -y
+            apt-get install -q -y java-1.8.0-amazon-corretto-jdk autoconf automake libtool make tar maven git cmake build-essential
           run: |
             chmod +x ./mvnw
             JAVA_HOME=/usr/lib/jvm/java-17-amazon-corretto ./mvnw -B -ntp clean package
