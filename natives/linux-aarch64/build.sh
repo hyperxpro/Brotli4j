@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 CURPATH=$(pwd)
 TARGET_CLASSES_PATH="target/classes/lib/linux-aarch64"
