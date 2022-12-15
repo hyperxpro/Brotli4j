@@ -197,6 +197,7 @@ jobs:
 
           # Mount the .m2/repository
           dockerRunArgs: |
+            --platform linux/arm64
             --volume "/home/runner/.m2/repository/:/root/.m2/repository"
 
           # Install dependencies
