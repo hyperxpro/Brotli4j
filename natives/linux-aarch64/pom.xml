@@ -52,10 +52,7 @@
                                     <goal>exec</goal>
                                 </goals>
                                 <configuration>
-                                    <executable>/bin/bash</executable>
-                                    <arguments>
-                                        <argument>build.sh</argument>
-                                    </arguments>
+                                    <executable>./build.sh</executable>
                                     <workingDirectory>${project.basedir}</workingDirectory>
                                 </configuration>
                             </execution>
