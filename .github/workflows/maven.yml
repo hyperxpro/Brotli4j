@@ -208,6 +208,7 @@ jobs:
             apt-get update -q -y
             apt-get install -q -y java-17-amazon-corretto-jdk autoconf automake libtool make tar git cmake build-essential
           run: |
+            chmod 775 /usr/lib/jvm/java-17-amazon-corretto/lib/jspawnhelper
             chmod 775 ./mvnw
             ./mvnw -B -ntp clean package
 
