@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.ServiceLoader;
 
 /**
  * Loads Brotli Native Library
@@ -38,7 +39,8 @@ public class Brotli4jLoader {
         } catch (Throwable t) {
             try {
                 String nativeLibName = System.mapLibraryName("brotli");
-                String libPath = "/lib/" + getPlatform() + "/" + nativeLibName;
+                String platform = getPlatform();
+                String libPath = "/lib/" + platform + "/" + nativeLibName;
 
                 File tempDir = new File(System.getProperty("java.io.tmpdir"), "com_aayushatharva_brotli4j_" + System.nanoTime());
                 tempDir.mkdir();
@@ -46,7 +48,16 @@ public class Brotli4jLoader {
 
                 File tempFile = new File(tempDir, nativeLibName);
 
-                try (InputStream in = Brotli4jLoader.class.getResourceAsStream(libPath)) {
+                Class<?> loaderClassToUse = Brotli4jLoader.class; // Use this as a fallback for non-JPMS contexts
+                // In Java9+ with JPMS enabled, we need a class in the jar that contains the file to be able to access its content
+                ServiceLoader<BrotliNativeProvider> nativeProviders = ServiceLoader.load(BrotliNativeProvider.class, Brotli4jLoader.class.getClassLoader());
+                for (BrotliNativeProvider nativeProvider : nativeProviders) {
+                    if (nativeProvider.platformName().equals(platform)) {
+                        loaderClassToUse = nativeProvider.getClass();
+                        break;
+                    }
+                }
+                try (InputStream in = loaderClassToUse.getResourceAsStream(libPath)) {
                     Files.copy(in, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 } catch (Throwable throwable) {
                     tempFile.delete();

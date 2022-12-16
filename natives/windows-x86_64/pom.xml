@@ -22,12 +22,51 @@
     <parent>
         <artifactId>natives</artifactId>
         <groupId>com.aayushatharva.brotli4j</groupId>
-        <version>1.8.0</version>
+        <version>1.9.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>native-windows-x86_64</artifactId>
     <packaging>jar</packaging>
+
+    <properties>
+        <javaModuleName>com.aayushatharva.brotli4j.windows.x86_64</javaModuleName>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.moditect</groupId>
+                <artifactId>moditect-maven-plugin</artifactId>
+                <version>1.0.0.RC2</version>
+                <executions>
+                    <execution>
+                        <id>add-module-infos</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>add-module-info</goal>
+                        </goals>
+                        <configuration>
+                            <jvmVersion>9</jvmVersion>
+                            <module>
+                                <moduleInfoSource>
+                                    module ${javaModuleName} {
+                                        requires com.aayushatharva.brotli4j;
+                                        exports ${javaModuleName} to com.aayushatharva.brotli4j;
+                                        provides com.aayushatharva.brotli4j.BrotliNativeProvider with ${javaModuleName}.NativeLoader;
+                                    }
+                                </moduleInfoSource>
+                            </module>
+                            <jdepsExtraArgs>
+                                <arg>--multi-release</arg>
+                                <arg>9</arg>
+                            </jdepsExtraArgs>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
     <profiles>
         <profile>
