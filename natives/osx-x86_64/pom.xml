@@ -49,12 +49,13 @@
                         <configuration>
                             <jvmVersion>9</jvmVersion>
                             <module>
-                                <moduleInfo>
-                                    <name>${javaModuleName}</name>
-                                    <exports>
-                                        ${javaModuleName} to com.aayushatharva.brotli4j;
-                                    </exports>
-                                </moduleInfo>
+                                <moduleInfoSource>
+                                    module ${javaModuleName} {
+                                        requires com.aayushatharva.brotli4j;
+                                        exports ${javaModuleName} to com.aayushatharva.brotli4j;
+                                        provides com.aayushatharva.brotli4j.BrotliNativeProvider with ${javaModuleName}.NativeLoader;
+                                    }
+                                </moduleInfoSource>
                             </module>
                             <jdepsExtraArgs>
                                 <arg>--multi-release</arg>

@@ -35,6 +35,15 @@
         <module>osx-aarch64</module>
     </modules>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.aayushatharva.brotli4j</groupId>
+            <artifactId>brotli4j</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
     <profiles>
         <profile>
             <id>linux-x86_64</id>

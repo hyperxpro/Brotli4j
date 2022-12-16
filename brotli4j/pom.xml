@@ -49,15 +49,15 @@
                         <configuration>
                             <jvmVersion>9</jvmVersion>
                             <module>
-                                <moduleInfo>
-                                    <name>${javaModuleName}</name>
-                                    <exports>
-                                        com.aayushatharva.brotli4j;
-                                        com.aayushatharva.brotli4j.common;
-                                        com.aayushatharva.brotli4j.decoder;
-                                        com.aayushatharva.brotli4j.encoder;
-                                    </exports>
-                                </moduleInfo>
+                                <moduleInfoSource>
+                                    module ${javaModuleName} {
+                                        exports com.aayushatharva.brotli4j;
+                                        exports com.aayushatharva.brotli4j.common;
+                                        exports com.aayushatharva.brotli4j.decoder;
+                                        exports com.aayushatharva.brotli4j.encoder;
+                                        uses com.aayushatharva.brotli4j.BrotliNativeProvider;
+                                    }
+                                </moduleInfoSource>
                             </module>
                             <jdepsExtraArgs>
                                 <arg>--multi-release</arg>
@@ -69,92 +69,5 @@
             </plugin>
         </plugins>
     </build>
-
-    <profiles>
-        <profile>
-            <id>linux-x86_64</id>
-            <activation>
-                <os>
-                    <family>Linux</family>
-                    <arch>amd64</arch>
-                </os>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.aayushatharva.brotli4j</groupId>
-                    <artifactId>native-linux-x86_64</artifactId>
-                    <version>${project.parent.version}</version>
-                </dependency>
-            </dependencies>
-        </profile>
-
-        <profile>
-            <id>linux-aarch64</id>
-            <activation>
-                <os>
-                    <family>Linux</family>
-                    <arch>aarch64</arch>
-                </os>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.aayushatharva.brotli4j</groupId>
-                    <artifactId>native-linux-aarch64</artifactId>
-                    <version>${project.parent.version}</version>
-                </dependency>
-            </dependencies>
-        </profile>
-
-	    <profile>
-            <id>windows-x86_64</id>
-            <activation>
-                <os>
-                    <family>Windows</family>
-                    <arch>amd64</arch>
-                </os>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.aayushatharva.brotli4j</groupId>
-                    <artifactId>native-windows-x86_64</artifactId>
-                    <version>${project.parent.version}</version>
-                </dependency>
-            </dependencies>
-        </profile>
-
-        <profile>
-            <id>osx-x86_64</id>
-            <activation>
-                <os>
-                    <family>Mac</family>
-                    <arch>x86_64</arch>
-                </os>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.aayushatharva.brotli4j</groupId>
-                    <artifactId>native-osx-x86_64</artifactId>
-                    <version>${project.parent.version}</version>
-                </dependency>
-            </dependencies>
-        </profile>
-
-        <profile>
-            <id>osx-aarch64</id>
-            <activation>
-                <os>
-                    <family>Mac</family>
-                    <arch>aarch64</arch>
-                </os>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.aayushatharva.brotli4j</groupId>
-                    <artifactId>native-osx-aarch64</artifactId>
-                    <version>${project.parent.version}</version>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
 
 </project>

@@ -10,8 +10,6 @@ REM  o  cmake 3.0 + installed and available via PATH
 REM  o  nmake installed (comes e.g. with Visual Studio), call "vcvarsall.bat x64" before to activate 64bit tools
 REM
 
-IF exist "%~dp0target" (exit)
-
 :ENSURE_WORKING_DIRECTORY
 cd "%~dp0"
 

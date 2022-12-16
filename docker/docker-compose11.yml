@@ -6,7 +6,7 @@ services:
     image: brotli4j:default
     build:
       context: .
-      dockerfile: Dockerfile.centos6
+      dockerfile: Dockerfile11.centos6
 
   common: &common
     image: brotli4j:default
