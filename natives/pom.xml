@@ -77,7 +77,7 @@
             <activation>
                 <os>
                     <family>Linux</family>
-                    <arch>armv7</arch>
+                    <arch>arm</arch>
                 </os>
             </activation>
             <modules>

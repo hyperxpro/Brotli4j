@@ -70,11 +70,11 @@
 
     <profiles>
         <profile>
-            <id>linux-aarch64</id>
+            <id>linux-armv7</id>
             <activation>
                 <os>
                     <family>Linux</family>
-                    <arch>aarch64</arch>
+                    <arch>armv7</arch>
                 </os>
             </activation>
             <build>
