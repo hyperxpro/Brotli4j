@@ -103,7 +103,7 @@ jobs:
         id: runcmd
         with:
           arch: aarch64
-          distro: ubuntu20.04
+          distro: ubuntu18.04
           
           # Not required, but speeds up builds by storing container images in
           # a GitHub package registry.
@@ -111,19 +111,22 @@ jobs:
 
           # Mount the .m2/repository
           dockerRunArgs: |
+            --platform linux/arm64
             --volume "/home/runner/.m2/repository/:/root/.m2/repository"
 
           # Install dependencies
           install: |
-            apt-get update -q -y
-            apt-get install wget gnupg2 software-properties-common -q -y
-            wget -O- https://apt.corretto.aws/corretto.key | apt-key add - 
-            add-apt-repository 'deb https://apt.corretto.aws stable main'
-            apt-get update -q -y
-            apt-get install -q -y java-1.8.0-amazon-corretto-jdk autoconf automake libtool make tar git cmake build-essential
+            apt-get update
+            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential
+
+            curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | bash && . ~/.jabba/jabba.sh
+            jabba install 1.8.0-custom=tgz+https://corretto.aws/downloads/resources/8.352.08.1/amazon-corretto-8.352.08.1-linux-aarch64.tar.gz -o /jdk
+          
           run: |
+            export JAVA_HOME="/jdk"
             chmod +x ./mvnw
             ./mvnw -B -ntp clean package
+            
       - name: Upload the build
         uses: actions/upload-artifact@v3
         with:
@@ -148,25 +151,27 @@ jobs:
         id: runcmd
         with:
           arch: aarch64
-          distro: ubuntu20.04
-          
-            # Not required, but speeds up builds by storing container images in
+          distro: ubuntu18.04
+
+          # Not required, but speeds up builds by storing container images in
           # a GitHub package registry.
           githubToken: ${{ github.token }}
 
           # Mount the .m2/repository
           dockerRunArgs: |
+            --platform linux/arm64
             --volume "/home/runner/.m2/repository/:/root/.m2/repository"
-          
+
           # Install dependencies
           install: |
-            apt-get update -q -y
-            apt-get install wget gnupg2 software-properties-common -q -y
-            wget -O- https://apt.corretto.aws/corretto.key | apt-key add - 
-            add-apt-repository 'deb https://apt.corretto.aws stable main'
-            apt-get update -q -y
-            apt-get install -q -y java-11-amazon-corretto-jdk autoconf automake libtool make tar git cmake build-essential
+            apt-get update
+            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential
+
+            curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | bash && . ~/.jabba/jabba.sh
+            jabba install 11.0.0-custom=tgz+https://corretto.aws/downloads/resources/11.0.17.8.1/amazon-corretto-11.0.17.8.1-linux-aarch64.tar.gz -o /jdk
+          
           run: |
+            export JAVA_HOME="/jdk"
             chmod +x ./mvnw
             ./mvnw -B -ntp clean package
 
@@ -188,30 +193,119 @@ jobs:
         id: runcmd
         with:
           arch: aarch64
-          distro: ubuntu20.04
+          distro: ubuntu18.04
 
           # Not required, but speeds up builds by storing container images in
           # a GitHub package registry.
           githubToken: ${{ github.token }}
-          
-          shell: /bin/bash
 
           # Mount the .m2/repository
           dockerRunArgs: |
             --platform linux/arm64
             --volume "/home/runner/.m2/repository/:/root/.m2/repository"
+            
+          # Install dependencies
+          install: |
+            apt-get update
+            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential
+
+            curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | bash && . ~/.jabba/jabba.sh
+            jabba install 17.0.0-custom=tgz+https://corretto.aws/downloads/resources/17.0.5.8.1/amazon-corretto-17.0.5.8.1-linux-aarch64.tar.gz -o /jdk
+          
+          run: |
+            export MAVEN_OPTS="-Djdk.lang.Process.launchMechanism=vfork"
+            export JAVA_HOME="/jdk"
+            chmod +x ./mvnw
+            ./mvnw -B -ntp clean package
+
+  Linux-ArmV7-Build-JDK8:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/cache@v3
+        env:
+          cache-name: cache-m2-repository
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-pr-${{ env.cache-name }}-
+            ${{ runner.os }}-pr-
+      - uses: uraimo/run-on-arch-action@v2.3.0
+        name: Run commands
+        id: runcmd
+        with:
+          arch: armv7
+          distro: ubuntu18.04
+
+          # Not required, but speeds up builds by storing container images in
+          # a GitHub package registry.
+          githubToken: ${{ github.token }}
+
+          # Mount the .m2/repository
+          dockerRunArgs: |
+            --platform linux/arm/v7
+            --volume "/home/runner/.m2/repository/:/root/.m2/repository"
 
           # Install dependencies
           install: |
-            apt-get update -q -y
-            apt-get install wget gnupg2 software-properties-common -q -y
-            wget -O- https://apt.corretto.aws/corretto.key | apt-key add - 
-            add-apt-repository 'deb https://apt.corretto.aws stable main'
-            apt-get update -q -y
-            apt-get install -q -y java-17-amazon-corretto-jdk autoconf automake libtool make tar git cmake build-essential
+            apt-get update
+            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential
+
+            curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | bash && . ~/.jabba/jabba.sh
+            jabba install 1.8.0-custom=tgz+https://cdn.azul.com/zulu-embedded/bin/zulu8.66.0.15-ca-jdk8.0.352-linux_aarch32hf.tar.gz -o /jdk
+          
           run: |
-            export MAVEN_OPTS="-Djdk.lang.Process.launchMechanism=vfork"
-            chmod 775 ./mvnw
+            export JAVA_HOME="/jdk"
+            chmod +x ./mvnw
+            ./mvnw -B -ntp clean package
+            
+      - name: Upload the build
+        uses: actions/upload-artifact@v3
+        with:
+          name: Linux-Aarch64-Build-JDK8
+          path: /home/runner/work/Brotli4j/
+
+  Linux-ArmV7-Build-JDK11:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/cache@v3
+        env:
+          cache-name: cache-m2-repository
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-pr-${{ env.cache-name }}-
+            ${{ runner.os }}-pr-
+      - uses: uraimo/run-on-arch-action@v2.3.0
+        name: Run commands
+        id: runcmd
+        with:
+          arch: armv7
+          distro: ubuntu18.04
+
+          # Not required, but speeds up builds by storing container images in
+          # a GitHub package registry.
+          githubToken: ${{ github.token }}
+
+          # Mount the .m2/repository
+          dockerRunArgs: |
+            --platform linux/arm/v7
+            --volume "/home/runner/.m2/repository/:/root/.m2/repository"
+            
+          # Install dependencies
+          install: |
+            apt-get update
+            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential
+
+            curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | bash && . ~/.jabba/jabba.sh
+            jabba install 11.0.0-custom=tgz+https://cdn.azul.com/zulu-embedded/bin/zulu11.60.19-ca-jdk11.0.17-linux_aarch32hf.tar.gz -o /jdk
+          
+          run: |
+            export JAVA_HOME="/jdk"
+            chmod +x ./mvnw
             ./mvnw -B -ntp clean package
 
   Windows-x86_64-Build-JDK8:
