@@ -66,7 +66,10 @@ dependencies {
 #### Groovy
 
 ```groovy
-def brotliVersion = "1.8.0"
+import org.gradle.nativeplatform.platform.internal.Architectures
+import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
+
+def brotliVersion = "1.9.0"
 def operatingSystem = DefaultNativePlatform.getCurrentOperatingSystem()
 
 repositories {
@@ -74,16 +77,24 @@ repositories {
 }
 
 dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+
     implementation "com.aayushatharva.brotli4j:brotli4j:$brotliVersion"
-    runtimeOnly("com.aayushatharva.brotli4j:native-${
+    runtimeOnly("""com.aayushatharva.brotli4j:native-${
         if (operatingSystem.isWindows()) "windows-x86_64"
         else if (operatingSystem.isMacOsX())
             if (DefaultNativePlatform.getCurrentArchitecture().isArm()) "osx-aarch64"
             else "osx-x86_64"
         else if (operatingSystem.isLinux())
-            if (DefaultNativePlatform.getCurrentArchitecture().isArm()) "linux-aarch64"
-            else "linux-x86_64"
-    }:$brotliVersion")
+            if (Architectures.ARM_V7.isAlias(DefaultNativePlatform.getCurrentArchitecture().getName())) "linux-armv7"
+            else if (Architectures.AARCH64.isAlias(DefaultNativePlatform.getCurrentArchitecture().getName())) "linux-aarch64"
+            else if (Architectures.X86_64.isAlias(DefaultNativePlatform.getCurrentArchitecture().getName())) "linux-x86_64"
+            else
+                throw new IllegalStateException("Unsupported architecture: ${DefaultNativePlatform.getCurrentArchitecture().getName()}");
+        else 
+            throw new IllegalStateException("Unsupported operating system: $operatingSystem");
+    }:$brotliVersion""")
 }
 ```
 
