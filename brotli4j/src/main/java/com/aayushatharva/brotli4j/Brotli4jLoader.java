@@ -105,6 +105,8 @@ public class Brotli4jLoader {
                 return "linux-x86_64";
             } else if (archName.equalsIgnoreCase("aarch64")) {
                 return "linux-aarch64";
+            } else if (archName.equalsIgnoreCase("arm")) {
+                return "linux-armv7";
             }
         } else if (osName.startsWith("Windows")) {
             if (archName.equalsIgnoreCase("amd64")) {

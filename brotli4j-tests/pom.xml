@@ -84,6 +84,24 @@
         </profile>
 
         <profile>
+            <id>linux-armv7</id>
+            <activation>
+                <os>
+                    <family>Linux</family>
+                    <arch>arm</arch>
+                </os>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.aayushatharva.brotli4j</groupId>
+                    <artifactId>native-linux-armv7</artifactId>
+                    <version>${project.version}</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
             <id>windows-x86_64</id>
             <activation>
                 <os>
