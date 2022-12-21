@@ -77,9 +77,6 @@ repositories {
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
-
     implementation "com.aayushatharva.brotli4j:brotli4j:$brotliVersion"
     runtimeOnly("""com.aayushatharva.brotli4j:native-${
         if (operatingSystem.isWindows()) "windows-x86_64"
