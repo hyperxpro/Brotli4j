@@ -319,7 +319,7 @@ jobs:
           java-version: 8
           architecture: x64
       - name: Enable Developer Command Prompt
-        uses: ilammy/msvc-dev-cmd@v1.5.0
+        uses: ilammy/msvc-dev-cmd@v1.12.0
       - name: Build with Maven
         run: mvn -B -ntp clean package --file pom.xml
       - name: Upload the build
@@ -340,7 +340,7 @@ jobs:
           java-version: 11
           architecture: x64
       - name: Enable Developer Command Prompt
-        uses: ilammy/msvc-dev-cmd@v1.5.0
+        uses: ilammy/msvc-dev-cmd@v1.12.0
       - name: Build with Maven
         run: mvn -B -ntp clean package --file pom.xml
           
@@ -356,7 +356,7 @@ jobs:
           java-version: 17
           architecture: x64
       - name: Enable Developer Command Prompt
-        uses: ilammy/msvc-dev-cmd@v1.5.0
+        uses: ilammy/msvc-dev-cmd@v1.12.0
       - name: Build with Maven
         run: mvn -B -ntp clean package --file pom.xml
   
