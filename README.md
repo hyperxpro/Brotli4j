@@ -106,7 +106,9 @@ dependencies {
 
 ### Loading native library:
 
-Call `Brotli4jLoader.ensureAvailability()` in your application once before using Brotli4j.
+Call `Brotli4jLoader.ensureAvailability()` in your application once before using Brotli4j. This will load
+Brotli4j native library automatically using automatic dependency resolution.
+However, its possible to load native library manually from custom path by specifying System Property `"brotli4j.library.path"`.
 
 ### Direct API
 
