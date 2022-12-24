@@ -263,7 +263,7 @@ jobs:
       - name: Upload the build
         uses: actions/upload-artifact@v3
         with:
-          name: Linux-Aarch64-Build-JDK8
+          name: Linux-ArmV7-Build-JDK8
           path: /home/runner/work/Brotli4j/
 
   Linux-ArmV7-Build-JDK11:
