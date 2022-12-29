@@ -204,6 +204,10 @@ OR:
 #define BROTLI_TARGET_POWERPC64
 #endif
 
+#if defined(__loongarch64)
+#define BROTLI_TARGET_LOONGARCH64
+#endif
+
 #if defined(__riscv) && defined(__riscv_xlen) && __riscv_xlen == 64
 #define BROTLI_TARGET_RISCV64
 #endif

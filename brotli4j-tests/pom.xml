@@ -150,6 +150,24 @@
         </profile>
 
         <profile>
+            <id>linux-loongarch64</id>
+            <activation>
+                <os>
+                    <family>Linux</family>
+                    <arch>loongarch64</arch>
+                </os>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.aayushatharva.brotli4j</groupId>
+                    <artifactId>native-linux-loongarch64</artifactId>
+                    <version>${project.version}</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+	
+	<profile>
             <id>windows-x86_64</id>
             <activation>
                 <os>
