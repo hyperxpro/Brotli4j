@@ -70,4 +70,11 @@ class EncoderTest {
         final byte[] compressedFont = Encoder.compress(text, parameters.setMode(Encoder.Mode.FONT));
         assertEquals(31, compressedFont.length);
     }
+
+    @Test
+    void encodeModeEnumValues() {
+        assertEquals(Encoder.Mode.FONT, Encoder.Mode.of(Encoder.Mode.FONT.ordinal()));
+        assertEquals(Encoder.Mode.TEXT, Encoder.Mode.of(Encoder.Mode.TEXT.ordinal()));
+        assertEquals(Encoder.Mode.GENERIC, Encoder.Mode.of(Encoder.Mode.GENERIC.ordinal()));
+    }
 }
