@@ -75,6 +75,7 @@ public class Brotli4jLoader {
                     }
 
                     System.load(tempFile.getAbsolutePath());
+                    tempFile.deleteOnExit();
                 } catch (Throwable throwable) {
                     cause = throwable;
                 }
