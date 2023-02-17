@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.aayushatharva.brotli4j;
+package com.aayushatharva.brotli4j.service;
 
 /**
  * A service interface that signals that an implementor jar contains a native lib.

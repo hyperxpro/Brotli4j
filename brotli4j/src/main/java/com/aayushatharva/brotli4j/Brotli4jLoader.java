@@ -17,6 +17,7 @@
 package com.aayushatharva.brotli4j;
 
 import com.aayushatharva.brotli4j.common.annotations.Local;
+import com.aayushatharva.brotli4j.service.BrotliNativeProvider;
 
 import java.io.File;
 import java.io.InputStream;

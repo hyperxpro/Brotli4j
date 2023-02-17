@@ -55,7 +55,7 @@
     <modules>
         <module>natives</module>
         <module>brotli4j</module>
-        <module>brotli4j-tests</module>
+        <module>service</module>
         <module>all</module>
     </modules>
 

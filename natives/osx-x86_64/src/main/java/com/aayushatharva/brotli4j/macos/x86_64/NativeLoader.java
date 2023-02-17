@@ -16,7 +16,7 @@
  */
 package com.aayushatharva.brotli4j.macos.x86_64;
 
-import com.aayushatharva.brotli4j.BrotliNativeProvider;
+import com.aayushatharva.brotli4j.service.BrotliNativeProvider;
 
 /**
  * Service class to access the native lib in a JPMS context
