@@ -3,7 +3,7 @@ package com.aayushatharva.brotli4j;
 import com.aayushatharva.brotli4j.common.annotations.Internal;
 
 /**
- * This interface is superseded by {@link com.aayushatharva.brotli4j.service.BrotliNativeProvider}.
+ * @deprecated This interface is NO-OP now. It is superseded by {@link com.aayushatharva.brotli4j.service.BrotliNativeProvider}.
  * However, we cannot remove this interface because it is part of the public API.
  * <p>
  * Also, this is an Internal API and should not be used by external users.
@@ -19,5 +19,7 @@ public interface BrotliNativeProvider {
      * <p>
      */
     @Deprecated
-    String platformName();
+    default String platformName() {
+        throw new UnsupportedOperationException("This method is superseded by com.aayushatharva.brotli4j.service.BrotliNativeProvider#platformName()");
+    }
 }

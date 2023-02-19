@@ -34,7 +34,7 @@
                             <module>
                                 <moduleInfoSource>
                                     module ${javaModuleName} {
-                                        exports com.aayushatharva.brotli4j.service;
+                                    exports com.aayushatharva.brotli4j.service;
                                     }
                                 </moduleInfoSource>
                             </module>

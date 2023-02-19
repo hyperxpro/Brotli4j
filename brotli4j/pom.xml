@@ -29,6 +29,10 @@
     <artifactId>brotli4j</artifactId>
     <packaging>jar</packaging>
 
+    <properties>
+        <javaModuleName>com.aayushatharva.brotli4j</javaModuleName>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.aayushatharva.brotli4j</groupId>
@@ -141,10 +145,6 @@
         </profile>
     </profiles>
 
-    <properties>
-        <javaModuleName>com.aayushatharva.brotli4j</javaModuleName>
-    </properties>
-
     <build>
         <plugins>
             <plugin>
@@ -163,12 +163,12 @@
                             <module>
                                 <moduleInfoSource>
                                     module ${javaModuleName} {
-                                        requires com.aayushatharva.brotli4j.service;
-                                        exports com.aayushatharva.brotli4j;
-                                        exports com.aayushatharva.brotli4j.common;
-                                        exports com.aayushatharva.brotli4j.decoder;
-                                        exports com.aayushatharva.brotli4j.encoder;
-                                        uses com.aayushatharva.brotli4j.service.BrotliNativeProvider;
+                                    requires com.aayushatharva.brotli4j.service;
+                                    exports com.aayushatharva.brotli4j;
+                                    exports com.aayushatharva.brotli4j.common;
+                                    exports com.aayushatharva.brotli4j.decoder;
+                                    exports com.aayushatharva.brotli4j.encoder;
+                                    uses com.aayushatharva.brotli4j.service.BrotliNativeProvider;
                                     }
                                 </moduleInfoSource>
                             </module>

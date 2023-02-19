@@ -30,7 +30,7 @@
     <modules>
         <module>linux-x86_64</module>
         <module>linux-aarch64</module>
-		<module>linux-armv7</module>
+        <module>linux-armv7</module>
         <module>windows-x86_64</module>
         <module>osx-x86_64</module>
         <module>osx-aarch64</module>

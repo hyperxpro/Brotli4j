@@ -7,7 +7,6 @@ package com.aayushatharva.brotli4j.decoder;
 
 import com.aayushatharva.brotli4j.common.annotations.Local;
 import com.aayushatharva.brotli4j.common.annotations.Upstream;
-import io.netty.buffer.ByteBuf;
 
 import java.io.IOException;
 import java.nio.Buffer;
