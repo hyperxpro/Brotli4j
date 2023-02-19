@@ -51,9 +51,10 @@
                             <module>
                                 <moduleInfoSource>
                                     module ${javaModuleName} {
-                                        requires com.aayushatharva.brotli4j;
-                                        exports ${javaModuleName} to com.aayushatharva.brotli4j;
-                                        provides com.aayushatharva.brotli4j.BrotliNativeProvider with ${javaModuleName}.NativeLoader;
+                                    requires com.aayushatharva.brotli4j.service;
+                                    exports ${javaModuleName} to com.aayushatharva.brotli4j;
+                                    provides com.aayushatharva.brotli4j.service.BrotliNativeProvider with
+                                    ${javaModuleName}.NativeLoader;
                                     }
                                 </moduleInfoSource>
                             </module>
