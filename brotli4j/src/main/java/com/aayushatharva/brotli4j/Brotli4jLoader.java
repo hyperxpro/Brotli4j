@@ -68,15 +68,22 @@ public class Brotli4jLoader {
                             break;
                         }
                     }
-                    try (InputStream in = loaderClassToUse.getResourceAsStream(libPath)) {
-                        Files.copy(in, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                    } catch (Throwable throwable) {
-                        tempFile.delete();
-                        throw throwable;
-                    }
 
-                    System.load(tempFile.getAbsolutePath());
-                    tempFile.deleteOnExit();
+                    // Copy the native library to a temporary file and load it
+                    try (InputStream in = loaderClassToUse.getResourceAsStream(libPath)) {
+
+                        // If the library is not found, throw an exception.
+                        if (in == null) {
+                            throw new UnsatisfiedLinkError("Failed to find Brotli native library in classpath: " + libPath);
+                        }
+
+                        Files.copy(in, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                        System.load(tempFile.getAbsolutePath());
+                    } catch (Throwable throwable) {
+                        throw throwable;
+                    } finally {
+                        tempFile.deleteOnExit();
+                    }
                 } catch (Throwable throwable) {
                     cause = throwable;
                 }
