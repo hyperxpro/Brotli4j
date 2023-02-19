@@ -24,7 +24,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class BrotliInputStreamTest {
 
@@ -42,7 +42,7 @@ class BrotliInputStreamTest {
         BrotliInputStream brotliInputStream = new BrotliInputStream(bais);
 
         int read = brotliInputStream.read();
-        while(read > -1) { // -1 means EOF
+        while (read > -1) { // -1 means EOF
             baos.write(read);
             read = brotliInputStream.read();
         }

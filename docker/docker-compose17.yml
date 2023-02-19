@@ -10,7 +10,7 @@ services:
 
   common: &common
     image: brotli4j:default
-    depends_on: [runtime-setup]
+    depends_on: [ runtime-setup ]
     volumes:
       - ~/.m2:/root/.m2
       - ..:/code

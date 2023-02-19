@@ -56,43 +56,43 @@ OPTIONS
 -------
 
 * `-#`:
-    compression level (0-9); bigger values cause denser, but slower compression
+  compression level (0-9); bigger values cause denser, but slower compression
 * `-c`, `--stdout`:
-    write on standard output
+  write on standard output
 * `-d`, `--decompress`:
-    decompress mode
+  decompress mode
 * `-f`, `--force`:
-    force output file overwrite
+  force output file overwrite
 * `-h`, `--help`:
-    display this help and exit
+  display this help and exit
 * `-j`, `--rm`:
-    remove source file(s); `gzip (1)`-like behaviour
+  remove source file(s); `gzip (1)`-like behaviour
 * `-k`, `--keep`:
-    keep source file(s); `zstd (1)`-like behaviour
+  keep source file(s); `zstd (1)`-like behaviour
 * `-n`, `--no-copy-stat`:
-    do not copy source file(s) attributes
+  do not copy source file(s) attributes
 * `-o FILE`, `--output=FILE`
-    output file; valid only if there is a single input entry
+  output file; valid only if there is a single input entry
 * `-q NUM`, `--quality=NUM`:
-    compression level (0-11); bigger values cause denser, but slower compression
+  compression level (0-11); bigger values cause denser, but slower compression
 * `-t`, `--test`:
-    test file integrity mode
+  test file integrity mode
 * `-v`, `--verbose`:
-    increase output verbosity
+  increase output verbosity
 * `-w NUM`, `--lgwin=NUM`:
-    set LZ77 window size (0, 10-24) (default: 24); window size is
-    `(2**NUM - 16)`; 0 lets compressor decide over the optimal value; bigger
-    windows size improve density; decoder might require up to window size
-    memory to operate
+  set LZ77 window size (0, 10-24) (default: 24); window size is
+  `(2**NUM - 16)`; 0 lets compressor decide over the optimal value; bigger
+  windows size improve density; decoder might require up to window size
+  memory to operate
 * `-D FILE`, `--dictionary=FILE`:
-    use FILE as raw (LZ77) dictionary; same dictionary MUST be used both for
-    compression and decompression
+  use FILE as raw (LZ77) dictionary; same dictionary MUST be used both for
+  compression and decompression
 * `-S SUF`, `--suffix=SUF`:
-    output file suffix (default: `.br`)
+  output file suffix (default: `.br`)
 * `-V`, `--version`:
-    display version and exit
+  display version and exit
 * `-Z`, `--best`:
-    use best compression level (default); same as "`-q 11`"
+  use best compression level (default); same as "`-q 11`"
 
 SEE ALSO
 --------

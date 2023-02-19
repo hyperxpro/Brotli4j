@@ -40,6 +40,7 @@ public class BrotliCommon {
 
     /**
      * Checks if the given checksum matches MD5 checksum of the RFC dictionary.
+     *
      * @param digest digest byte array
      * @return {@code true} if check was successful else {@code false}
      */
@@ -49,6 +50,7 @@ public class BrotliCommon {
 
     /**
      * Checks if the given checksum matches SHA-1 checksum of the RFC dictionary.
+     *
      * @param digest digest byte array
      * @return {@code true} if check was successful else {@code false}
      */
@@ -58,6 +60,7 @@ public class BrotliCommon {
 
     /**
      * Checks if the given checksum matches SHA-256 checksum of the RFC dictionary.
+     *
      * @param digest digest byte array
      * @return {@code true} if check was successful else {@code false}
      */
@@ -81,6 +84,7 @@ public class BrotliCommon {
 
     /**
      * Copies data and sets it to be brotli dictionary.
+     *
      * @param data byte array of data
      */
     public static void setDictionaryData(byte[] data) {
@@ -97,6 +101,7 @@ public class BrotliCommon {
 
     /**
      * Reads data and sets it to be brotli dictionary.
+     *
      * @param src {@link InputStream} of dictionary data
      * @throws IOException In case of error during processing dictionary
      */

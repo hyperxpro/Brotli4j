@@ -19,7 +19,6 @@ package com.aayushatharva.brotli4j.decoder;
 import com.aayushatharva.brotli4j.common.annotations.Local;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
-import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.buffer.Unpooled;
 
 import java.io.IOException;

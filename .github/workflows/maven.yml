@@ -5,7 +5,7 @@ on:
     branches:
       - main
   pull_request:
-    
+
   workflow_dispatch:
     inputs:
       name:
@@ -70,7 +70,7 @@ jobs:
         with:
           name: Linux-x86_64-Build-JDK8
           path: /home/runner/work/Brotli4j/
-          
+
   Linux-x86_64-Build-JDK11:
     runs-on: ubuntu-latest
     steps:
@@ -126,7 +126,7 @@ jobs:
             export JAVA_HOME="/jdk"
             chmod +x ./mvnw
             ./mvnw -B -ntp clean package
-            
+
       - name: Upload the build
         uses: actions/upload-artifact@v3
         with:
@@ -203,7 +203,7 @@ jobs:
           dockerRunArgs: |
             --platform linux/arm64
             --volume "/home/runner/.m2/repository/:/root/.m2/repository"
-            
+
           # Install dependencies
           install: |
             apt-get update
@@ -259,7 +259,7 @@ jobs:
             export JAVA_HOME="/jdk"
             chmod +x ./mvnw
             ./mvnw -B -ntp clean package
-            
+
       - name: Upload the build
         uses: actions/upload-artifact@v3
         with:
@@ -294,7 +294,7 @@ jobs:
           dockerRunArgs: |
             --platform linux/arm/v7
             --volume "/home/runner/.m2/repository/:/root/.m2/repository"
-            
+
           # Install dependencies
           install: |
             apt-get update
@@ -327,7 +327,7 @@ jobs:
         with:
           name: Windows-x86_64-Build-JDK8
           path: D:\a\Brotli4j\
-          
+
 
   Windows-x86_64-Build-JDK11:
     runs-on: windows-latest
@@ -343,7 +343,7 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1.12.0
       - name: Build with Maven
         run: mvn -B -ntp clean package --file pom.xml
-          
+
 
   Windows-x86_64-Build-JDK17:
     runs-on: windows-latest

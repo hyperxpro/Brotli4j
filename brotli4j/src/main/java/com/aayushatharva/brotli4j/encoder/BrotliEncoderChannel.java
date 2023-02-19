@@ -42,7 +42,7 @@ public class BrotliEncoderChannel extends Encoder implements WritableByteChannel
      * Creates a BrotliEncoderChannel
      *
      * @param destination underlying destination
-     * @param params encoding settings
+     * @param params      encoding settings
      * @throws IOException If any failure during initialization
      */
     public BrotliEncoderChannel(WritableByteChannel destination, Encoder.Parameters params)

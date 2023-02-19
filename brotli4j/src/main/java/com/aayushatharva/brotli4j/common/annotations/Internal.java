@@ -14,17 +14,19 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.aayushatharva.brotli4j.linux.armv7;
+package com.aayushatharva.brotli4j.common.annotations;
 
-import com.aayushatharva.brotli4j.service.BrotliNativeProvider;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Service class to access the native lib in a JPMS context
+ * Class and methods annotated with {@link Internal} are
+ * for internal use and should not be used by user directly
+ * as they can change and break anytime.
  */
-public class NativeLoader implements BrotliNativeProvider {
-
-    @Override
-    public String platformName() {
-        return "linux-armv7";
-    }
+@Target({ElementType.TYPE, ElementType.METHOD})
+@Retention(RetentionPolicy.SOURCE)
+public @interface Internal {
 }
