@@ -16,17 +16,11 @@ import java.nio.ByteBuffer;
 @Upstream
 class EncoderJNI {
     private static native ByteBuffer nativeCreate(long[] context);
-
     private static native void nativePush(long[] context, int length);
-
     private static native ByteBuffer nativePull(long[] context);
-
     private static native void nativeDestroy(long[] context);
-
     private static native boolean nativeAttachDictionary(long[] context, ByteBuffer dictionary);
-
     private static native ByteBuffer nativePrepareDictionary(ByteBuffer dictionary, long type);
-
     private static native void nativeDestroyDictionary(ByteBuffer dictionary);
 
     enum Operation {
@@ -37,8 +31,10 @@ class EncoderJNI {
 
     private static class PreparedDictionaryImpl implements PreparedDictionary {
         private ByteBuffer data;
+        /** Reference to (non-copied) LZ data. */
+        private ByteBuffer rawData;
 
-        private PreparedDictionaryImpl(ByteBuffer data) {
+        private PreparedDictionaryImpl(ByteBuffer data, ByteBuffer rawData) {
             this.data = data;
         }
 
@@ -52,6 +48,7 @@ class EncoderJNI {
             try {
                 ByteBuffer data = this.data;
                 this.data = null;
+                this.rawData = null;
                 nativeDestroyDictionary(data);
             } finally {
                 super.finalize();
@@ -62,7 +59,7 @@ class EncoderJNI {
     /**
      * Prepares raw or serialized dictionary for being used by encoder.
      *
-     * @param dictionary           raw / serialized dictionary data; MUST be direct
+     * @param dictionary raw / serialized dictionary data; MUST be direct
      * @param sharedDictionaryType dictionary data type
      */
     static PreparedDictionary prepareDictionary(ByteBuffer dictionary, int sharedDictionaryType) {
@@ -73,7 +70,7 @@ class EncoderJNI {
         if (dictionaryData == null) {
             throw new IllegalStateException("OOM");
         }
-        return new PreparedDictionaryImpl(dictionaryData);
+        return new PreparedDictionaryImpl(dictionaryData, dictionary);
     }
 
     static class Wrapper {
@@ -176,7 +173,7 @@ class EncoderJNI {
         @Override
         protected void finalize() throws Throwable {
             if (context[0] != 0) {
-                /* TODO: log resource leak? */
+                /* TODO(eustas): log resource leak? */
                 destroy();
             }
             super.finalize();

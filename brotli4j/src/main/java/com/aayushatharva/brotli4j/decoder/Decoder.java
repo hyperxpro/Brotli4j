@@ -103,6 +103,7 @@ public class Decoder {
         return new DirectDecompress(decoder.getStatus(), result, null);
     }
 
+    @Upstream
     private void fail(String message) throws IOException {
         try {
             close();
@@ -112,12 +113,14 @@ public class Decoder {
         throw new IOException(message);
     }
 
+    @Upstream
     void attachDictionary(ByteBuffer dictionary) throws IOException {
         if (!decoder.attachDictionary(dictionary)) {
             fail("failed to attach dictionary");
         }
     }
 
+    @Upstream
     public void enableEagerOutput() {
         this.eager = true;
     }
@@ -127,6 +130,7 @@ public class Decoder {
      *
      * @return -1 if stream is finished, or number of bytes available in read buffer (> 0)
      */
+    @Upstream
     int decode() throws IOException {
         while (true) {
             if (buffer != null) {
@@ -175,6 +179,7 @@ public class Decoder {
         }
     }
 
+    @Upstream
     void discard(int length) {
         ((Buffer) buffer).position(buffer.position() + length);
         if (!buffer.hasRemaining()) {
@@ -182,6 +187,7 @@ public class Decoder {
         }
     }
 
+    @Upstream
     int consume(ByteBuffer dst) {
         ByteBuffer slice = buffer.slice();
         int limit = Math.min(slice.remaining(), dst.remaining());
@@ -191,6 +197,7 @@ public class Decoder {
         return limit;
     }
 
+    @Upstream
     void close() throws IOException {
         if (closed) {
             return;
@@ -198,5 +205,56 @@ public class Decoder {
         closed = true;
         decoder.destroy();
         source.close();
+    }
+
+    /** Decodes the given data buffer starting at offset till length. */
+    @Upstream
+    public static byte[] decompress(byte[] data, int offset, int length) throws IOException {
+        DecoderJNI.Wrapper decoder = new DecoderJNI.Wrapper(length);
+        ArrayList<byte[]> output = new ArrayList<>();
+        int totalOutputSize = 0;
+        try {
+            decoder.getInputBuffer().put(data, offset, length);
+            decoder.push(length);
+            while (decoder.getStatus() != DecoderJNI.Status.DONE) {
+                switch (decoder.getStatus()) {
+                    case OK:
+                        decoder.push(0);
+                        break;
+
+                    case NEEDS_MORE_OUTPUT:
+                        ByteBuffer buffer = decoder.pull();
+                        byte[] chunk = new byte[buffer.remaining()];
+                        buffer.get(chunk);
+                        output.add(chunk);
+                        totalOutputSize += chunk.length;
+                        break;
+
+                    case NEEDS_MORE_INPUT:
+                        // Give decoder a chance to process the remaining of the buffered byte.
+                        decoder.push(0);
+                        // If decoder still needs input, this means that stream is truncated.
+                        if (decoder.getStatus() == DecoderJNI.Status.NEEDS_MORE_INPUT) {
+                            throw new IOException("corrupted input");
+                        }
+                        break;
+
+                    default:
+                        throw new IOException("corrupted input");
+                }
+            }
+        } finally {
+            decoder.destroy();
+        }
+        if (output.size() == 1) {
+            return output.get(0);
+        }
+        byte[] result = new byte[totalOutputSize];
+        int resultOffset = 0;
+        for (byte[] chunk : output) {
+            System.arraycopy(chunk, 0, result, resultOffset, chunk.length);
+            resultOffset += chunk.length;
+        }
+        return result;
     }
 }
