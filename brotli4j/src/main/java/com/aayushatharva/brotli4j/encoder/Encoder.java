@@ -21,12 +21,12 @@ import java.util.List;
 @Upstream
 @Local
 public class Encoder {
-    final ByteBuffer inputBuffer;
     private final WritableByteChannel destination;
     private final List<PreparedDictionary> dictionaries;
     private final EncoderJNI.Wrapper encoder;
-    boolean closed;
     private ByteBuffer buffer;
+    final ByteBuffer inputBuffer;
+    boolean closed;
 
     /**
      * Creates a Encoder wrapper.
@@ -35,11 +35,11 @@ public class Encoder {
      * @param params          encoding parameters
      * @param inputBufferSize read buffer size
      */
-    Encoder(WritableByteChannel destination, Parameters params, int inputBufferSize)
-            throws IOException {
+    Encoder(WritableByteChannel destination, Parameters params, int inputBufferSize) throws IOException {
         if (inputBufferSize <= 0) {
             throw new IllegalArgumentException("buffer size must be positive");
         }
+
         if (destination == null) {
             throw new NullPointerException("destination can not be null");
         }
@@ -49,7 +49,7 @@ public class Encoder {
         this.inputBuffer = this.encoder.getInputBuffer();
     }
 
-    /**
+    /*
      * Encodes the given data buffer.
      *
      * @param data   byte array to be compressed
@@ -57,18 +57,19 @@ public class Encoder {
      * @return compressed byte array
      * @throws IOException If any failure during encoding
      */
-    public static byte[] compress(byte[] data, Parameters params) throws IOException {
-        if (data.length == 0) {
+    @Upstream
+    public static byte[] compress(byte[] data, int offset, int length, Parameters params) throws IOException {
+        if (length == 0) {
             byte[] empty = new byte[1];
             empty[0] = 6;
             return empty;
         }
         /* data.length > 0 */
-        EncoderJNI.Wrapper encoder = new EncoderJNI.Wrapper(data.length, params.quality, params.lgwin, params.mode);
+        EncoderJNI.Wrapper encoder = new EncoderJNI.Wrapper(length, params.quality, params.lgwin, params.mode);
         ArrayList<byte[]> output = new ArrayList<>();
         int totalOutputSize = 0;
         try {
-            encoder.getInputBuffer().put(data);
+            encoder.getInputBuffer().put(data, offset, length);
             encoder.push(EncoderJNI.Operation.FINISH, data.length);
             while (true) {
                 if (!encoder.isSuccess()) {
@@ -92,10 +93,10 @@ public class Encoder {
             return output.get(0);
         }
         byte[] result = new byte[totalOutputSize];
-        int offset = 0;
+        int resultOffset = 0;
         for (byte[] chunk : output) {
-            System.arraycopy(chunk, 0, result, offset, chunk.length);
-            offset += chunk.length;
+            System.arraycopy(chunk, 0, result, resultOffset, chunk.length);
+            resultOffset += chunk.length;
         }
         return result;
     }
@@ -105,6 +106,17 @@ public class Encoder {
         return compress(data, Parameters.DEFAULT);
     }
 
+    @Upstream
+    /* Encodes the given data buffer. */
+    public static byte[] compress(byte[] data, Parameters params) throws IOException {
+        return compress(data, 0, data.length, params);
+    }
+
+    @Upstream
+    public static byte[] compress(byte[] data, int offset, int length) throws IOException {
+        return compress(data, offset, length, new Parameters());
+    }
+
     /**
      * Prepares raw or serialized dictionary for being used by encoder.
      *
@@ -112,11 +124,12 @@ public class Encoder {
      * @param sharedDictionaryType dictionary data type
      * @return {@link PreparedDictionary} instance
      */
-    public static PreparedDictionary prepareDictionary(ByteBuffer dictionary,
-                                                       int sharedDictionaryType) {
+    @Upstream
+    public static PreparedDictionary prepareDictionary(ByteBuffer dictionary, int sharedDictionaryType) {
         return EncoderJNI.prepareDictionary(dictionary, sharedDictionaryType);
     }
 
+    @Upstream
     private void fail(String message) throws IOException {
         try {
             close();
@@ -126,6 +139,7 @@ public class Encoder {
         throw new IOException(message);
     }
 
+    @Upstream
     public void attachDictionary(PreparedDictionary dictionary) throws IOException {
         if (!encoder.attachDictionary(dictionary.getData())) {
             fail("failed to attach dictionary");
@@ -138,6 +152,7 @@ public class Encoder {
      * @param force repeat pushing until all output is consumed
      * @return true if all encoder output is consumed
      */
+    @Upstream
     boolean pushOutput(boolean force) throws IOException {
         while (buffer != null) {
             if (buffer.hasRemaining()) {
@@ -155,6 +170,7 @@ public class Encoder {
     /**
      * @return true if there is space in inputBuffer.
      */
+    @Upstream
     boolean encode(EncoderJNI.Operation op) throws IOException {
         boolean force = (op != EncoderJNI.Operation.PROCESS);
         if (force) {
@@ -182,10 +198,12 @@ public class Encoder {
         }
     }
 
+    @Upstream
     void flush() throws IOException {
         encode(EncoderJNI.Operation.FLUSH);
     }
 
+    @Upstream
     void close() throws IOException {
         if (closed) {
             return;
@@ -229,13 +247,13 @@ public class Encoder {
         }
     }
 
-
     /**
      * Brotli encoder settings.
      */
     @Upstream
     @Local
     public static final class Parameters {
+        @Local
         public static final Parameters DEFAULT = new Parameters();
 
         private int quality = -1;
