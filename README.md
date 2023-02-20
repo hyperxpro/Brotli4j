@@ -43,7 +43,7 @@ Of course, you can add native(s) as dependency manually also.
 import org.gradle.nativeplatform.platform.internal.Architectures
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 
-val brotliVersion = "1.9.0"
+val brotliVersion = "1.10.0"
 val operatingSystem: OperatingSystem = DefaultNativePlatform.getCurrentOperatingSystem()
 
 repositories {
@@ -77,7 +77,7 @@ dependencies {
 import org.gradle.nativeplatform.platform.internal.Architectures
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 
-def brotliVersion = "1.9.0"
+def brotliVersion = "1.10.0"
 def operatingSystem = DefaultNativePlatform.getCurrentOperatingSystem()
 
 repositories {
