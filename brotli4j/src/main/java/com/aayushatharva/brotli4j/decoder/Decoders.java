@@ -35,10 +35,10 @@ public final class Decoders {
     /**
      * Decodes the given data buffer.
      *
-     * @param compressed   {@link ByteBuffer} source
-     * @param decompressed {@link ByteBuffer} destination
-     * @return {@link DirectDecompress} instance
-     * @throws IOException Thrown in case of error during encoding
+     * @param compressed   {@link ByteBuffer} source - will be read in full (position == limit after this call).
+     * @param decompressed {@link ByteBuffer} destination - compressed data will be filled in beginning at position, up to remaining bytes; position is updated
+     * @return {@link DirectDecompress} instance - upon return, only the status code is still valid
+     * @throws IOException Thrown in case of error during decoding
      */
     @Local
     public static DirectDecompress decompress(ByteBuffer compressed, ByteBuffer decompressed) throws IOException {
@@ -47,8 +47,9 @@ public final class Decoders {
 
         try {
             src.writeBytes(compressed);
-            dst.writeBytes(decompressed);
-            return decompress(src, dst);
+            final DirectDecompress result = decompress(src, dst);
+            dst.readBytes(decompressed);
+            return result;
         } finally {
             src.release();
             dst.release();
