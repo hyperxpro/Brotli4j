@@ -7,9 +7,7 @@ RUN yum -y install \
 
 RUN export java_version=amazon-corretto@1.12.0-11.9.1 && \
     export JAVA_VERSION=$java_version && \
-    curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | JABBA_COMMAND="install $JAVA_VERSION -o /jdk" bash && \
-    echo 'export JAVA_HOME="/jdk"' >> ~/.bashrc && \
-    echo 'PATH=/jdk/bin:$PATH' >> ~/.bashrc 
+    curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | JABBA_COMMAND="install $JAVA_VERSION -o /jdk" bash
 
 ENV JAVA_HOME "/jdk"
 ENV PATH      "/jdk/bin:$PATH"
