@@ -24,7 +24,7 @@
     <groupId>com.aayushatharva.brotli4j</groupId>
     <artifactId>brotli4j-parent</artifactId>
     <packaging>pom</packaging>
-    <version>1.11.0</version>
+    <version>1.12.0</version>
 
     <name>Brotli4j</name>
     <description>Brotli4j provides Brotli compression and decompression for Java.</description>
@@ -83,7 +83,7 @@
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-buffer</artifactId>
-            <version>4.1.89.Final</version>
+            <version>4.1.93.Final</version>
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>
