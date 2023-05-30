@@ -250,13 +250,9 @@ jobs:
           # Install dependencies
           install: |
             apt-get update
-            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential
-
-            curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | bash && . ~/.jabba/jabba.sh
-            jabba install 1.8.0-custom=tgz+https://cdn.azul.com/zulu-embedded/bin/zulu8.66.0.15-ca-jdk8.0.352-linux_aarch32hf.tar.gz -o /jdk
+            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential openjdk-17-jdk
           
           run: |
-            export JAVA_HOME="/jdk"
             chmod +x ./mvnw
             ./mvnw -B -ntp clean package
 
