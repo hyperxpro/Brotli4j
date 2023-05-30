@@ -247,20 +247,18 @@ jobs:
             --platform linux/arm/v7
             --volume "/home/runner/.m2/repository/:/root/.m2/repository"
 
-          # Install dependencies
+         # Install dependencies
           install: |
             apt-get update
-            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential openjdk-17-jdk
+            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential
+
+            curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | bash && . ~/.jabba/jabba.sh
+            jabba install 1.8.0-custom=tgz+https://corretto.aws/downloads/resources/8.352.08.1/amazon-corretto-8.352.08.1-linux-aarch64.tar.gz -o /jdk
           
           run: |
+            export JAVA_HOME="/jdk"
             chmod +x ./mvnw
             ./mvnw -B -ntp clean package
-
-      - name: Upload the build
-        uses: actions/upload-artifact@v3
-        with:
-          name: Linux-ArmV7-Build-JDK8
-          path: /home/runner/work/Brotli4j/
 
   Linux-ArmV7-Build-JDK11:
     runs-on: ubuntu-latest
@@ -336,13 +334,9 @@ jobs:
           # Install dependencies
           install: |
             apt-get update
-            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential
-
-            curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | bash && . ~/.jabba/jabba.sh
-            jabba install 17.0.0-custom=tgz+https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.7%2B7/OpenJDK17U-jdk_arm_linux_hotspot_17.0.7_7.tar.gz -o /jdk
-          
+            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential openjdk-17-jdk
+            
           run: |
-            export JAVA_HOME="/jdk"
             chmod +x ./mvnw
             ./mvnw -B -ntp clean package -Dmaven.javadoc.skip=true
 
