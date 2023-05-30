@@ -170,8 +170,9 @@ public class Encoder {
     /**
      * @return true if there is space in inputBuffer.
      */
+    @Local
     @Upstream
-    boolean encode(EncoderJNI.Operation op) throws IOException {
+    public boolean encode(EncoderJNI.Operation op) throws IOException {
         boolean force = (op != EncoderJNI.Operation.PROCESS);
         if (force) {
             ((Buffer) inputBuffer).limit(inputBuffer.position());
@@ -198,8 +199,9 @@ public class Encoder {
         }
     }
 
+    @Local
     @Upstream
-    void flush() throws IOException {
+    public void flush() throws IOException {
         encode(EncoderJNI.Operation.FLUSH);
     }
 
