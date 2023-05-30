@@ -308,6 +308,48 @@ jobs:
             chmod +x ./mvnw
             ./mvnw -B -ntp clean package
 
+  Linux-ArmV7-Build-JDK17:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/cache@v3
+        env:
+          cache-name: cache-m2-repository
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-pr-${{ env.cache-name }}-
+            ${{ runner.os }}-pr-
+      - uses: uraimo/run-on-arch-action@v2.3.0
+        name: Run commands
+        id: runcmd
+        with:
+          arch: armv7
+          distro: ubuntu18.04
+
+          # Not required, but speeds up builds by storing container images in
+          # a GitHub package registry.
+          githubToken: ${{ github.token }}
+
+          # Mount the .m2/repository
+          dockerRunArgs: |
+            --platform linux/arm/v7
+            --volume "/home/runner/.m2/repository/:/root/.m2/repository"
+
+          # Install dependencies
+          install: |
+            apt-get update
+            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential
+
+            curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | bash && . ~/.jabba/jabba.sh
+            jabba install 17.0.0-custom=tgz+https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.7%2B7/OpenJDK17U-jdk_arm_linux_hotspot_17.0.7_7.tar.gz -o /jdk
+          
+          run: |
+            export JAVA_HOME="/jdk"
+            chmod +x ./mvnw
+            ./mvnw -B -ntp clean package
+
   Windows-x86_64-Build-JDK8:
     runs-on: windows-latest
     steps:
