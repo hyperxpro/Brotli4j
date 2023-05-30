@@ -92,7 +92,7 @@
                                     <goal>exec</goal>
                                 </goals>
                                 <configuration>
-                                    <executable>/bin/bash</executable>
+                                    <executable>/bin/sh</executable>
                                     <arguments>
                                         <argument>build.sh</argument>
                                     </arguments>
