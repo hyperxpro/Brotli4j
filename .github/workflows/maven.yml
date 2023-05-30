@@ -348,7 +348,7 @@ jobs:
           run: |
             export JAVA_HOME="/jdk"
             chmod +x ./mvnw
-            ./mvnw -B -ntp clean package
+            ./mvnw -B -ntp clean package -Dmaven.javadoc.skip=true
 
   Windows-x86_64-Build-JDK8:
     runs-on: windows-latest
