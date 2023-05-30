@@ -220,9 +220,9 @@ public class Encoder {
     }
 
     /**
-     * https://www.brotli.org/encode.html#aa6f
+     * <a href="https://www.brotli.org/encode.html#aa6f">...</a>
      * See encode.h, typedef enum BrotliEncoderMode
-     *
+     * <p>
      * <strong>Important</strong>: The ordinal value of the
      * modes should be the same as the constant values in encode.h
      */
