@@ -343,7 +343,6 @@ jobs:
             apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential openjdk-8-jdk
           
           run: |
-            export JAVA_HOME="/jdk"
             chmod +x ./mvnw
             ./mvnw -B -ntp clean package
 
