@@ -307,6 +307,51 @@ jobs:
             export JAVA_HOME="/jdk"
             chmod +x ./mvnw
             ./mvnw -B -ntp clean package
+            
+  Linux-s390x-Build-JDK8:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/cache@v3
+        env:
+          cache-name: cache-m2-repository
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-pr-${{ env.cache-name }}-
+            ${{ runner.os }}-pr-
+      - uses: uraimo/run-on-arch-action@v2.3.0
+        name: Run commands
+        id: runcmd
+        with:
+          arch: s390x
+          distro: ubuntu18.04
+
+          # Not required, but speeds up builds by storing container images in
+          # a GitHub package registry.
+          githubToken: ${{ github.token }}
+
+          # Mount the .m2/repository
+          dockerRunArgs: |
+            --platform linux/s390x
+            --volume "/home/runner/.m2/repository/:/root/.m2/repository"
+
+          # Install dependencies
+          install: |
+            apt-get update
+            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential openjdk-8-jdk
+          
+          run: |
+            export JAVA_HOME="/jdk"
+            chmod +x ./mvnw
+            ./mvnw -B -ntp clean package
+
+      - name: Upload the build
+        uses: actions/upload-artifact@v3
+        with:
+          name: Linux-s390x-Build-JDK8
+          path: /home/runner/work/Brotli4j/
 
   Windows-x86_64-Build-JDK8:
     runs-on: windows-latest
