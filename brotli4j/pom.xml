@@ -60,6 +60,23 @@
         </profile>
 
         <profile>
+            <id>linux-s390x</id>
+            <activation>
+                <os>
+                    <family>Linux</family>
+                    <arch>s390x</arch>
+                </os>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.aayushatharva.brotli4j</groupId>
+                    <artifactId>native-linux-s390x</artifactId>
+                    <version>${project.parent.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
             <id>linux-aarch64</id>
             <activation>
                 <os>
