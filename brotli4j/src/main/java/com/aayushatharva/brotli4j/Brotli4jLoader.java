@@ -127,6 +127,8 @@ public class Brotli4jLoader {
                 return "linux-aarch64";
             } else if (archName.equalsIgnoreCase("arm")) {
                 return "linux-armv7";
+            } else if (archName.equalsIgnoreCase("s390x")) {
+                return "linux-s390x";
             }
         } else if (osName.startsWith("Windows")) {
             if (archName.equalsIgnoreCase("amd64")) {

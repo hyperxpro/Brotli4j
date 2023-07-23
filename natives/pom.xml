@@ -31,6 +31,7 @@
         <module>linux-x86_64</module>
         <module>linux-aarch64</module>
         <module>linux-armv7</module>
+        <module>linux-s390x</module>
         <module>windows-x86_64</module>
         <module>osx-x86_64</module>
         <module>osx-aarch64</module>
@@ -56,6 +57,19 @@
             </activation>
             <modules>
                 <module>linux-x86_64</module>
+            </modules>
+        </profile>
+
+        <profile>
+            <id>linux-s390x</id>
+            <activation>
+                <os>
+                    <family>Linux</family>
+                    <arch>s390x</arch>
+                </os>
+            </activation>
+            <modules>
+                <module>linux-s390x</module>
             </modules>
         </profile>
 
@@ -130,11 +144,11 @@
                 <module>linux-x86_64</module>
                 <module>linux-aarch64</module>
                 <module>linux-armv7</module>
+                <module>linux-s390x</module>
                 <module>windows-x86_64</module>
                 <module>osx-x86_64</module>
                 <module>osx-aarch64</module>
             </modules>
         </profile>
     </profiles>
-
 </project>

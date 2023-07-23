@@ -30,7 +30,7 @@
     <packaging>jar</packaging>
 
     <properties>
-        <javaModuleName>com.aayushatharva.brotli4j.linux.x86_64</javaModuleName>
+        <javaModuleName>com.aayushatharva.brotli4j.linux.s390x</javaModuleName>
     </properties>
 
     <build>
