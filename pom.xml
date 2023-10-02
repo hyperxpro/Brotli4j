@@ -125,7 +125,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.1.0</version>
                 <configuration>
-                    <argLine>-Xmx2G</argLine>
+                    <argLine>-Xmx2G -Xcheck:jni</argLine>
                 </configuration>
             </plugin>
 
