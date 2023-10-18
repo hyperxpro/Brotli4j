@@ -7,6 +7,8 @@
 /* Implementation of Brotli compressor. */
 
 #include <brotli/encode.h>
+#include <brotli/shared_dictionary.h>
+#include <brotli/types.h>
 
 #include <stdlib.h>  /* free, malloc */
 #include <string.h>  /* memcpy, memset */
@@ -928,8 +930,8 @@ static void ExtendLastCommand(BrotliEncoderState* s, uint32_t* bytes,
    If |*out_size| is positive, |*output| points to the start of the output
    data. If |is_last| or |force_flush| is BROTLI_TRUE, an output meta-block is
    always created. However, until |is_last| is BROTLI_TRUE encoder may retain up
-   to 7 bits of the last byte of output. To force encoder to dump the remaining
-   bits use WriteMetadata() to append an empty meta-data block.
+   to 7 bits of the last byte of output. Byte-alignment could be enforced by
+   emitting an empty meta-data block.
    Returns BROTLI_FALSE if the size of the input data is larger than
    input_block_size().
  */
@@ -1707,8 +1709,12 @@ BrotliEncoderPreparedDictionary* BrotliEncoderPrepareDictionary(
     const uint8_t data[BROTLI_ARRAY_PARAM(size)], int quality,
     brotli_alloc_func alloc_func, brotli_free_func free_func, void* opaque) {
   ManagedDictionary* managed_dictionary = NULL;
-  if (type != BROTLI_SHARED_DICTIONARY_RAW &&
-      type != BROTLI_SHARED_DICTIONARY_SERIALIZED) {
+  BROTLI_BOOL type_is_known = BROTLI_FALSE;
+  type_is_known |= (type == BROTLI_SHARED_DICTIONARY_RAW);
+#if defined(BROTLI_EXPERIMENTAL)
+  type_is_known |= (type == BROTLI_SHARED_DICTIONARY_SERIALIZED);
+#endif  /* BROTLI_EXPERIMENTAL */
+  if (!type_is_known) {
     return NULL;
   }
   managed_dictionary =
@@ -1719,7 +1725,9 @@ BrotliEncoderPreparedDictionary* BrotliEncoderPrepareDictionary(
   if (type == BROTLI_SHARED_DICTIONARY_RAW) {
     managed_dictionary->dictionary = (uint32_t*)CreatePreparedDictionary(
         &managed_dictionary->memory_manager_, data, size);
-  } else {
+  }
+#if defined(BROTLI_EXPERIMENTAL)
+  if (type == BROTLI_SHARED_DICTIONARY_SERIALIZED) {
     SharedEncoderDictionary* dict = (SharedEncoderDictionary*)BrotliAllocate(
         &managed_dictionary->memory_manager_, sizeof(SharedEncoderDictionary));
     managed_dictionary->dictionary = (uint32_t*)dict;
@@ -1732,6 +1740,9 @@ BrotliEncoderPreparedDictionary* BrotliEncoderPrepareDictionary(
       }
     }
   }
+#else  /* BROTLI_EXPERIMENTAL */
+  (void)quality;
+#endif  /* BROTLI_EXPERIMENTAL */
   if (managed_dictionary->dictionary == NULL) {
     BrotliDestroyManagedDictionary(managed_dictionary);
     return NULL;
@@ -1825,6 +1836,8 @@ BROTLI_BOOL BrotliEncoderAttachPreparedDictionary(BrotliEncoderState* state,
 size_t BrotliEncoderEstimatePeakMemoryUsage(int quality, int lgwin,
                                             size_t input_size) {
   BrotliEncoderParams params;
+  size_t memory_manager_slots = BROTLI_ENCODER_MEMORY_MANAGER_SLOTS;
+  size_t memory_manager_size = memory_manager_slots * sizeof(void*);
   BrotliEncoderInitParams(&params);
   params.quality = quality;
   params.lgwin = lgwin;
@@ -1881,7 +1894,7 @@ size_t BrotliEncoderEstimatePeakMemoryUsage(int quality, int lgwin,
                        command_histograms * sizeof(HistogramCommand) +
                        distance_histograms * sizeof(HistogramDistance);
     }
-    return (ringbuffer_size +
+    return (memory_manager_size + ringbuffer_size +
             hash_size[0] + hash_size[1] + hash_size[2] + hash_size[3] +
             cmdbuf_size +
             outbuf_size +
