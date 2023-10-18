@@ -51,7 +51,7 @@ public class Brotli4jLoader {
                 try {
                     String nativeLibName = System.mapLibraryName("brotli");
                     String platform = getPlatform();
-                    String libPath = "/lib/" + platform + "/" + nativeLibName;
+                    String libPath = "/lib/" + platform + '/' + nativeLibName;
 
                     File tempDir = new File(System.getProperty("java.io.tmpdir"), "com_aayushatharva_brotli4j_" + System.nanoTime());
                     tempDir.mkdir();
@@ -79,8 +79,6 @@ public class Brotli4jLoader {
 
                         Files.copy(in, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                         System.load(tempFile.getAbsolutePath());
-                    } catch (Throwable throwable) {
-                        throw throwable;
                     } finally {
                         tempFile.deleteOnExit();
                     }
@@ -120,24 +118,25 @@ public class Brotli4jLoader {
     private static String getPlatform() {
         String osName = System.getProperty("os.name");
         String archName = System.getProperty("os.arch");
-        if (osName.equalsIgnoreCase("Linux")) {
-            if (archName.equalsIgnoreCase("amd64")) {
+
+        if ("Linux".equalsIgnoreCase(osName)) {
+            if ("amd64".equalsIgnoreCase(archName)) {
                 return "linux-x86_64";
-            } else if (archName.equalsIgnoreCase("aarch64")) {
+            } else if ("aarch64".equalsIgnoreCase(archName)) {
                 return "linux-aarch64";
-            } else if (archName.equalsIgnoreCase("arm")) {
+            } else if ("arm".equalsIgnoreCase(archName)) {
                 return "linux-armv7";
-            } else if (archName.equalsIgnoreCase("s390x")) {
+            } else if ("s390x".equalsIgnoreCase(archName)) {
                 return "linux-s390x";
             }
         } else if (osName.startsWith("Windows")) {
-            if (archName.equalsIgnoreCase("amd64")) {
+            if ("amd64".equalsIgnoreCase(archName)) {
                 return "windows-x86_64";
             }
         } else if (osName.startsWith("Mac")) {
-            if (archName.equalsIgnoreCase("x86_64")) {
+            if ("x86_64".equalsIgnoreCase(archName)) {
                 return "osx-x86_64";
-            } else if (archName.equalsIgnoreCase("aarch64")) {
+            } else if ("aarch64".equalsIgnoreCase(archName)) {
                 return "osx-aarch64";
             }
         }
