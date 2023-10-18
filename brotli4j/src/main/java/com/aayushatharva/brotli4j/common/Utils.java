@@ -38,10 +38,12 @@ public final class Utils {
 
         /* [window bits / empty metadata] + N * [uncompressed] + [last empty] */
         int num_large_blocks = input_size >> 14;
-        int overhead = 2 + (4 * num_large_blocks) + 3 + 1;
+        int overhead = 2 + 4 * num_large_blocks + 3 + 1;
         int result = input_size + overhead;
-        if (input_size == 0) return 2;
-        return (result < input_size) ? 0 : result;
+        if (input_size == 0) {
+            return 2;
+        }
+        return result < input_size ? 0 : result;
     }
 
     private Utils() {
