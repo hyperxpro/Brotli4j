@@ -29,7 +29,7 @@ For maven, the natives will
 <dependency>
     <groupId>com.aayushatharva.brotli4j</groupId>
     <artifactId>brotli4j</artifactId>
-    <version>1.12.0</version>
+    <version>1.13.0</version>
 </dependency>
 ```
 
@@ -44,7 +44,7 @@ Of course, you can add native(s) as dependency manually also.
 import org.gradle.nativeplatform.platform.internal.Architectures
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 
-val brotliVersion = "1.12.0"
+val brotliVersion = "1.13.0"
 val operatingSystem: OperatingSystem = DefaultNativePlatform.getCurrentOperatingSystem()
 
 repositories {
@@ -78,7 +78,7 @@ dependencies {
 import org.gradle.nativeplatform.platform.internal.Architectures
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 
-def brotliVersion = "1.12.0"
+def brotliVersion = "1.13.0"
 def operatingSystem = DefaultNativePlatform.getCurrentOperatingSystem()
 
 repositories {
