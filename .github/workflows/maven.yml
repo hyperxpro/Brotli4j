@@ -401,7 +401,7 @@ jobs:
         id: runcmd
         with:
           arch: riscv64
-          distro: ubuntu22.04
+          distro: ubuntu20.04
 
           # Not required, but speeds up builds by storing container images in
           # a GitHub package registry.
