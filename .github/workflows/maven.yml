@@ -384,6 +384,80 @@ jobs:
             chmod +x ./mvnw
             ./mvnw -B -ntp clean package
 
+  Linux-riscv64-Build-JDK11:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/cache@v3
+        env:
+          cache-name: cache-m2-repository-${{ runner.os }}-jdk11-riscv64
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
+      - uses: uraimo/run-on-arch-action@v2.4.0
+        name: Run commands
+        id: runcmd
+        with:
+          arch: riscv64
+          distro: ubuntu20.04
+
+          # Not required, but speeds up builds by storing container images in
+          # a GitHub package registry.
+          githubToken: ${{ github.token }}
+
+          # Mount the .m2/repository
+          dockerRunArgs: |
+            --platform linux/riscv64
+            --volume "/home/runner/.m2/repository/:/root/.m2/repository"
+          # Install dependencies
+          install: |
+            apt-get update
+            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential openjdk-11-jdk
+
+          run: |
+            export MAVEN_OPTS="-Djdk.lang.Process.launchMechanism=vfork"
+            chmod +x ./mvnw
+            ./mvnw -B -ntp clean package
+
+  Linux-riscv64-Build-JDK17:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/cache@v3
+        env:
+          cache-name: cache-m2-repository-${{ runner.os }}-jdk17-riscv64
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
+      - uses: uraimo/run-on-arch-action@v2.4.0
+        name: Run commands
+        id: runcmd
+        with:
+          arch: riscv64
+          distro: ubuntu20.04
+
+          # Not required, but speeds up builds by storing container images in
+          # a GitHub package registry.
+          githubToken: ${{ github.token }}
+
+          # Mount the .m2/repository
+          dockerRunArgs: |
+            --platform linux/riscv64
+            --volume "/home/runner/.m2/repository/:/root/.m2/repository"
+          # Install dependencies
+          install: |
+            apt-get update
+            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential openjdk-17-jdk
+
+          run: |
+            export MAVEN_OPTS="-Djdk.lang.Process.launchMechanism=vfork"
+            chmod +x ./mvnw
+            ./mvnw -B -ntp clean package
+
   Linux-riscv64-Build-JDK21:
     runs-on: ubuntu-latest
     steps:
