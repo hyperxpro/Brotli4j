@@ -401,7 +401,7 @@ jobs:
         id: runcmd
         with:
           arch: riscv64
-          distro: ubuntu20.04
+          distro: ubuntu22.04
 
           # Not required, but speeds up builds by storing container images in
           # a GitHub package registry.
@@ -421,7 +421,6 @@ jobs:
             jabba install 21.0.0-custom=tgz+https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.1%2B12-ea-beta/OpenJDK21U-jdk_riscv64_linux_hotspot_ea_21-0-1-12.tar.gz -o /jdk
 
           run: |
-            export MAVEN_OPTS="-Djdk.lang.Process.launchMechanism=vfork"
             export JAVA_HOME="/jdk"
             chmod +x ./mvnw
             ./mvnw -B -ntp clean package
