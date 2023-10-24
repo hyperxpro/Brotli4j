@@ -492,7 +492,7 @@ jobs:
             apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential
 
             curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | bash && . ~/.jabba/jabba.sh
-            jabba install 21.0.0-custom=tgz+https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.1%2B12-ea-beta/OpenJDK21U-jdk_riscv64_linux_hotspot_ea_21-0-1-12.tar.gz -o /jdk
+            jabba install 21-custom=tgz+https://api.adoptium.net/v3/binary/latest/21/ea/linux/riscv64/jdk/hotspot/normal/eclipse?project=jdk -o /jdk
 
           run: |
             export JAVA_HOME="/jdk"
