@@ -18,13 +18,7 @@ services:
 
   build:
     <<: *common
-    command:
-      - /bin/bash
-      - -cl
-      - |
-        JAVA_HOME=/jdk  mvn -B --show-version -ntp --file pom.xml clean package
-        # Test with JDK 8
-        JAVA_HOME=/jdk8 mvn -B --show-version -ntp --file pom.xml surefire:test
+    command: /bin/bash -cl "mvn -B --show-version -ntp --file pom.xml clean package"
 
   shell:
     <<: *common

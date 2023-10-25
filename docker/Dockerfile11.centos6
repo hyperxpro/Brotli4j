@@ -4,14 +4,7 @@ RUN rm -vf /usr/lib64/libstdc++.so.6.0.24-gdb.py
 
 RUN yum -y install \
             git 
-
-RUN export java8_version=amazon-corretto@1.8.292-10.1 && \
-    export JAVA8_VERSION=$java8_version && \
-    curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | JABBA_COMMAND="install $JAVA8_VERSION -o /jdk8" bash && \
-    echo 'export JAVA8_HOME="/jdk8"' >> ~/.bashrc
-
-ENV JAVA8_HOME "/jdk8"
-
+            
 RUN export java_version=amazon-corretto@1.11.0-11.9.1 && \
     export JAVA_VERSION=$java_version && \
     curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | JABBA_COMMAND="install $JAVA_VERSION -o /jdk" bash && \
