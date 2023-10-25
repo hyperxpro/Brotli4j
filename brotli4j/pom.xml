@@ -111,6 +111,23 @@
         </profile>
 
         <profile>
+            <id>linux-riscv64</id>
+            <activation>
+                <os>
+                    <family>Linux</family>
+                    <arch>riscv64</arch>
+                </os>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.aayushatharva.brotli4j</groupId>
+                    <artifactId>native-linux-riscv64</artifactId>
+                    <version>${project.parent.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
             <id>windows-x86_64</id>
             <activation>
                 <os>

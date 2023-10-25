@@ -26,7 +26,7 @@ jobs:
           java-version: 8
           architecture: x64
       - name: Build with Maven
-        run: mvn -B -ntp clean package --file pom.xml
+        run: mvn -B --show-version -ntp clean package --file pom.xml
       - name: Upload the build
         uses: actions/upload-artifact@v3
         with:
@@ -44,7 +44,7 @@ jobs:
           java-version: 11
           architecture: x64
       - name: Build with Maven
-        run: mvn -B -ntp clean package --file pom.xml
+        run: mvn -B --show-version -ntp --file pom.xml clean package
 
   MacOS-x86_64-Build-JDK17:
     runs-on: macos-latest
@@ -57,7 +57,7 @@ jobs:
           java-version: 17
           architecture: x64
       - name: Build with Maven
-        run: mvn -B -ntp clean package --file pom.xml
+        run: mvn -B --show-version -ntp --file pom.xml clean package
 
   Linux-x86_64-Build-JDK8:
     runs-on: ubuntu-latest
@@ -98,7 +98,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pr-${{ env.cache-name }}-
             ${{ runner.os }}-pr-
-      - uses: uraimo/run-on-arch-action@v2.3.0
+      - uses: uraimo/run-on-arch-action@v2.4.0
         name: Run commands
         id: runcmd
         with:
@@ -125,7 +125,7 @@ jobs:
           run: |
             export JAVA_HOME="/jdk"
             chmod +x ./mvnw
-            ./mvnw -B -ntp clean package
+            ./mvnw -B --show-version -ntp clean package
 
       - name: Upload the build
         uses: actions/upload-artifact@v3
@@ -145,7 +145,7 @@ jobs:
           key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
-      - uses: uraimo/run-on-arch-action@v2.3.0
+      - uses: uraimo/run-on-arch-action@v2.4.0
         name: Run commands
         id: runcmd
         with:
@@ -172,7 +172,7 @@ jobs:
           run: |
             export JAVA_HOME="/jdk"
             chmod +x ./mvnw
-            ./mvnw -B -ntp clean package
+            ./mvnw -B --show-version -ntp clean package
 
   Linux-Aarch64-Build-JDK17:
     runs-on: ubuntu-latest
@@ -186,7 +186,7 @@ jobs:
           key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
-      - uses: uraimo/run-on-arch-action@v2.3.0
+      - uses: uraimo/run-on-arch-action@v2.4.0
         name: Run commands
         id: runcmd
         with:
@@ -214,7 +214,7 @@ jobs:
             export MAVEN_OPTS="-Djdk.lang.Process.launchMechanism=vfork"
             export JAVA_HOME="/jdk"
             chmod +x ./mvnw
-            ./mvnw -B -ntp clean package
+            ./mvnw -B --show-version -ntp clean package
 
   Linux-ArmV7-Build-JDK8:
     runs-on: ubuntu-latest
@@ -228,7 +228,7 @@ jobs:
           key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
-      - uses: uraimo/run-on-arch-action@v2.3.0
+      - uses: uraimo/run-on-arch-action@v2.4.0
         name: Run commands
         id: runcmd
         with:
@@ -255,7 +255,7 @@ jobs:
           run: |
             export JAVA_HOME="/jdk"
             chmod +x ./mvnw
-            ./mvnw -B -ntp clean package
+            ./mvnw -B --show-version -ntp clean package
 
       - name: Upload the build
         uses: actions/upload-artifact@v3
@@ -275,7 +275,7 @@ jobs:
           key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
-      - uses: uraimo/run-on-arch-action@v2.3.0
+      - uses: uraimo/run-on-arch-action@v2.4.0
         name: Run commands
         id: runcmd
         with:
@@ -302,7 +302,7 @@ jobs:
           run: |
             export JAVA_HOME="/jdk"
             chmod +x ./mvnw
-            ./mvnw -B -ntp clean package
+            ./mvnw -B --show-version -ntp clean package
             
   Linux-s390x-Build-JDK8:
     runs-on: ubuntu-latest
@@ -316,7 +316,7 @@ jobs:
           key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
-      - uses: uraimo/run-on-arch-action@v2.3.0
+      - uses: uraimo/run-on-arch-action@v2.4.0
         name: Run commands
         id: runcmd
         with:
@@ -339,7 +339,7 @@ jobs:
           
           run: |
             chmod +x ./mvnw
-            ./mvnw -B -ntp clean package
+            ./mvnw -B --show-version -ntp clean package
 
       - name: Upload the build
         uses: actions/upload-artifact@v3
@@ -359,7 +359,7 @@ jobs:
           key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
-      - uses: uraimo/run-on-arch-action@v2.3.0
+      - uses: uraimo/run-on-arch-action@v2.4.0
         name: Run commands
         id: runcmd
         with:
@@ -382,7 +382,160 @@ jobs:
 
           run: |
             chmod +x ./mvnw
-            ./mvnw -B -ntp clean package
+            ./mvnw -B --show-version -ntp clean package
+
+  Linux-riscv64-Build-JDK11:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/cache@v3
+        env:
+          cache-name: cache-m2-repository-${{ runner.os }}-jdk11-riscv64
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
+
+      - uses: uraimo/run-on-arch-action@v2.4.0
+        name: Run commands
+        id: runcmd
+        with:
+          arch: riscv64
+          distro: ubuntu20.04
+
+          # Not required, but speeds up builds by storing container images in
+          # a GitHub package registry.
+          githubToken: ${{ github.token }}
+
+          # Mount the .m2/repository
+          dockerRunArgs: |
+            --platform linux/riscv64
+            --volume "/home/runner/.m2/repository/:/root/.m2/repository"
+          # Install dependencies
+          install: |
+            apt-get update
+            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential openjdk-11-jdk
+
+          run: |
+            export MAVEN_OPTS="-Djdk.lang.Process.launchMechanism=vfork"
+            chmod +x ./mvnw
+            ./mvnw -B --show-version -ntp clean package
+
+      - uses: uraimo/run-on-arch-action@v2.4.0
+        name: Test on JDK 8
+        id: test
+        with:
+          arch: aarch64
+          distro: ubuntu20.04
+
+          # Not required, but speeds up builds by storing container images in
+          # a GitHub package registry.
+          githubToken: ${{ github.token }}
+
+          # Mount the .m2/repository
+          dockerRunArgs: |
+            --platform linux/aarch64
+            --volume "/home/runner/.m2/repository/:/root/.m2/repository"
+
+          # Install dependencies
+          install: |
+            apt-get update
+            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential openjdk-8-jdk
+
+          run: |
+            export MAVEN_OPTS="-Djdk.lang.Process.launchMechanism=vfork"
+            chmod +x ./mvnw
+            # Build native-linux-aarch64 only
+            ./mvnw -B --show-version -ntp clean package -pl :native-linux-aarch64 -DskipTests
+            # Test with JDK 8
+            ./mvnw -B --show-version -ntp surefire:test
+
+      # RISC-V doesn't upload the JDK 8 build because JDK 8 doesn't exist on RISC-V. Instead, we upload
+      # the JDK 11 build. It should work on JDK 8 as well, as we are testing it on all other platforms.
+      - name: Upload the build
+        uses: actions/upload-artifact@v3
+        with:
+          name: Linux-riscv64-Build-JDK11
+          path: /home/runner/work/Brotli4j/
+
+  Linux-riscv64-Build-JDK17:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/cache@v3
+        env:
+          cache-name: cache-m2-repository-${{ runner.os }}-jdk17-riscv64
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
+      - uses: uraimo/run-on-arch-action@v2.4.0
+        name: Run commands
+        id: runcmd
+        with:
+          arch: riscv64
+          distro: ubuntu20.04
+
+          # Not required, but speeds up builds by storing container images in
+          # a GitHub package registry.
+          githubToken: ${{ github.token }}
+
+          # Mount the .m2/repository
+          dockerRunArgs: |
+            --platform linux/riscv64
+            --volume "/home/runner/.m2/repository/:/root/.m2/repository"
+          # Install dependencies
+          install: |
+            apt-get update
+            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential openjdk-17-jdk
+
+          run: |
+            export MAVEN_OPTS="-Djdk.lang.Process.launchMechanism=vfork"
+            chmod +x ./mvnw
+            ./mvnw -B --show-version -ntp clean package
+
+  Linux-riscv64-Build-JDK21:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/cache@v3
+        env:
+          cache-name: cache-m2-repository-${{ runner.os }}-jdk21-riscv64
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
+      - uses: uraimo/run-on-arch-action@v2.4.0
+        name: Run commands
+        id: runcmd
+        with:
+          arch: riscv64
+          distro: ubuntu22.04
+
+          # Not required, but speeds up builds by storing container images in
+          # a GitHub package registry.
+          githubToken: ${{ github.token }}
+
+          # Mount the .m2/repository
+          dockerRunArgs: |
+            --platform linux/riscv64
+            --volume "/home/runner/.m2/repository/:/root/.m2/repository"
+
+          # Install dependencies
+          install: |
+            apt-get update
+            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential
+
+            curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | bash && . ~/.jabba/jabba.sh
+            jabba install 21-custom=tgz+https://api.adoptium.net/v3/binary/latest/21/ea/linux/riscv64/jdk/hotspot/normal/eclipse?project=jdk -o /jdk
+
+          run: |
+            export JAVA_HOME="/jdk"
+            chmod +x ./mvnw
+            ./mvnw -B --show-version -ntp clean package
 
   Windows-x86_64-Build-JDK8:
     runs-on: windows-latest
@@ -397,7 +550,7 @@ jobs:
       - name: Enable Developer Command Prompt
         uses: ilammy/msvc-dev-cmd@v1.12.0
       - name: Build with Maven
-        run: mvn -B -ntp clean package --file pom.xml
+        run: mvn -B --show-version -ntp clean package --file pom.xml
       - name: Upload the build
         uses: actions/upload-artifact@v3
         with:
@@ -418,7 +571,7 @@ jobs:
       - name: Enable Developer Command Prompt
         uses: ilammy/msvc-dev-cmd@v1.12.0
       - name: Build with Maven
-        run: mvn -B -ntp clean package --file pom.xml
+        run: mvn -B --show-version -ntp --file pom.xml clean package
 
   Windows-x86_64-Build-JDK17:
     runs-on: windows-latest
@@ -433,4 +586,4 @@ jobs:
       - name: Enable Developer Command Prompt
         uses: ilammy/msvc-dev-cmd@v1.12.0
       - name: Build with Maven
-        run: mvn -B -ntp clean package --file pom.xml
+        run: mvn -B --show-version -ntp --file pom.xml clean package
