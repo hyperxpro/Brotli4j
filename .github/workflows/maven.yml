@@ -445,6 +445,14 @@ jobs:
             chmod +x ./mvnw
             ./mvnw -B --show-version -ntp clean package
 
+      # RISC-V doesn't upload the JDK 8 build because JDK 8 doesn't exist on RISC-V. Instead, we upload
+      # the JDK 11 build. It should work on JDK 8 as well, as we are testing it on all other platforms.
+      - name: Upload the build
+        uses: actions/upload-artifact@v3
+        with:
+          name: Linux-riscv64-Build-JDK11
+          path: /home/runner/work/Brotli4j/
+
   Linux-riscv64-Build-JDK17:
     runs-on: ubuntu-latest
     steps:
