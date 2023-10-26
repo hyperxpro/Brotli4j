@@ -5,9 +5,9 @@ RUN rm -vf /usr/lib64/libstdc++.so.6.0.21-gdb.py
 RUN yum -y install \
             git 
 
-RUN export java_version=amazon-corretto@21.0.1.12.1 && \
+RUN export java_version=amazon-corretto@21.0.1 && \
     export JAVA_VERSION=$java_version && \
-    curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | JABBA_COMMAND="install 21.0.1.12.1-custom=tgz+https://corretto.aws/downloads/resources/21.0.1.12.1/amazon-corretto-21.0.1.12.1-linux-x64.tar.gz -o /jdk" bash && \
+    curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | JABBA_COMMAND="install 21.0.1-custom=tgz+https://corretto.aws/downloads/resources/21.0.1.12.1/amazon-corretto-21.0.1.12.1-linux-x64.tar.gz -o /jdk" bash && \
     echo 'export JAVA_HOME="/jdk"' >> ~/.bashrc && \
     echo 'PATH=/jdk/bin:$PATH' >> ~/.bashrc 
 
