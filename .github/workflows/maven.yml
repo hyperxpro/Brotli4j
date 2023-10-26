@@ -270,7 +270,7 @@ jobs:
             apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential
 
             curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | bash && . ~/.jabba/jabba.sh
-            jabba install 21.0.1.12.1-custom=tgz+https://corretto.aws/downloads/resources/21.0.1.12.1/amazon-corretto-21.0.1.12.1-linux-x64.tar.gz -o /jdk
+            jabba install 21.0.1-custom=tgz+https://corretto.aws/downloads/resources/21.0.1.12.1/amazon-corretto-21.0.1.12.1-linux-x64.tar.gz -o /jdk
 
           run: |
             export MAVEN_OPTS="-Djdk.lang.Process.launchMechanism=vfork"
