@@ -44,6 +44,7 @@ Of course, you can add native(s) as dependency manually also.
 ```kotlin
 import org.gradle.nativeplatform.platform.internal.Architectures
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
+import org.gradle.nativeplatform.operatingsystem.OperatingSystem
 
 val brotliVersion = "1.12.0"
 val operatingSystem: OperatingSystem = DefaultNativePlatform.getCurrentOperatingSystem()
@@ -55,20 +56,32 @@ repositories {
 dependencies {
     implementation("com.aayushatharva.brotli4j:brotli4j:$brotliVersion")
     runtimeOnly(
-        "com.aayushatharva.brotli4j:native-${
-            if (operatingSystem.isWindows) "windows-x86_64"
-            else if (operatingSystem.isMacOsX)
-                if (DefaultNativePlatform.getCurrentArchitecture().isArm()) "osx-aarch64"
-                else "osx-x86_64"
-            else if (operatingSystem.isLinux)
-                if (Architectures.ARM_V7.isAlias(DefaultNativePlatform.getCurrentArchitecture().name)) "linux-armv7"
-                else if (Architectures.AARCH64.isAlias(DefaultNativePlatform.getCurrentArchitecture().name)) "linux-aarch64"
-                else if (Architectures.X86_64.isAlias(DefaultNativePlatform.getCurrentArchitecture().name)) "linux-x86_64"
-                else
-                    throw IllegalStateException("Unsupported architecture: ${DefaultNativePlatform.getCurrentArchitecture().name}")
-            else
-                throw IllegalStateException("Unsupported operating system: $operatingSystem")
-        }:$brotliVersion"
+        "com.aayushatharva.brotli4j:native-" +
+                if (operatingSystem.isWindows) {
+                    "windows-x86_64"
+                } else if (operatingSystem.isMacOsX) {
+                    if (DefaultNativePlatform.getCurrentArchitecture().isArm()) {
+                        "osx-aarch64"
+                    } else {
+                        "osx-x86_64"
+                    }
+                } else if (operatingSystem.isLinux) {
+                    if (Architectures.ARM_V7.isAlias(DefaultNativePlatform.getCurrentArchitecture().name)) {
+                        "linux-armv7"
+                    } else if (Architectures.AARCH64.isAlias(DefaultNativePlatform.getCurrentArchitecture().name)) {
+                        "linux-aarch64"
+                    } else if (Architectures.X86_64.isAlias(DefaultNativePlatform.getCurrentArchitecture().name)) {
+                        "linux-x86_64"
+                    } else if (Architectures.S390X.isAlias(DefaultNativePlatform.getCurrentArchitecture().name)) {
+                        "linux-s390x"
+                    } else if (Architectures.RISCV_64.isAlias(DefaultNativePlatform.getCurrentArchitecture().name)) {
+                        "linux-riscv64"
+                    } else {
+                        throw IllegalStateException("Unsupported architecture: ${DefaultNativePlatform.getCurrentArchitecture().name}")
+                    }
+                } else {
+                    throw IllegalStateException("Unsupported operating system: $operatingSystem")
+                } + ":$brotliVersion"
     )
 }
 ```
@@ -97,9 +110,11 @@ dependencies {
             if (Architectures.ARM_V7.isAlias(DefaultNativePlatform.getCurrentArchitecture().getName())) "linux-armv7"
             else if (Architectures.AARCH64.isAlias(DefaultNativePlatform.getCurrentArchitecture().getName())) "linux-aarch64"
             else if (Architectures.X86_64.isAlias(DefaultNativePlatform.getCurrentArchitecture().getName())) "linux-x86_64"
+            else if (Architectures.S390X.isAlias(DefaultNativePlatform.getCurrentArchitecture().getName())) "linux-s390x"
+            else if (Architectures.RISCV_64.isAlias(DefaultNativePlatform.getCurrentArchitecture().getName())) "linux-riscv64"
             else
                 throw new IllegalStateException("Unsupported architecture: ${DefaultNativePlatform.getCurrentArchitecture().getName()}");
-        else 
+        else
             throw new IllegalStateException("Unsupported operating system: $operatingSystem");
     }:$brotliVersion""")
 }
