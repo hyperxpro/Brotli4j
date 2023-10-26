@@ -59,6 +59,19 @@ jobs:
       - name: Build with Maven
         run: mvn -B --show-version -ntp --file pom.xml clean package
 
+  MacOS-x86_64-Build-JDK21:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'corretto'
+          java-version: 21
+          architecture: x64
+      - name: Build with Maven
+        run: mvn -B --show-version -ntp --file pom.xml clean package
+
   Linux-x86_64-Build-JDK8:
     runs-on: ubuntu-latest
     steps:
@@ -84,6 +97,13 @@ jobs:
       - uses: actions/checkout@v3
       - name: build centos6
         run: docker-compose -f docker/docker-compose17.yml run build
+
+  Linux-x86_64-Build-JDK21:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: build centos6
+        run: docker-compose -f docker/docker-compose21.yml run build
 
   Linux-Aarch64-Build-JDK8:
     runs-on: ubuntu-latest
@@ -210,6 +230,48 @@ jobs:
             curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | bash && . ~/.jabba/jabba.sh
             jabba install 17.0.0-custom=tgz+https://corretto.aws/downloads/resources/17.0.5.8.1/amazon-corretto-17.0.5.8.1-linux-aarch64.tar.gz -o /jdk
           
+          run: |
+            export MAVEN_OPTS="-Djdk.lang.Process.launchMechanism=vfork"
+            export JAVA_HOME="/jdk"
+            chmod +x ./mvnw
+            ./mvnw -B --show-version -ntp clean package
+
+  Linux-Aarch64-Build-JDK21:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/cache@v3
+        env:
+          cache-name: cache-m2-repository-${{ runner.os }}-jdk17-aarch64
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
+      - uses: uraimo/run-on-arch-action@v2.4.0
+        name: Run commands
+        id: runcmd
+        with:
+          arch: aarch64
+          distro: ubuntu18.04
+
+          # Not required, but speeds up builds by storing container images in
+          # a GitHub package registry.
+          githubToken: ${{ github.token }}
+
+          # Mount the .m2/repository
+          dockerRunArgs: |
+            --platform linux/arm64
+            --volume "/home/runner/.m2/repository/:/root/.m2/repository"
+
+          # Install dependencies
+          install: |
+            apt-get update
+            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential
+
+            curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | bash && . ~/.jabba/jabba.sh
+            jabba install 21.0.1.12.1-custom=tgz+https://corretto.aws/downloads/resources/21.0.1.12.1/amazon-corretto-21.0.1.12.1-linux-x64.tar.gz -o /jdk
+
           run: |
             export MAVEN_OPTS="-Djdk.lang.Process.launchMechanism=vfork"
             export JAVA_HOME="/jdk"
@@ -551,6 +613,21 @@ jobs:
         with:
           distribution: 'corretto'
           java-version: 17
+          architecture: x64
+      - name: Enable Developer Command Prompt
+        uses: ilammy/msvc-dev-cmd@v1.12.0
+      - name: Build with Maven
+        run: mvn -B --show-version -ntp --file pom.xml clean package
+
+  Windows-x86_64-Build-JDK21:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'corretto'
+          java-version: 21
           architecture: x64
       - name: Enable Developer Command Prompt
         uses: ilammy/msvc-dev-cmd@v1.12.0
