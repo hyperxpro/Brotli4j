@@ -422,37 +422,6 @@ jobs:
             chmod +x ./mvnw
             ./mvnw -B --show-version -ntp clean package
 
-      - uses: uraimo/run-on-arch-action@v2.4.0
-        name: Test on JDK 8
-        id: test
-        with:
-          arch: aarch64
-          distro: ubuntu20.04
-
-          # Not required, but speeds up builds by storing container images in
-          # a GitHub package registry.
-          githubToken: ${{ github.token }}
-
-          # Mount the .m2/repository
-          dockerRunArgs: |
-            --platform linux/aarch64
-            --volume "/home/runner/.m2/repository/:/root/.m2/repository"
-
-          # Install dependencies
-          install: |
-            apt-get update
-            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential openjdk-8-jdk
-
-          run: |
-            export MAVEN_OPTS="-Djdk.lang.Process.launchMechanism=vfork"
-            chmod +x ./mvnw
-            # Build native-linux-aarch64 only
-            ./mvnw -B --show-version -ntp clean package -pl :native-linux-aarch64 -DskipTests
-            # Test with JDK 8
-            ./mvnw -B --show-version -ntp surefire:test
-
-      # RISC-V doesn't upload the JDK 8 build because JDK 8 doesn't exist on RISC-V. Instead, we upload
-      # the JDK 11 build. It should work on JDK 8 as well, as we are testing it on all other platforms.
       - name: Upload the build
         uses: actions/upload-artifact@v3
         with:
