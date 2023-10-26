@@ -6,15 +6,16 @@ Brotli4j provides Brotli compression and decompression for Java.
 
 ## Supported Platforms:
 
-| Module                        | Architecture |               Tested On |
-|:------------------------------|:------------:|------------------------:|
-| Windows (Windows Server 2022) |     x64      | JDK 1.8, JDK 11, JDK 17 |
-| Linux (CentOS 6)              |     x64      | JDK 1.8, JDK 11, JDK 17 |
-| Linux (Ubuntu 18.04)          |   Aarch64    | JDK 1.8, JDK 11, JDK 17 |
-| Linux (Ubuntu 18.04)          |    ARMv7     |         JDK 1.8, JDK 11 |
-| Linux (Ubuntu 18.04)          |    s390x     |         JDK 1.8, JDK 11 |
-| macOS (Catalina)              |     x64      | JDK 1.8, JDK 11, JDK 17 |
-| macOS (Catalina)              |   Aarch64    | JDK 1.8, JDK 11, JDK 17 |
+| Module                        | Architecture |                       Tested On |
+|:------------------------------|:------------:|--------------------------------:|
+| Windows (Windows Server 2022) |     x64      |         JDK 1.8, JDK 11, JDK 17 |
+| Linux (CentOS 6)              |     x64      |         JDK 1.8, JDK 11, JDK 17 |
+| Linux (Ubuntu 18.04)          |   Aarch64    |         JDK 1.8, JDK 11, JDK 17 |
+| Linux (Ubuntu 18.04)          |    ARMv7     |                 JDK 1.8, JDK 11 |
+| Linux (Ubuntu 18.04)          |    s390x     |                 JDK 1.8, JDK 11 |
+| Linux (Ubuntu 20.04)          |   RISC-V64   | JDK 1.8, JDK 11, JDK 17, JDK 21 |
+| macOS (Catalina)              |     x64      |         JDK 1.8, JDK 11, JDK 17 |
+| macOS (Catalina)              |   Aarch64    |         JDK 1.8, JDK 11, JDK 17 |
 
 #### *Install [Microsoft Visual C++ Redistributable](https://learn.microsoft.com/en-US/cpp/windows/latest-supported-vc-redist?view=msvc-170) before running this library on Windows
 
@@ -189,6 +190,11 @@ public class Example {
 }
 ```
 
+### Additional Notes
+
+* RISC-V64: This platform is only supported by JDK 11+ (i.e. JDK 11, JDK 17, JDK 21, atm.). However, Since Brotli4j was always compiled
+with JDK 8, we're cross-compiling RISC-V64 native module bytecode with JDK 8. This should not break existing application using
+Broti4j. However, you should use JDK 11+ for using Brotli4j on RISC-V64 platform.
 __________________________________________________________________
 
 ## Sponsors
