@@ -6,15 +6,17 @@ Brotli4j provides Brotli compression and decompression for Java.
 
 ## Supported Platforms:
 
-| Module                        | Architecture |               Tested On |
-|:------------------------------|:------------:|------------------------:|
-| Windows (Windows Server 2022) |     x64      | JDK 1.8, JDK 11, JDK 17 |
-| Linux (CentOS 6)              |     x64      | JDK 1.8, JDK 11, JDK 17 |
-| Linux (Ubuntu 18.04)          |   Aarch64    | JDK 1.8, JDK 11, JDK 17 |
-| Linux (Ubuntu 18.04)          |    ARMv7     |         JDK 1.8, JDK 11 |
-| Linux (Ubuntu 18.04)          |    s390x     |         JDK 1.8, JDK 11 |
-| macOS (Catalina)              |     x64      | JDK 1.8, JDK 11, JDK 17 |
-| macOS (Catalina)              |   Aarch64    | JDK 1.8, JDK 11, JDK 17 |
+| Module                        | Architecture |                       Tested On |
+|:------------------------------|:------------:|--------------------------------:|
+| Windows (Windows Server 2022) |     x64      |         JDK 1.8, JDK 11, JDK 17 |
+| Linux (CentOS 6)              |     x64      |         JDK 1.8, JDK 11, JDK 17 |
+| Linux (Ubuntu 18.04)          |   Aarch64    |         JDK 1.8, JDK 11, JDK 17 |
+| Linux (Ubuntu 18.04)          |    ARMv7     |                 JDK 1.8, JDK 11 |
+| Linux (Ubuntu 18.04)          |    s390x     |                 JDK 1.8, JDK 11 |
+| Linux (Ubuntu 18.04)          |    ppc64le     |                 JDK 1.8, JDK 11 |
+| Linux (Ubuntu 20.04)          |   RISC-V64   | JDK 1.8, JDK 11, JDK 17, JDK 21 |
+| macOS (Catalina)              |     x64      |         JDK 1.8, JDK 11, JDK 17 |
+| macOS (Catalina)              |   Aarch64    |         JDK 1.8, JDK 11, JDK 17 |
 
 #### *Install [Microsoft Visual C++ Redistributable](https://learn.microsoft.com/en-US/cpp/windows/latest-supported-vc-redist?view=msvc-170) before running this library on Windows
 
@@ -43,6 +45,7 @@ Of course, you can add native(s) as dependency manually also.
 ```kotlin
 import org.gradle.nativeplatform.platform.internal.Architectures
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
+import org.gradle.nativeplatform.operatingsystem.OperatingSystem
 
 val brotliVersion = "1.13.0"
 val operatingSystem: OperatingSystem = DefaultNativePlatform.getCurrentOperatingSystem()
@@ -54,20 +57,32 @@ repositories {
 dependencies {
     implementation("com.aayushatharva.brotli4j:brotli4j:$brotliVersion")
     runtimeOnly(
-        "com.aayushatharva.brotli4j:native-${
-            if (operatingSystem.isWindows) "windows-x86_64"
-            else if (operatingSystem.isMacOsX)
-                if (DefaultNativePlatform.getCurrentArchitecture().isArm()) "osx-aarch64"
-                else "osx-x86_64"
-            else if (operatingSystem.isLinux)
-                if (Architectures.ARM_V7.isAlias(DefaultNativePlatform.getCurrentArchitecture().name)) "linux-armv7"
-                else if (Architectures.AARCH64.isAlias(DefaultNativePlatform.getCurrentArchitecture().name)) "linux-aarch64"
-                else if (Architectures.X86_64.isAlias(DefaultNativePlatform.getCurrentArchitecture().name)) "linux-x86_64"
-                else
-                    throw IllegalStateException("Unsupported architecture: ${DefaultNativePlatform.getCurrentArchitecture().name}")
-            else
-                throw IllegalStateException("Unsupported operating system: $operatingSystem")
-        }:$brotliVersion"
+        "com.aayushatharva.brotli4j:native-" +
+                if (operatingSystem.isWindows) {
+                    "windows-x86_64"
+                } else if (operatingSystem.isMacOsX) {
+                    if (DefaultNativePlatform.getCurrentArchitecture().isArm()) {
+                        "osx-aarch64"
+                    } else {
+                        "osx-x86_64"
+                    }
+                } else if (operatingSystem.isLinux) {
+                    if (Architectures.ARM_V7.isAlias(DefaultNativePlatform.getCurrentArchitecture().name)) {
+                        "linux-armv7"
+                    } else if (Architectures.AARCH64.isAlias(DefaultNativePlatform.getCurrentArchitecture().name)) {
+                        "linux-aarch64"
+                    } else if (Architectures.X86_64.isAlias(DefaultNativePlatform.getCurrentArchitecture().name)) {
+                        "linux-x86_64"
+                    } else if (Architectures.S390X.isAlias(DefaultNativePlatform.getCurrentArchitecture().name)) {
+                        "linux-s390x"
+                    } else if (Architectures.RISCV_64.isAlias(DefaultNativePlatform.getCurrentArchitecture().name)) {
+                        "linux-riscv64"
+                    } else {
+                        throw IllegalStateException("Unsupported architecture: ${DefaultNativePlatform.getCurrentArchitecture().name}")
+                    }
+                } else {
+                    throw IllegalStateException("Unsupported operating system: $operatingSystem")
+                } + ":$brotliVersion"
     )
 }
 ```
@@ -96,9 +111,11 @@ dependencies {
             if (Architectures.ARM_V7.isAlias(DefaultNativePlatform.getCurrentArchitecture().getName())) "linux-armv7"
             else if (Architectures.AARCH64.isAlias(DefaultNativePlatform.getCurrentArchitecture().getName())) "linux-aarch64"
             else if (Architectures.X86_64.isAlias(DefaultNativePlatform.getCurrentArchitecture().getName())) "linux-x86_64"
+            else if (Architectures.S390X.isAlias(DefaultNativePlatform.getCurrentArchitecture().getName())) "linux-s390x"
+            else if (Architectures.RISCV_64.isAlias(DefaultNativePlatform.getCurrentArchitecture().getName())) "linux-riscv64"
             else
                 throw new IllegalStateException("Unsupported architecture: ${DefaultNativePlatform.getCurrentArchitecture().getName()}");
-        else 
+        else
             throw new IllegalStateException("Unsupported operating system: $operatingSystem");
     }:$brotliVersion""")
 }
@@ -189,6 +206,11 @@ public class Example {
 }
 ```
 
+### Additional Notes
+
+* RISC-V64: This platform is only supported by JDK 11+ (i.e. JDK 11, JDK 17, JDK 21, atm.). However, Since Brotli4j was always compiled
+with JDK 8, we're cross-compiling RISC-V64 native module bytecode with JDK 8. This should not break existing application using
+Broti4j. However, you should use JDK 11+ for using Brotli4j on RISC-V64 platform.
 __________________________________________________________________
 
 ## Sponsors

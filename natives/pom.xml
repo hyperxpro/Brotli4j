@@ -32,6 +32,8 @@
         <module>linux-aarch64</module>
         <module>linux-armv7</module>
         <module>linux-s390x</module>
+        <module>linux-ppc64le</module>
+        <module>linux-riscv64</module>
         <module>windows-x86_64</module>
         <module>osx-x86_64</module>
         <module>osx-aarch64</module>
@@ -74,6 +76,19 @@
         </profile>
 
         <profile>
+            <id>linux-ppc64le</id>
+            <activation>
+                <os>
+                    <family>Linux</family>
+                    <arch>ppc64le</arch>
+                </os>
+            </activation>
+            <modules>
+                <module>linux-ppc64le</module>
+            </modules>
+        </profile>
+
+        <profile>
             <id>linux-aarch64</id>
             <activation>
                 <os>
@@ -96,6 +111,19 @@
             </activation>
             <modules>
                 <module>linux-armv7</module>
+            </modules>
+        </profile>
+
+        <profile>
+            <id>linux-riscv64</id>
+            <activation>
+                <os>
+                    <family>Linux</family>
+                    <arch>riscv64</arch>
+                </os>
+            </activation>
+            <modules>
+                <module>linux-riscv64</module>
             </modules>
         </profile>
 
@@ -145,6 +173,8 @@
                 <module>linux-aarch64</module>
                 <module>linux-armv7</module>
                 <module>linux-s390x</module>
+                <module>linux-ppc64le</module>
+                <module>linux-riscv64</module>
                 <module>windows-x86_64</module>
                 <module>osx-x86_64</module>
                 <module>osx-aarch64</module>

@@ -77,6 +77,23 @@
         </profile>
 
         <profile>
+            <id>linux-ppc64le</id>
+            <activation>
+                <os>
+                    <family>Linux</family>
+                    <arch>ppc64le</arch>
+                </os>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.aayushatharva.brotli4j</groupId>
+                    <artifactId>native-linux-ppc64le</artifactId>
+                    <version>${project.parent.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
             <id>linux-aarch64</id>
             <activation>
                 <os>
@@ -105,6 +122,23 @@
                 <dependency>
                     <groupId>com.aayushatharva.brotli4j</groupId>
                     <artifactId>native-linux-armv7</artifactId>
+                    <version>${project.parent.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>linux-riscv64</id>
+            <activation>
+                <os>
+                    <family>Linux</family>
+                    <arch>riscv64</arch>
+                </os>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.aayushatharva.brotli4j</groupId>
+                    <artifactId>native-linux-riscv64</artifactId>
                     <version>${project.parent.version}</version>
                 </dependency>
             </dependencies>

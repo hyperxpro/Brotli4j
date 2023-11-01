@@ -128,6 +128,10 @@ public class Brotli4jLoader {
                 return "linux-armv7";
             } else if ("s390x".equalsIgnoreCase(archName)) {
                 return "linux-s390x";
+            } else if ("ppc64le".equalsIgnoreCase(archName)) {
+                return "linux-ppc64le";
+            } else if ("riscv64".equalsIgnoreCase(archName)) {
+                return "linux-riscv64";
             }
         } else if (osName.startsWith("Windows")) {
             if ("amd64".equalsIgnoreCase(archName)) {
