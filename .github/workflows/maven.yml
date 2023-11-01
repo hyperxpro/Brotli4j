@@ -253,7 +253,7 @@ jobs:
         id: runcmd
         with:
           arch: aarch64
-          distro: ubuntu18.04
+          distro: ubuntu20.04
 
           # Not required, but speeds up builds by storing container images in
           # a GitHub package registry.
@@ -267,7 +267,10 @@ jobs:
           # Install dependencies
           install: |
             apt-get update
-            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential openjdk-21-jdk
+            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential
+            
+            curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | bash && . ~/.jabba/jabba.sh
+            jabba install 21.0.1-custom=tgz+https://corretto.aws/downloads/resources/21.0.1.12.1/java-21-amazon-corretto-jdk_21.0.1.12-1_arm64.deb -o /jdk
 
           run: |
             export MAVEN_OPTS="-Djdk.lang.Process.launchMechanism=vfork"
