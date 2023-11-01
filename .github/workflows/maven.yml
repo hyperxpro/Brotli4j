@@ -247,7 +247,7 @@ jobs:
           path: ~/.m2/repository
           key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
-            ${{ runner.os }}-pr-jdk21-aarch64-pr-${{ env.cache-name }}-pr-
+            ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
       - uses: uraimo/run-on-arch-action@v2.4.0
         name: Run commands
         id: runcmd
