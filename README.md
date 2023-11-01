@@ -13,6 +13,7 @@ Brotli4j provides Brotli compression and decompression for Java.
 | Linux (Ubuntu 18.04)          |   Aarch64    |         JDK 1.8, JDK 11, JDK 17 |
 | Linux (Ubuntu 18.04)          |    ARMv7     |                 JDK 1.8, JDK 11 |
 | Linux (Ubuntu 18.04)          |    s390x     |                 JDK 1.8, JDK 11 |
+| Linux (Ubuntu 18.04)          |    ppc64le     |                 JDK 1.8, JDK 11 |
 | Linux (Ubuntu 20.04)          |   RISC-V64   | JDK 1.8, JDK 11, JDK 17, JDK 21 |
 | macOS (Catalina)              |     x64      |         JDK 1.8, JDK 11, JDK 17 |
 | macOS (Catalina)              |   Aarch64    |         JDK 1.8, JDK 11, JDK 17 |

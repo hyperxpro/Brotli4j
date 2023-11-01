@@ -31,6 +31,7 @@
 
     <properties>
         <javaModuleName>com.aayushatharva.brotli4j.linux.s390x</javaModuleName>
+        <javaModuleName>com.aayushatharva.brotli4j.linux.ppc64le</javaModuleName>
     </properties>
 
     <build>
