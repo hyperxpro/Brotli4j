@@ -360,12 +360,56 @@ jobs:
 
             curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | bash && . ~/.jabba/jabba.sh
             jabba install 11.0.0-custom=tgz+https://cdn.azul.com/zulu-embedded/bin/zulu11.60.19-ca-jdk11.0.17-linux_aarch32hf.tar.gz -o /jdk
-          
+
           run: |
             export JAVA_HOME="/jdk"
             chmod +x ./mvnw
             ./mvnw -B --show-version -ntp clean package
+
+  Linux-ArmV7-Build-JDK17:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/cache@v3
+        env:
+          cache-name: cache-m2-repository-${{ runner.os }}-jdk11-armv7
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
+      - uses: uraimo/run-on-arch-action@v2.4.0
+        name: Run commands
+        id: runcmd
+        with:
+          arch: armv7
+          distro: ubuntu18.04
+
+          # Not required, but speeds up builds by storing container images in
+          # a GitHub package registry.
+          githubToken: ${{ github.token }}
+
+          # Mount the .m2/repository
+          dockerRunArgs: |
+            --platform linux/arm/v7
+            --volume "/home/runner/.m2/repository/:/root/.m2/repository"
+
+          # Install dependencies
+          install: |
+            apt-get update
+            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential apt-transport-https wget
             
+            mkdir -p /etc/apt/keyrings
+            wget -O - https://packages.adoptium.net/artifactory/api/gpg/key/public | tee /etc/apt/keyrings/adoptium.asc
+            echo "deb [signed-by=/etc/apt/keyrings/adoptium.asc] https://packages.adoptium.net/artifactory/deb $(awk -F= '/^VERSION_CODENAME/{print$2}' /etc/os-release) main" | tee /etc/apt/sources.list.d/adoptium.list
+
+            apt-get update
+            apt install temurin-17-jdk -y
+          run: |
+            export MAVEN_OPTS="-Djdk.lang.Process.launchMechanism=vfork"
+            chmod +x ./mvnw
+            ./mvnw -B --show-version -ntp clean package
+
   Linux-s390x-Build-JDK8:
     runs-on: ubuntu-latest
     steps:
