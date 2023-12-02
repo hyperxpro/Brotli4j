@@ -89,6 +89,11 @@
                 <artifactId>native-windows-x86_64</artifactId>
                 <version>${project.version}</version>
             </dependency>
+             <dependency>
+                <groupId>com.aayushatharva.brotli4j</groupId>
+                <artifactId>native-windows-aarch64</artifactId>
+                <version>${project.version}</version>
+            </dependency>           
         </dependencies>
     </dependencyManagement>
 
