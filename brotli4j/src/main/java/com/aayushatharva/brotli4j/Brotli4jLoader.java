@@ -136,6 +136,8 @@ public class Brotli4jLoader {
         } else if (osName.startsWith("Windows")) {
             if ("amd64".equalsIgnoreCase(archName)) {
                 return "windows-x86_64";
+            } else if ("aarch64".equalsIgnoreCase(archName)) {
+                return "windows-aarch64";
             }
         } else if (osName.startsWith("Mac")) {
             if ("x86_64".equalsIgnoreCase(archName)) {
