@@ -35,6 +35,7 @@
         <module>linux-ppc64le</module>
         <module>linux-riscv64</module>
         <module>windows-x86_64</module>
+        <module>windows-aarch64</module>
         <module>osx-x86_64</module>
         <module>osx-aarch64</module>
     </modules>
@@ -141,6 +142,19 @@
         </profile>
 
         <profile>
+            <id>windows-aarch64</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                    <arch>aarch64</arch>
+                </os>
+            </activation>
+            <modules>
+                <module>windows-aarch64</module>
+            </modules>
+        </profile>
+
+        <profile>
             <id>osx-x86_64</id>
             <activation>
                 <os>
@@ -176,6 +190,7 @@
                 <module>linux-ppc64le</module>
                 <module>linux-riscv64</module>
                 <module>windows-x86_64</module>
+                <module>windows-aarch64</module>
                 <module>osx-x86_64</module>
                 <module>osx-aarch64</module>
             </modules>

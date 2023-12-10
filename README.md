@@ -9,6 +9,7 @@ Brotli4j provides Brotli compression and decompression for Java.
 | Module                        | Architecture |                       Tested On |
 |:------------------------------|:------------:|--------------------------------:|
 | Windows (Windows Server 2022) |     x64      | JDK 1.8, JDK 11, JDK 17, JDK 21 |
+| Windows 11                    |     Aarch64  | JDK 11                          |
 | Linux (CentOS 6)              |     x64      | JDK 1.8, JDK 11, JDK 17, JDK 21 |
 | Linux (Ubuntu 18.04)          |   Aarch64    | JDK 1.8, JDK 11, JDK 17, JDK 21 |
 | Linux (Ubuntu 18.04)          |    ARMv7     |         JDK 1.8, JDK 11, JDK 17 |
@@ -207,6 +208,10 @@ public class Example {
 ```
 
 ### Additional Notes
+
+* Windows-AArch64: Brotli4j is compiled with JDK 11 with JDK 8 as target because JDK 8 Windows Aarch64 builds are not available at the moment.
+However, it should not cause any problem on running it on JDK 8 or plus.
+__________________________________________________________________
 
 * RISC-V64: This platform is only supported by JDK 11+ (i.e. JDK 11, JDK 17, JDK 21, atm.). However, Since Brotli4j was always compiled
 with JDK 8, we're cross-compiling RISC-V64 native module bytecode with JDK 8. This should not break existing application using

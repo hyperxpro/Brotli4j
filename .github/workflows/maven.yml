@@ -753,3 +753,19 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1.12.0
       - name: Build with Maven
         run: mvn -B --show-version -ntp --file pom.xml clean package
+
+  Windows-ARM-Build-JDK11:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v3
+      - name: Enable Developer Command Prompt
+        uses: ilammy/msvc-dev-cmd@v1.12.0
+        with:
+          arch: arm64
+      - name: Build with Maven
+        run: .\mvnw -B --show-version -ntp --file pom.xml clean package
+      - name: Upload the build
+        uses: actions/upload-artifact@v3
+        with:
+          name: Windows-ARM-Build-JDK8
+          path: C:\Users\HyperXPro\Desktop\actions-runner\_work\Brotli4j\
