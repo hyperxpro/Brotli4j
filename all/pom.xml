@@ -39,7 +39,7 @@
                 <artifactId>brotli4j</artifactId>
                 <version>${project.version}</version>
             </dependency>
-			<dependency>
+	    <dependency>
                 <groupId>com.aayushatharva.brotli4j</groupId>
                 <artifactId>service</artifactId>
                 <version>${project.version}</version>
