@@ -14,7 +14,7 @@ import java.nio.ByteBuffer;
  * JNI wrapper for brotli encoder.
  */
 @Upstream
-class EncoderJNI {
+public class EncoderJNI {
     private static native ByteBuffer nativeCreate(long[] context);
     private static native void nativePush(long[] context, int length);
     private static native ByteBuffer nativePull(long[] context);
@@ -73,7 +73,7 @@ class EncoderJNI {
         return new PreparedDictionaryImpl(dictionaryData, dictionary);
     }
 
-    static class Wrapper {
+    public static class Wrapper {
         protected final long[] context = new long[5];
         private final ByteBuffer inputBuffer;
         private boolean fresh = true;
