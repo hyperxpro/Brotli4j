@@ -14,7 +14,7 @@ import java.nio.ByteBuffer;
  * JNI wrapper for brotli encoder.
  */
 @Upstream
-class EncoderJNI {
+public class EncoderJNI {
     private static native ByteBuffer nativeCreate(long[] context);
     private static native void nativePush(long[] context, int length);
     private static native ByteBuffer nativePull(long[] context);
@@ -73,12 +73,12 @@ class EncoderJNI {
         return new PreparedDictionaryImpl(dictionaryData, dictionary);
     }
 
-    static class Wrapper {
+    public static class Wrapper {
         protected final long[] context = new long[5];
         private final ByteBuffer inputBuffer;
         private boolean fresh = true;
 
-        Wrapper(int inputBufferSize, int quality, int lgwin, Encoder.Mode mode)
+        public Wrapper(int inputBufferSize, int quality, int lgwin, Encoder.Mode mode)
                 throws IOException {
             if (inputBufferSize <= 0) {
                 throw new IOException("buffer size must be positive");
@@ -97,7 +97,7 @@ class EncoderJNI {
             this.context[4] = 0;
         }
 
-        boolean attachDictionary(ByteBuffer dictionary) {
+        public boolean attachDictionary(ByteBuffer dictionary) {
             if (!dictionary.isDirect()) {
                 throw new IllegalArgumentException("only direct buffers allowed");
             }
@@ -110,7 +110,7 @@ class EncoderJNI {
             return nativeAttachDictionary(context, dictionary);
         }
 
-        void push(Operation op, int length) {
+        public void push(Operation op, int length) {
             if (length < 0) {
                 throw new IllegalArgumentException("negative block length");
             }
@@ -128,27 +128,27 @@ class EncoderJNI {
             nativePush(context, length);
         }
 
-        boolean isSuccess() {
+        public boolean isSuccess() {
             return context[1] != 0;
         }
 
-        boolean hasMoreOutput() {
+        public boolean hasMoreOutput() {
             return context[2] != 0;
         }
 
-        boolean hasRemainingInput() {
+        public boolean hasRemainingInput() {
             return context[3] != 0;
         }
 
-        boolean isFinished() {
+        public boolean isFinished() {
             return context[4] != 0;
         }
 
-        ByteBuffer getInputBuffer() {
+        public ByteBuffer getInputBuffer() {
             return inputBuffer;
         }
 
-        ByteBuffer pull() {
+        public ByteBuffer pull() {
             if (context[0] == 0) {
                 throw new IllegalStateException("brotli encoder is already destroyed");
             }
@@ -162,7 +162,7 @@ class EncoderJNI {
         /**
          * Releases native resources.
          */
-        void destroy() {
+        public void destroy() {
             if (context[0] == 0) {
                 throw new IllegalStateException("brotli encoder is already destroyed");
             }
