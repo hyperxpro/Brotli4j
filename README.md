@@ -32,7 +32,7 @@ For maven, the natives will
 <dependency>
     <groupId>com.aayushatharva.brotli4j</groupId>
     <artifactId>brotli4j</artifactId>
-    <version>1.14.0</version>
+    <version>1.15.0</version>
 </dependency>
 ```
 
@@ -48,7 +48,7 @@ import org.gradle.nativeplatform.platform.internal.Architectures
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 import org.gradle.nativeplatform.operatingsystem.OperatingSystem
 
-val brotliVersion = "1.14.0"
+val brotliVersion = "1.15.0"
 val operatingSystem: OperatingSystem = DefaultNativePlatform.getCurrentOperatingSystem()
 
 repositories {
@@ -60,7 +60,11 @@ dependencies {
     runtimeOnly(
         "com.aayushatharva.brotli4j:native-" +
                 if (operatingSystem.isWindows) {
-                    "windows-x86_64"
+                    if (DefaultNativePlatform.getCurrentArchitecture().isArm()) {
+                        "windows-aarch64"
+                    } else {
+                        "windows-x86_64"
+                    }
                 } else if (operatingSystem.isMacOsX) {
                     if (DefaultNativePlatform.getCurrentArchitecture().isArm()) {
                         "osx-aarch64"
@@ -78,6 +82,8 @@ dependencies {
                         "linux-s390x"
                     } else if (Architectures.RISCV_64.isAlias(DefaultNativePlatform.getCurrentArchitecture().name)) {
                         "linux-riscv64"
+                    } else if (Architectures.PPC64LE.isAlias(DefaultNativePlatform.getCurrentArchitecture().name)) {
+                        "linux-ppc64le"
                     } else {
                         throw IllegalStateException("Unsupported architecture: ${DefaultNativePlatform.getCurrentArchitecture().name}")
                     }
@@ -94,8 +100,9 @@ dependencies {
 import org.gradle.nativeplatform.platform.internal.Architectures
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 
-def brotliVersion = "1.14.0"
+def brotliVersion = "1.15.0"
 def operatingSystem = DefaultNativePlatform.getCurrentOperatingSystem()
+def currentArchitecture = DefaultNativePlatform.getCurrentArchitecture()
 
 repositories {
     mavenCentral()
@@ -104,18 +111,23 @@ repositories {
 dependencies {
     implementation "com.aayushatharva.brotli4j:brotli4j:$brotliVersion"
     runtimeOnly("""com.aayushatharva.brotli4j:native-${
-        if (operatingSystem.isWindows()) "windows-x86_64"
+        if (operatingSystem.isWindows())
+            if (currentArchitecture.isX86_64()) "windows-x86_64"
+            else if (currentArchitecture.isArm()) "windows-aarch64"
+            else
+                throw new IllegalStateException("Unsupported architecture: ${currentArchitecture.getName()}");
         else if (operatingSystem.isMacOsX())
-            if (DefaultNativePlatform.getCurrentArchitecture().isArm()) "osx-aarch64"
+            if (currentArchitecture.isArm()) "osx-aarch64"
             else "osx-x86_64"
         else if (operatingSystem.isLinux())
-            if (Architectures.ARM_V7.isAlias(DefaultNativePlatform.getCurrentArchitecture().getName())) "linux-armv7"
-            else if (Architectures.AARCH64.isAlias(DefaultNativePlatform.getCurrentArchitecture().getName())) "linux-aarch64"
-            else if (Architectures.X86_64.isAlias(DefaultNativePlatform.getCurrentArchitecture().getName())) "linux-x86_64"
-            else if (Architectures.S390X.isAlias(DefaultNativePlatform.getCurrentArchitecture().getName())) "linux-s390x"
-            else if (Architectures.RISCV_64.isAlias(DefaultNativePlatform.getCurrentArchitecture().getName())) "linux-riscv64"
+            if (currentArchitecture.isAARCH64()) "linux-aarch64"
+            else if (currentArchitecture.isX86_64()) "linux-x86_64"
+            else if (currentArchitecture.isARM_V7()) "linux-armv7"
+            else if (currentArchitecture.isPPC64LE()) "linux-ppc64le"
+            else if (currentArchitecture.isS390X()) "linux-s390x"
+            else if (currentArchitecture.isRISCV64()) "linux-riscv64"
             else
-                throw new IllegalStateException("Unsupported architecture: ${DefaultNativePlatform.getCurrentArchitecture().getName()}");
+                throw new IllegalStateException("Unsupported architecture: ${currentArchitecture.getName()}");
         else
             throw new IllegalStateException("Unsupported operating system: $operatingSystem");
     }:$brotliVersion""")
