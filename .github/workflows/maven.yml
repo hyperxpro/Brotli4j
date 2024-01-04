@@ -42,4 +42,4 @@ jobs:
           file-path: /Users/runner/work/Brotli4j/${{ github.job }}.zip
           public: false
           bucket-root: /
-          destination-dir: /
+          destination-dir: release/artifacts/
