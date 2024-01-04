@@ -30,6 +30,7 @@ jobs:
       - name: Zip and archive current directory
         run: zip -r ${{ github.job }}.zip .
         working-directory: /Users/runner/work/Brotli4j/
+      
       # Upload the executable binary file to S3
       - name: Upload the build to S3
         uses: hkusu/s3-upload-action@v2
@@ -38,7 +39,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
           aws-bucket: ${{ secrets.AWS_BUCKET }}
           aws-region: ap-south-1
-          file-path: /home/runner/work/Brotli4j/Brotli4j/${{ github.job }}.zip
+          file-path: /Users/runner/work/Brotli4j//Brotli4j/${{ github.job }}.zip
           public: false
           bucket-root: /
           destination-dir: /
