@@ -38,7 +38,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
           aws-bucket: ${{ secrets.AWS_BUCKET }}
           aws-region: ap-south-1
-          file-path: ${{ github.job }}.zip
+          file-path: /home/runner/work/Brotli4j/Brotli4j/${{ github.job }}.zip
           public: false
           bucket-root: /
           destination-dir: /
