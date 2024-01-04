@@ -28,5 +28,5 @@ jobs:
       - name: Build with Maven
         run: mvn -B --show-version -ntp clean package --file pom.xml
       - name: Zip and archive current directory
-        run: zip -r ${{ job.name }}.zip .
+        run: zip -r ${{ github.job }}.zip .
         working-directory: /Users/runner/work/Brotli4j/
