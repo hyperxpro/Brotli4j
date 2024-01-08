@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.aayushatharva.brotli4j.linux.s390x;
+package com.aayushatharva.brotli4j.linux.x86_64;
 
 import com.aayushatharva.brotli4j.service.BrotliNativeProvider;
 
