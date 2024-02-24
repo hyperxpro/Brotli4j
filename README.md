@@ -230,6 +230,17 @@ with JDK 8, we're cross-compiling RISC-V64 native module bytecode with JDK 8. Th
 Broti4j. However, you should use JDK 11+ for using Brotli4j on RISC-V64 platform.
 __________________________________________________________________
 
+## Projects that use Brotli4j
+
+- [Netty](https://github.com/netty/netty)
+- [reactor-netty](https://github.com/reactor/reactor-netty)
+- [Armeria](https://github.com/line/armeria)
+- [vert.x](https://github.com/eclipse-vertx/vert.x)
+- [gatling](https://github.com/gatling/gatling)
+- [Netflix Zuul](https://github.com/netflix/zuul)
+- [hbase](https://github.com/apache/hbase)
+- [micronaut](https://github.com/micronaut-projects/micronaut-core)
+
 ## Sponsors
 
 JProfiler is supporting Brotli4J with its full-featured Java Profiler. JProfiler's intuitive UI helps you resolve
