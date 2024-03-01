@@ -240,6 +240,7 @@ __________________________________________________________________
 - [Netflix Zuul](https://github.com/netflix/zuul)
 - [hbase](https://github.com/apache/hbase)
 - [micronaut](https://github.com/micronaut-projects/micronaut-core)
+- [async-http-client](https://github.com/AsyncHttpClient/async-http-client)
 
 ## Sponsors
 
