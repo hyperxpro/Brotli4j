@@ -242,6 +242,7 @@ __________________________________________________________________
 - [micronaut](https://github.com/micronaut-projects/micronaut-core)
 - [async-http-client](https://github.com/AsyncHttpClient/async-http-client)
 - [Apache NiFi](https://github.com/apache/nifi)
+- [quarkus](https://github.com/quarkusio/quarkus)
 
 ## Sponsors
 
