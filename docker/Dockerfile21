@@ -1,0 +1,42 @@
+FROM ubuntu:jammy
+
+RUN apt-get update -y && \
+    apt-get install -y \
+        curl \
+        wget \
+        git \
+        gcc-x86-64-linux-gnu \
+        g++-x86-64-linux-gnu \
+        gcc-i686-linux-gnu \
+        g++-i686-linux-gnu && \
+    apt-get clean
+
+RUN mkdir -p /opt
+WORKDIR /opt
+
+RUN wget --no-verbose https://corretto.aws/downloads/latest/amazon-corretto-21-x64-linux-jdk.tar.gz && \
+    mkdir -p /opt/jdk && \
+    tar -xzf amazon-corretto-*-x64-linux-jdk.tar.gz -C /opt/jdk --strip-components 1
+
+ENV JAVA_HOME "/opt/jdk"
+ENV PATH      "/opt/jdk/bin:$PATH"
+
+RUN wget --no-verbose https://maven-central.storage-download.googleapis.com/maven2/org/apache/maven/apache-maven/3.8.7/apache-maven-3.8.7-bin.tar.gz && \
+    tar -xzf apache-maven-3.8.7-bin.tar.gz && \
+    ln -s ./apache-maven-3.8.7 /opt/maven
+
+ENV MAVEN_HOME 	"/opt/maven"
+ENV PATH 	"/opt/maven/bin:$PATH"
+
+RUN wget --no-verbose https://github.com/Kitware/CMake/releases/download/v3.29.3/cmake-3.29.3-linux-x86_64.sh && \
+    chmod +x cmake-3.29.3-linux-x86_64.sh && \
+    yes | ./cmake-3.29.3-linux-x86_64.sh
+
+ENV PATH 	"/opt/cmake-3.29.3-linux-x86_64/bin:$PATH"
+
+RUN mkdir -p /workspace/Brotli4j
+WORKDIR /workspace/Brotli4j
+
+RUN echo "/opt/jdk/lib/amd64" >> /etc/ld.so.conf && \
+    echo "/opt/jdk/jre/lib/amd64/" >> /etc/ld.so.conf && \
+    ldconfig

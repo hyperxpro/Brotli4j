@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2020-2023, Aayush Atharva
+ *    Copyright (c) 2020-2024, Aayush Atharva
  *
  *    Brotli4j licenses this file to you under the
  *    Apache License, Version 2.0 (the "License");
@@ -122,6 +122,8 @@ public class Brotli4jLoader {
         if ("Linux".equalsIgnoreCase(osName)) {
             if ("amd64".equalsIgnoreCase(archName)) {
                 return "linux-x86_64";
+            } else if ("i386".equalsIgnoreCase(archName)) { // TODO Check value on a real system - I am fairly certain this is right
+                return "linux-x86";
             } else if ("aarch64".equalsIgnoreCase(archName)) {
                 return "linux-aarch64";
             } else if ("arm".equalsIgnoreCase(archName)) {
@@ -136,8 +138,12 @@ public class Brotli4jLoader {
         } else if (osName.startsWith("Windows")) {
             if ("amd64".equalsIgnoreCase(archName)) {
                 return "windows-x86_64";
+            } else if ("i386".equalsIgnoreCase(archName)) { // TODO Check value on a real system
+                return "windows-x86";
             } else if ("aarch64".equalsIgnoreCase(archName)) {
                 return "windows-aarch64";
+            } else if ("arm".equalsIgnoreCase(archName)) { // TODO Check value on a real system
+                return "windows-armv7";
             }
         } else if (osName.startsWith("Mac")) {
             if ("x86_64".equalsIgnoreCase(archName)) {

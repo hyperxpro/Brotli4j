@@ -7,7 +7,7 @@ REM Requirements
 REM --------------
 REM  o  Java 1.8 JDK installed, needs JAVA_HOME set
 REM  o  cmake 3.0 + installed and available via PATH
-REM  o  nmake installed (comes e.g. with Visual Studio), call "vcvarsall.bat x64_arm64" before to activate 64bit tools
+REM  o  nmake installed (comes e.g. with Visual Studio), call "vcvarsall.bat x64_x86" before to activate 64bit tools
 REM
 
 :ENSURE_WORKING_DIRECTORY
@@ -17,7 +17,7 @@ cd "%~dp0"
 if not exist "%~dp0target" mkdir "%~dp0target"
 if not exist "%~dp0target\classes" mkdir "%~dp0target\classes"
 if not exist "%~dp0target\classes\lib" mkdir "%~dp0target\classes\lib"
-SET TARGET_CLASSES_PATH=%~dp0target\classes\lib\windows-aarch64
+SET TARGET_CLASSES_PATH=%~dp0target\classes\lib\windows-x86
 if not exist "%TARGET_CLASSES_PATH%" mkdir "%TARGET_CLASSES_PATH%"
 
 :PREPARE_MAKEFILES
