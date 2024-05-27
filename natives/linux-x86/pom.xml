@@ -72,12 +72,6 @@
     <profiles>
         <profile>
             <id>linux-x86</id>
-            <activation>
-                <os>
-                    <family>Linux</family>
-                    <arch>i386</arch> <!-- TODO Check value on a real system-->
-                </os>
-            </activation>
             <build>
                 <plugins>
                     <plugin>

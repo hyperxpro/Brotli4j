@@ -72,12 +72,6 @@
     <profiles>
         <profile>
             <id>linux-aarch64</id>
-            <activation>
-                <os>
-                    <family>Linux</family>
-                    <arch>aarch64</arch>
-                </os>
-            </activation>
             <build>
                 <plugins>
                     <plugin>

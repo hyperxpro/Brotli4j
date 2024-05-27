@@ -72,12 +72,6 @@
     <profiles>
         <profile>
             <id>linux-s390x</id>
-            <activation>
-                <os>
-                    <family>Linux</family>
-                    <arch>s390x</arch>
-                </os>
-            </activation>
             <build>
                 <plugins>
                     <plugin>

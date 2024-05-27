@@ -72,12 +72,6 @@
     <profiles>
         <profile>
             <id>windows-x86_64</id>
-            <activation>
-                <os>
-                    <family>Windows</family>
-                    <arch>amd64</arch>
-                </os>
-            </activation>
             <build>
                 <plugins>
                     <plugin>

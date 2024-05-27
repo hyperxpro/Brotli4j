@@ -73,12 +73,6 @@
 
         <profile>
             <id>osx-x86_64</id>
-            <activation>
-                <os>
-                    <family>Mac</family>
-                    <arch>x86_64</arch>
-                </os>
-            </activation>
             <build>
                 <plugins>
                     <plugin>

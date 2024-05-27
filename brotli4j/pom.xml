@@ -64,7 +64,7 @@
             <activation>
                 <os>
                     <family>Linux</family>
-                    <arch>i386</arch>
+                    <arch>i386</arch> <!-- TODO Check value on a real system-->
                 </os>
             </activation>
             <dependencies>
