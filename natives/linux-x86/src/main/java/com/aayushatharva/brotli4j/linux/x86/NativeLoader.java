@@ -27,4 +27,10 @@ public class NativeLoader implements BrotliNativeProvider {
     public String platformName() {
         return "linux-x86";
     }
+
+    @Override
+    public boolean isCurrentPlatform() {
+        // TODO Check value on a real system
+        return "linux".equalsIgnoreCase(System.getProperty("os.name")) && "i386".equalsIgnoreCase(System.getProperty("os.arch"));
+    }
 }

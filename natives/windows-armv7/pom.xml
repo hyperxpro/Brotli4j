@@ -75,7 +75,7 @@
             <activation>
                 <os>
                     <family>Windows</family>
-                    <arch>arm</arch>
+                    <arch>amd64</arch>
                 </os>
             </activation>
             <build>

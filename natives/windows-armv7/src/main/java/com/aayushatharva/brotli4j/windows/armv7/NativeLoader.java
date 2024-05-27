@@ -27,4 +27,10 @@ public class NativeLoader implements BrotliNativeProvider {
     public String platformName() {
         return "windows-armv7";
     }
+
+    @Override
+    public boolean isCurrentPlatform() {
+        // TODO Check value on a real system
+        return "windows".equalsIgnoreCase(System.getProperty("os.name")) && "arm".equalsIgnoreCase(System.getProperty("os.arch"));
+    }
 }

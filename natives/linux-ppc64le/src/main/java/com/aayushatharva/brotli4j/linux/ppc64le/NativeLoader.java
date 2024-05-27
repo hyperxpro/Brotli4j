@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2020-2023, Aayush Atharva
+ *    Copyright (c) 2020-2024, Aayush Atharva
  *
  *    Brotli4j licenses this file to you under the
  *    Apache License, Version 2.0 (the "License");
@@ -26,5 +26,10 @@ public class NativeLoader implements BrotliNativeProvider {
     @Override
     public String platformName() {
         return "linux-ppc64le";
+    }
+
+    @Override
+    public boolean isCurrentPlatform() {
+        return "linux".equalsIgnoreCase(System.getProperty("os.name")) && "ppc64le".equalsIgnoreCase(System.getProperty("os.arch"));
     }
 }

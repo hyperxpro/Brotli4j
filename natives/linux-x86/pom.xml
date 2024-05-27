@@ -75,7 +75,7 @@
             <activation>
                 <os>
                     <family>Linux</family>
-                    <arch>amd64</arch>
+                    <arch>i386</arch> <!-- TODO Check value on a real system-->
                 </os>
             </activation>
             <build>
