@@ -9,16 +9,17 @@ on:
   workflow_dispatch:
 
 jobs:
-  MacOS-Build:
+  OSX-Build:
+    if: false
     strategy:
       fail-fast: true
       matrix:
         architecture:
-        - name: x86_64
-        - name: aarch64
+          - name: x86_64
+          - name: aarch64
         java_version: [ 8, 11, 17, 21 ]
 
-    name: MacOS-${{ matrix.architecture.name }}-Build-JDK${{ matrix.java_version }}
+    name: OSX-${{ matrix.architecture.name }}-Build-JDK${{ matrix.java_version }}
     runs-on: macos-latest
 
     steps:
@@ -31,18 +32,20 @@ jobs:
           distribution: 'corretto'
           java-version: ${{ matrix.java_version }}
           architecture: 'x64'
+          check-latest: true
 
       - name: Build
         run: mvn -B -V -ntp --file pom.xml -P osx-${{ matrix.architecture.name }} clean package
 
       - name: Upload build
-        if: ${{ matrix.java_version == 8 }}
         uses: actions/upload-artifact@v4
         with:
-          name: MacOS-${{ matrix.architecture.name }}-Build-JDK${{ matrix.java_version }}
+          name: OSX-${{ matrix.architecture.name }}-Build-JDK${{ matrix.java_version }}
           path: .
+          compression-level: 9
 
   Linux-Build:
+    if: false
     strategy:
       fail-fast: true
       matrix:
@@ -68,7 +71,7 @@ jobs:
           - name: s390x
             linux_name: s390x-linux-gnu
             exec_name: s390x-linux-gnu
-        java_version: [ 8,11,17,21 ]
+        java_version: [ 8, 11, 17, 21 ]
 
     name: Linux-${{ matrix.architecture.name }}-Build-JDK${{ matrix.java_version }}
     runs-on: ubuntu-latest
@@ -83,6 +86,7 @@ jobs:
           distribution: 'corretto'
           java-version: ${{ matrix.java_version }}
           architecture: 'x64'
+          check-latest: true
 
       - name: Install GCC
         run: |
@@ -94,13 +98,14 @@ jobs:
         run: mvn -B -V -ntp --file pom.xml -P linux-${{ matrix.architecture.name }} clean package
 
       - name: Upload build
-        if: ${{ matrix.java_version == 8 }}
         uses: actions/upload-artifact@v4
         with:
           name: Linux-${{ matrix.architecture.name }}-Build-JDK${{ matrix.java_version }}
           path: .
+          compression-level: 9
 
   Windows-Build:
+    if: false
     strategy:
       fail-fast: true
       matrix:
@@ -128,6 +133,7 @@ jobs:
           distribution: 'corretto'
           java-version: ${{ matrix.java_version }}
           architecture: 'x64'
+          check-latest: true
 
       - name: Enable compiler
         uses: ilammy/msvc-dev-cmd@v1
@@ -138,8 +144,67 @@ jobs:
         run: mvn -B -V -ntp --file pom.xml -P windows-${{ matrix.architecture.name }} clean package
 
       - name: Upload build
-        if: ${{ matrix.java_version == 8 }}
         uses: actions/upload-artifact@v4
         with:
           name: Windows-${{ matrix.architecture.name }}-Build-JDK${{ matrix.java_version }}
           path: .
+          compression-level: 9
+
+  Complete-Build:
+    strategy:
+      fail-fast: true
+      matrix:
+        java_version: [ 8, 11, 17, 21 ]
+#    needs: [ OSX-Build, Linux-Build, Windows-Build ]
+
+    name: Complete-Build-JDK${{ matrix.java_version }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: ${{ matrix.java_version }}
+          architecture: 'x64'
+          check-latest: true
+
+      - name: Download builds
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "*-JDK${{ matrix.java_version }}"
+          path: builds/
+          merge-multiple: false
+          run-id: 9265118958
+          github-token: ${{ secrets.GH_TOKEN }}
+
+      - name: Copy builds
+        shell: /usr/bin/bash -vx -e {0}
+        run: |
+          OUT=$PWD
+          rootPaths=($(find ./builds/*/natives/ -type d -name "target" | grep -oiP '(.*)\/([^-]*-[^-]*)-Build-JDK([0-9]*)(?=\/natives\/\2\/target)'))
+          paths=($(find ./builds/*/natives/ -type d -name "target" | grep -oiP '(?:(.*)\/([^-]*-[^-]*)-Build-JDK([0-9]*)\/)natives\/\2\/target'))
+          for i in "${!paths[@]}"; do
+            rootPath="${rootPaths[$i]}"
+            rootPathLen="${#rootPath}"
+            path="${paths[$i]}"
+            
+            cd $rootPath
+            path=.${path:rootPathLen:256}
+            
+            cp -r --parent $path $OUT
+            cd $OUT
+          done
+
+      - name: Build
+        run: mvn -B -V -ntp --file pom.xml -P release package
+
+      - name: Upload build
+        uses: actions/upload-artifact@v4
+        with:
+          name: Complete-Build-JDK${{ matrix.java_version }}
+          path: .
+          compression-level: 9
