@@ -21,7 +21,7 @@
     <parent>
         <groupId>com.aayushatharva.brotli4j</groupId>
         <artifactId>brotli4j-parent</artifactId>
-        <version>1.16.0</version>
+        <version>1.17.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -32,8 +32,8 @@
         <module>linux-x86</module>
         <module>linux-aarch64</module>
         <module>linux-armv7</module>
-        <module>linux-s390x</module>
         <module>linux-ppc64le</module>
+        <module>linux-s390x</module>
         <module>linux-riscv64</module>
         <module>windows-x86_64</module>
         <module>windows-x86</module>
@@ -68,20 +68,6 @@
         </profile>
 
         <profile>
-            <id>linux-s390x</id>
-            <modules>
-                <module>linux-s390x</module>
-            </modules>
-        </profile>
-
-        <profile>
-            <id>linux-ppc64le</id>
-            <modules>
-                <module>linux-ppc64le</module>
-            </modules>
-        </profile>
-
-        <profile>
             <id>linux-aarch64</id>
             <modules>
                 <module>linux-aarch64</module>
@@ -96,9 +82,23 @@
         </profile>
 
         <profile>
+            <id>linux-ppc64le</id>
+            <modules>
+                <module>linux-ppc64le</module>
+            </modules>
+        </profile>
+
+        <profile>
             <id>linux-riscv64</id>
             <modules>
                 <module>linux-riscv64</module>
+            </modules>
+        </profile>
+
+        <profile>
+            <id>linux-s390x</id>
+            <modules>
+                <module>linux-s390x</module>
             </modules>
         </profile>
 
@@ -151,8 +151,8 @@
                 <module>linux-x86</module>
                 <module>linux-aarch64</module>
                 <module>linux-armv7</module>
-                <module>linux-s390x</module>
                 <module>linux-ppc64le</module>
+                <module>linux-s390x</module>
                 <module>linux-riscv64</module>
                 <module>windows-x86_64</module>
                 <module>windows-x86</module>

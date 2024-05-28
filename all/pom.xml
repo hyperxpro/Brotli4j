@@ -23,7 +23,7 @@
     <parent>
         <groupId>com.aayushatharva.brotli4j</groupId>
         <artifactId>brotli4j-parent</artifactId>
-        <version>1.16.0</version>
+        <version>1.17.0</version>
     </parent>
 
     <artifactId>all</artifactId>
@@ -46,16 +46,6 @@
             </dependency>
             <dependency>
                 <groupId>com.aayushatharva.brotli4j</groupId>
-                <artifactId>native-linux-aarch64</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.aayushatharva.brotli4j</groupId>
-                <artifactId>native-linux-armv7</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.aayushatharva.brotli4j</groupId>
                 <artifactId>native-linux-x86_64</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -66,7 +56,12 @@
             </dependency>
             <dependency>
                 <groupId>com.aayushatharva.brotli4j</groupId>
-                <artifactId>native-linux-s390x</artifactId>
+                <artifactId>native-linux-aarch64</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.aayushatharva.brotli4j</groupId>
+                <artifactId>native-linux-armv7</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -76,17 +71,12 @@
             </dependency>
             <dependency>
                 <groupId>com.aayushatharva.brotli4j</groupId>
+                <artifactId>native-linux-s390x</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.aayushatharva.brotli4j</groupId>
                 <artifactId>native-linux-riscv64</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.aayushatharva.brotli4j</groupId>
-                <artifactId>native-osx-aarch64</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.aayushatharva.brotli4j</groupId>
-                <artifactId>native-osx-x86_64</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -107,6 +97,16 @@
             <dependency>
                 <groupId>com.aayushatharva.brotli4j</groupId>
                 <artifactId>native-windows-armv7</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.aayushatharva.brotli4j</groupId>
+                <artifactId>native-osx-aarch64</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.aayushatharva.brotli4j</groupId>
+                <artifactId>native-osx-x86_64</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

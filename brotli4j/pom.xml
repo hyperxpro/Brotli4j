@@ -22,7 +22,7 @@
     <parent>
         <artifactId>brotli4j-parent</artifactId>
         <groupId>com.aayushatharva.brotli4j</groupId>
-        <version>1.16.0</version>
+        <version>1.17.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -77,40 +77,6 @@
         </profile>
 
         <profile>
-            <id>linux-s390x</id>
-            <activation>
-                <os>
-                    <family>Linux</family>
-                    <arch>s390x</arch>
-                </os>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.aayushatharva.brotli4j</groupId>
-                    <artifactId>native-linux-s390x</artifactId>
-                    <version>${project.parent.version}</version>
-                </dependency>
-            </dependencies>
-        </profile>
-
-        <profile>
-            <id>linux-ppc64le</id>
-            <activation>
-                <os>
-                    <family>Linux</family>
-                    <arch>ppc64le</arch>
-                </os>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.aayushatharva.brotli4j</groupId>
-                    <artifactId>native-linux-ppc64le</artifactId>
-                    <version>${project.parent.version}</version>
-                </dependency>
-            </dependencies>
-        </profile>
-
-        <profile>
             <id>linux-aarch64</id>
             <activation>
                 <os>
@@ -139,6 +105,40 @@
                 <dependency>
                     <groupId>com.aayushatharva.brotli4j</groupId>
                     <artifactId>native-linux-armv7</artifactId>
+                    <version>${project.parent.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>linux-ppc64le</id>
+            <activation>
+                <os>
+                    <family>Linux</family>
+                    <arch>ppc64le</arch>
+                </os>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.aayushatharva.brotli4j</groupId>
+                    <artifactId>native-linux-ppc64le</artifactId>
+                    <version>${project.parent.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>linux-s390x</id>
+            <activation>
+                <os>
+                    <family>Linux</family>
+                    <arch>s390x</arch>
+                </os>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.aayushatharva.brotli4j</groupId>
+                    <artifactId>native-linux-s390x</artifactId>
                     <version>${project.parent.version}</version>
                 </dependency>
             </dependencies>
@@ -183,7 +183,7 @@
             <activation>
                 <os>
                     <family>Windows</family>
-                    <arch>i386</arch>
+                    <arch>i386</arch> <!-- TODO Check value on a real system-->
                 </os>
             </activation>
             <dependencies>
@@ -217,7 +217,7 @@
             <activation>
                 <os>
                     <family>Windows</family>
-                    <arch>arm</arch>
+                    <arch>arm</arch> <!-- TODO Check value on a real system-->
                 </os>
             </activation>
             <dependencies>
