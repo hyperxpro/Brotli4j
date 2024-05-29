@@ -59,7 +59,7 @@ jobs:
           sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/${{ matrix.architecture.exec_name}}-g++ 200
 
       - name: Build
-        run: mvn -B -V -ntp --file pom.xml -P linux-${{ matrix.architecture.name }} clean package
+        run: mvn -B -V -ntp --file pom.xml -P linux-${{ matrix.architecture.name }} -Dmaven.test.skip=true clean package
 
       - name: Upload build
         uses: actions/upload-artifact@v4
@@ -104,7 +104,7 @@ jobs:
           arch: ${{ matrix.architecture.msvc_code }}
 
       - name: Build
-        run: mvn -B -V -ntp --file pom.xml -P windows-${{ matrix.architecture.name }} clean package
+        run: mvn -B -V -ntp --file pom.xml -P windows-${{ matrix.architecture.name }} -Dmaven.test.skip=true clean package
 
       - name: Upload build
         uses: actions/upload-artifact@v4
@@ -138,7 +138,7 @@ jobs:
           check-latest: true
 
       - name: Build
-        run: mvn -B -V -ntp --file pom.xml -P osx-${{ matrix.architecture.name }} clean package
+        run: mvn -B -V -ntp --file pom.xml -P osx-${{ matrix.architecture.name }} -Dmaven.test.skip=true clean package
 
       - name: Upload build
         uses: actions/upload-artifact@v4
@@ -195,7 +195,7 @@ jobs:
           done
 
       - name: Build
-        run: mvn -B -V -ntp --file pom.xml -P release package
+        run: mvn -B -V -ntp --file pom.xml -P release -Dmaven.test.skip=false package
 
       - name: Upload build
         uses: actions/upload-artifact@v4
