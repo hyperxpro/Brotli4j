@@ -10,6 +10,7 @@ on:
 
 jobs:
   Linux-Build:
+    if: false
     strategy:
       fail-fast: true
       matrix:
@@ -47,7 +48,7 @@ jobs:
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
-          distribution: 'corretto'
+          distribution: 'temurin'
           java-version: ${{ matrix.java_version }}
           architecture: 'x64'
           check-latest: true
@@ -59,7 +60,7 @@ jobs:
           sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/${{ matrix.architecture.exec_name}}-g++ 200
 
       - name: Build
-        run: mvn -B -V -ntp --file pom.xml -P linux-${{ matrix.architecture.name }} -Dmaven.test.skip=true clean package
+        run: mvn -B -V -ntp --file pom.xml -P linux-${{ matrix.architecture.name }} "-Dmaven.test.skip=true" clean package
 
       - name: Upload build
         uses: actions/upload-artifact@v4
@@ -69,6 +70,7 @@ jobs:
           compression-level: 9
 
   Windows-Build:
+    if: false
     strategy:
       fail-fast: true
       matrix:
@@ -93,7 +95,7 @@ jobs:
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
-          distribution: 'corretto'
+          distribution: 'temurin'
           java-version: ${{ matrix.java_version }}
           architecture: 'x64'
           check-latest: true
@@ -104,7 +106,7 @@ jobs:
           arch: ${{ matrix.architecture.msvc_code }}
 
       - name: Build
-        run: mvn -B -V -ntp --file pom.xml -P windows-${{ matrix.architecture.name }} -Dmaven.test.skip=true clean package
+        run: mvn -B -V -ntp --file pom.xml -P windows-${{ matrix.architecture.name }} "-Dmaven.test.skip=true" clean package
 
       - name: Upload build
         uses: actions/upload-artifact@v4
@@ -114,6 +116,7 @@ jobs:
           compression-level: 9
 
   OSX-Build:
+    if: false
     strategy:
       fail-fast: true
       matrix:
@@ -132,13 +135,13 @@ jobs:
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
-          distribution: 'corretto'
+          distribution: 'temurin'
           java-version: ${{ matrix.java_version }}
           architecture: 'x64'
           check-latest: true
 
       - name: Build
-        run: mvn -B -V -ntp --file pom.xml -P osx-${{ matrix.architecture.name }} -Dmaven.test.skip=true clean package
+        run: mvn -B -V -ntp --file pom.xml -P osx-${{ matrix.architecture.name }} "-Dmaven.test.skip=true" clean package
 
       - name: Upload build
         uses: actions/upload-artifact@v4
@@ -148,6 +151,7 @@ jobs:
           compression-level: 9
 
   Complete-Build:
+    if: false
     strategy:
       fail-fast: true
       matrix:
@@ -164,7 +168,7 @@ jobs:
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
-          distribution: 'corretto'
+          distribution: 'temurin'
           java-version: ${{ matrix.java_version }}
           architecture: 'x64'
           check-latest: true
@@ -195,7 +199,7 @@ jobs:
           done
 
       - name: Build
-        run: mvn -B -V -ntp --file pom.xml -P release -Dmaven.test.skip=false package
+        run: mvn -B -V -ntp --file pom.xml -P release "-Dmaven.test.skip=false" package
 
       - name: Upload build
         uses: actions/upload-artifact@v4
@@ -203,3 +207,137 @@ jobs:
           name: Complete-Build-JDK${{ matrix.java_version }}
           path: .
           compression-level: 9
+
+  Linux-Test:
+    strategy:
+      fail-fast: false
+      matrix:
+        architecture:
+          - name: x86_64
+            java_distro: 'temurin'
+            java_name: x64
+            linux_name: amd64
+            is_ports: false
+            qemu_package_name: x86
+            qemu_name: x86_64
+            docker_name: linux/amd64
+          - name: x86
+            java_distro: 'liberica'
+            java_name: x86
+            linux_name: i386
+            is_ports: false
+            qemu_package_name: x86
+            qemu_name: i386
+            docker_name: linux/i386
+          - name: aarch64
+            java_distro: 'temurin'
+            java_name: aarch64
+            linux_name: arm64
+            is_ports: true
+            qemu_package_name: arm
+            qemu_name: aarch64
+            docker_name: linux/aarch64
+          - name: armv7
+            java_distro: 'liberica'
+            java_name: arm
+            linux_name: armhf
+            is_ports: true
+            qemu_package_name: arm
+            qemu_name: arm
+            docker_name: linux/arm/v7
+          - name: ppc64le
+            java_distro: 'temurin'
+            java_name: ppc64le
+            linux_name: ppc64el
+            is_ports: true
+            qemu_package_name: ppc
+            qemu_name: ppc64le
+            docker_name: linux/ppc64le
+          - name: riscv64
+            java_distro: 'temurin'
+            java_name: riscv64
+            linux_name: riscv64
+            is_ports: true
+            qemu_package_name: misc
+            qemu_name: riscv64
+            docker_name: linux/riscv64
+          - name: s390x
+            java_distro: 'temurin'
+            java_name: s390x
+            linux_name: s390x
+            is_ports: true
+            qemu_package_name: misc
+            qemu_name: s390x
+            docker_name: linux/s390x
+        java_version: [ 8, 11, 17, 21 ]
+
+        exclude:
+          - architecture:
+              name: armv7
+            java_version: 8
+          - architecture:
+              name: s390x
+            java_version: 8
+          - architecture:
+              name: riscv64
+            java_version: 8
+          - architecture:
+              name: riscv64
+            java_version: 11
+#    needs: Linux-Build
+
+    name: Linux-${{ matrix.architecture.name }}-Test-JDK${{ matrix.java_version }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup QEMU
+        run: |
+          sudo dpkg --add-architecture ${{ matrix.architecture.linux_name }}
+          sudo rm /etc/apt/sources.list
+          if [[ ${{ matrix.architecture.is_ports }} != true ]]; then
+              echo "deb [arch=amd64,${{ matrix.architecture.linux_name }}] http://azure.archive.ubuntu.com/ubuntu/ $(lsb_release -sc) main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/ubuntu.list
+              echo "deb [arch=amd64,${{ matrix.architecture.linux_name }}] http://azure.archive.ubuntu.com/ubuntu/ $(lsb_release -sc)-updates main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/ubuntu-updates.list
+              echo "deb [arch=amd64,${{ matrix.architecture.linux_name }}] http://azure.archive.ubuntu.com/ubuntu/ $(lsb_release -sc)-security main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/ubuntu-security.list          
+          else
+              echo "deb [arch=amd64] http://azure.archive.ubuntu.com/ubuntu/ $(lsb_release -sc) main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/ubuntu.list
+              echo "deb [arch=amd64] http://azure.archive.ubuntu.com/ubuntu/ $(lsb_release -sc)-updates main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/ubuntu-updates.list
+              echo "deb [arch=amd64] http://azure.archive.ubuntu.com/ubuntu/ $(lsb_release -sc)-security main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/ubuntu-security.list
+          fi
+          if [[ ${{ matrix.architecture.is_ports}} == true ]]; then
+              echo "deb [arch=${{ matrix.architecture.linux_name  }}] http://azure.ports.ubuntu.com/ubuntu-ports/ $(lsb_release -sc) main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/ubuntu-ports.list
+              echo "deb [arch=${{ matrix.architecture.linux_name }}] http://azure.ports.ubuntu.com/ubuntu-ports/ $(lsb_release -sc)-updates main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/ubuntu-ports-updates.list
+              echo "deb [arch=${{ matrix.architecture.linux_name }}] http://azure.ports.ubuntu.com/ubuntu-ports/ $(lsb_release -sc)-security main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/ubuntu-ports-security.list
+          fi
+          sudo apt-get update -y
+          sudo apt-get --fix-broken install
+
+          sudo apt-get install -y qemu-system-${{ matrix.architecture.qemu_package_name }}:amd64 qemu-user:amd64
+          
+          sudo apt-get install -y apt-file:amd64 libc6:amd64 libc6:${{ matrix.architecture.linux_name }} libstdc++6:amd64 libstdc++6:${{ matrix.architecture.linux_name }} libtinfo6:amd64 libtinfo6:${{ matrix.architecture.linux_name }} zlib1g:amd64 zlib1g:${{ matrix.architecture.linux_name }}
+
+          cd /opt
+          sudo apt-get download bash:${{ matrix.architecture.linux_name }}
+          sudo mkdir -p bashdata && sudo ar x --output=bashdata *.deb
+          sudo tar xf bashdata/data.tar.* -C bashdata
+          sudo mv bashdata/bin/bash /opt/bash
+          sudo rm -r *.deb bashdata
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: ${{ matrix.architecture.java_distro }}
+          java-version: ${{ matrix.java_version }}
+          architecture: ${{ matrix.architecture.java_name }}
+          check-latest: true
+
+      - name: Download build
+        uses: actions/download-artifact@v4
+        with:
+          name: Linux-${{ matrix.architecture.name }}-Build-JDK${{ matrix.java_version }}
+          path: .
+          run-id: 9285337849
+          github-token: ${{ secrets.GH_TOKEN }}
+
+      - name: Test
+        run: |
+          qemu-${{ matrix.architecture.qemu_name }} /opt/bash -c "$(which mvn) -B -V -ntp --file pom.xml -P release test"
