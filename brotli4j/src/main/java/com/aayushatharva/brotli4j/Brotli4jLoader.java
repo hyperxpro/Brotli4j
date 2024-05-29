@@ -57,7 +57,7 @@ public class Brotli4jLoader {
 
                     File tempFile = new File(tempDir, nativeLibName);
 
-                    String platform =null;
+                    String platform = null;
                     Class<?> loaderClassToUse = Brotli4jLoader.class; // Use this as a fallback for non-JPMS contexts
                     // In Java9+ with JPMS enabled, we need a class in the jar that contains the file to be able to access its content
                     ServiceLoader<BrotliNativeProvider> nativeProviders = ServiceLoader.load(BrotliNativeProvider.class, Brotli4jLoader.class.getClassLoader());

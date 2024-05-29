@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.aayushatharva.brotli4j.macos.aarch64;
+package com.aayushatharva.brotli4j.osx.x86_64;
 
 import com.aayushatharva.brotli4j.service.BrotliNativeProvider;
 
@@ -25,11 +25,11 @@ public class NativeLoader implements BrotliNativeProvider {
 
     @Override
     public String platformName() {
-        return "osx-aarch64";
+        return "osx-x86_64";
     }
 
     @Override
     public boolean isCurrentPlatform() {
-        return "mac".equalsIgnoreCase(System.getProperty("os.name")) && "aarch64".equalsIgnoreCase(System.getProperty("os.arch"));
+        return "mac".equalsIgnoreCase(System.getProperty("os.name")) && "x86_64".equalsIgnoreCase(System.getProperty("os.arch"));
     }
 }
