@@ -101,12 +101,12 @@
             </dependency>
             <dependency>
                 <groupId>com.aayushatharva.brotli4j</groupId>
-                <artifactId>native-osx-aarch64</artifactId>
+                <artifactId>native-osx-x86_64</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.aayushatharva.brotli4j</groupId>
-                <artifactId>native-osx-x86_64</artifactId>
+                <artifactId>native-osx-aarch64</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

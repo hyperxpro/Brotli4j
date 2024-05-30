@@ -10,7 +10,6 @@ on:
 
 jobs:
   Linux-Build:
-    if: false
     strategy:
       fail-fast: true
       matrix:
@@ -25,8 +24,8 @@ jobs:
             linux_name: aarch64-linux-gnu
             exec_name: aarch64-linux-gnu
           - name: armv7
-            linux_name: arm-linux-gnueabi
-            exec_name: arm-linux-gnueabi
+            linux_name: arm-linux-gnueabihf
+            exec_name: arm-linux-gnueabihf
           - name: ppc64le
             linux_name: powerpc64le-linux-gnu
             exec_name: powerpc64le-linux-gnu
@@ -70,7 +69,6 @@ jobs:
           compression-level: 9
 
   Windows-Build:
-    if: false
     strategy:
       fail-fast: true
       matrix:
@@ -116,7 +114,6 @@ jobs:
           compression-level: 9
 
   OSX-Build:
-    if: false
     strategy:
       fail-fast: true
       matrix:
@@ -151,7 +148,6 @@ jobs:
           compression-level: 9
 
   Complete-Build:
-    if: false
     strategy:
       fail-fast: true
       matrix:
@@ -190,10 +186,10 @@ jobs:
             rootPath="${rootPaths[$i]}"
             rootPathLen="${#rootPath}"
             path="${paths[$i]}"
-            
+          
             cd $rootPath
             path=.${path:rootPathLen:256}
-            
+          
             cp -r --parent $path $OUT
             cd $OUT
           done
@@ -220,7 +216,6 @@ jobs:
             is_ports: false
             qemu_package_name: x86
             qemu_name: x86_64
-            docker_name: linux/amd64
           - name: x86
             java_distro: 'liberica'
             java_name: x86
@@ -228,7 +223,6 @@ jobs:
             is_ports: false
             qemu_package_name: x86
             qemu_name: i386
-            docker_name: linux/i386
           - name: aarch64
             java_distro: 'temurin'
             java_name: aarch64
@@ -236,23 +230,20 @@ jobs:
             is_ports: true
             qemu_package_name: arm
             qemu_name: aarch64
-            docker_name: linux/aarch64
           - name: armv7
             java_distro: 'liberica'
             java_name: arm
             linux_name: armhf
             is_ports: true
             qemu_package_name: arm
-            qemu_name: arm
-            docker_name: linux/arm/v7
+            qemu_name: armhf
           - name: ppc64le
             java_distro: 'temurin'
             java_name: ppc64le
             linux_name: ppc64el
             is_ports: true
             qemu_package_name: ppc
-            qemu_name: ppc64le
-            docker_name: linux/ppc64le
+            qemu_name: ppc64el
           - name: riscv64
             java_distro: 'temurin'
             java_name: riscv64
@@ -260,7 +251,6 @@ jobs:
             is_ports: true
             qemu_package_name: misc
             qemu_name: riscv64
-            docker_name: linux/riscv64
           - name: s390x
             java_distro: 'temurin'
             java_name: s390x
@@ -268,7 +258,6 @@ jobs:
             is_ports: true
             qemu_package_name: misc
             qemu_name: s390x
-            docker_name: linux/s390x
         java_version: [ 8, 11, 17, 21 ]
 
         exclude:
@@ -284,7 +273,7 @@ jobs:
           - architecture:
               name: riscv64
             java_version: 11
-#    needs: Linux-Build
+    needs: Linux-Build
 
     name: Linux-${{ matrix.architecture.name }}-Test-JDK${{ matrix.java_version }}
     runs-on: ubuntu-latest
@@ -308,19 +297,20 @@ jobs:
               echo "deb [arch=${{ matrix.architecture.linux_name }}] http://azure.ports.ubuntu.com/ubuntu-ports/ $(lsb_release -sc)-updates main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/ubuntu-ports-updates.list
               echo "deb [arch=${{ matrix.architecture.linux_name }}] http://azure.ports.ubuntu.com/ubuntu-ports/ $(lsb_release -sc)-security main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/ubuntu-ports-security.list
           fi
+          
           sudo apt-get update -y
           sudo apt-get --fix-broken install
-
-          sudo apt-get install -y qemu-system-${{ matrix.architecture.qemu_package_name }}:amd64 qemu-user:amd64
           
-          sudo apt-get install -y apt-file:amd64 libc6:amd64 libc6:${{ matrix.architecture.linux_name }} libstdc++6:amd64 libstdc++6:${{ matrix.architecture.linux_name }} libtinfo6:amd64 libtinfo6:${{ matrix.architecture.linux_name }} zlib1g:amd64 zlib1g:${{ matrix.architecture.linux_name }}
-
+          sudo apt-get install -y qemu-system-${{ matrix.architecture.qemu_package_name }} qemu-user qemu-utils \
+                  libc6:amd64 libc6:${{ matrix.architecture.linux_name }} libstdc++6:amd64 libstdc++6:${{ matrix.architecture.linux_name }} libtinfo6:amd64 libtinfo6:${{ matrix.architecture.linux_name }} \
+                  zlib1g:amd64 zlib1g:${{ matrix.architecture.linux_name }}
+          
           cd /opt
           sudo apt-get download bash:${{ matrix.architecture.linux_name }}
-          sudo mkdir -p bashdata && sudo ar x --output=bashdata *.deb
+          sudo mkdir -p bashdata && sudo ar x bash_*.deb --output=bashdata
           sudo tar xf bashdata/data.tar.* -C bashdata
           sudo mv bashdata/bin/bash /opt/bash
-          sudo rm -r *.deb bashdata
+          sudo rm -r bash_*.deb bashdata
 
       - name: Setup JDK
         uses: actions/setup-java@v4
@@ -335,9 +325,8 @@ jobs:
         with:
           name: Linux-${{ matrix.architecture.name }}-Build-JDK${{ matrix.java_version }}
           path: .
-          run-id: 9285337849
-          github-token: ${{ secrets.GH_TOKEN }}
 
       - name: Test
         run: |
+          ls /usr/bin /usr/local/bin | grep qemu
           qemu-${{ matrix.architecture.qemu_name }} /opt/bash -c "$(which mvn) -B -V -ntp --file pom.xml -P release test"

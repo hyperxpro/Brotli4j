@@ -27,21 +27,6 @@
 
     <artifactId>natives</artifactId>
     <packaging>pom</packaging>
-    <modules>
-        <module>linux-x86_64</module>
-        <module>linux-x86</module>
-        <module>linux-aarch64</module>
-        <module>linux-armv7</module>
-        <module>linux-ppc64le</module>
-        <module>linux-s390x</module>
-        <module>linux-riscv64</module>
-        <module>windows-x86_64</module>
-        <module>windows-x86</module>
-        <module>windows-aarch64</module>
-        <module>windows-armv7</module>
-        <module>osx-x86_64</module>
-        <module>osx-aarch64</module>
-    </modules>
 
     <dependencies>
         <dependency>
@@ -55,6 +40,12 @@
     <profiles>
         <profile>
             <id>linux-x86_64</id>
+            <activation>
+                <os>
+                    <family>Linux</family>
+                    <arch>amd64</arch>
+                </os>
+            </activation>
             <modules>
                 <module>linux-x86_64</module>
             </modules>
@@ -62,6 +53,12 @@
 
         <profile>
             <id>linux-x86</id>
+            <activation>
+                <os>
+                    <family>Linux</family>
+                    <arch>i386</arch>
+                </os>
+            </activation>
             <modules>
                 <module>linux-x86</module>
             </modules>
@@ -69,6 +66,12 @@
 
         <profile>
             <id>linux-aarch64</id>
+            <activation>
+                <os>
+                    <family>Linux</family>
+                    <arch>aarch64</arch>
+                </os>
+            </activation>
             <modules>
                 <module>linux-aarch64</module>
             </modules>
@@ -76,6 +79,12 @@
 
         <profile>
             <id>linux-armv7</id>
+            <activation>
+                <os>
+                    <family>Linux</family>
+                    <arch>arm</arch>
+                </os>
+            </activation>
             <modules>
                 <module>linux-armv7</module>
             </modules>
@@ -83,6 +92,12 @@
 
         <profile>
             <id>linux-ppc64le</id>
+            <activation>
+                <os>
+                    <family>Linux</family>
+                    <arch>ppc64le</arch>
+                </os>
+            </activation>
             <modules>
                 <module>linux-ppc64le</module>
             </modules>
@@ -90,6 +105,12 @@
 
         <profile>
             <id>linux-riscv64</id>
+            <activation>
+                <os>
+                    <family>Linux</family>
+                    <arch>riscv64</arch>
+                </os>
+            </activation>
             <modules>
                 <module>linux-riscv64</module>
             </modules>
@@ -97,6 +118,12 @@
 
         <profile>
             <id>linux-s390x</id>
+            <activation>
+                <os>
+                    <family>Linux</family>
+                    <arch>s390x</arch>
+                </os>
+            </activation>
             <modules>
                 <module>linux-s390x</module>
             </modules>
@@ -104,6 +131,12 @@
 
         <profile>
             <id>windows-x86_64</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                    <arch>amd64</arch>
+                </os>
+            </activation>
             <modules>
                 <module>windows-x86_64</module>
             </modules>
@@ -111,6 +144,12 @@
 
         <profile>
             <id>windows-x86</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                    <arch>i386</arch> <!-- TODO Check value on a real system-->
+                </os>
+            </activation>
             <modules>
                 <module>windows-x86</module>
             </modules>
@@ -118,6 +157,12 @@
 
         <profile>
             <id>windows-aarch64</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                    <arch>aarch64</arch>
+                </os>
+            </activation>
             <modules>
                 <module>windows-aarch64</module>
             </modules>
@@ -125,6 +170,12 @@
 
         <profile>
             <id>windows-armv7</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                    <arch>arm</arch> <!-- TODO Check value on a real system-->
+                </os>
+            </activation>
             <modules>
                 <module>windows-armv7</module>
             </modules>
@@ -132,6 +183,12 @@
 
         <profile>
             <id>osx-x86_64</id>
+            <activation>
+                <os>
+                    <family>Mac</family>
+                    <arch>x86_64</arch>
+                </os>
+            </activation>
             <modules>
                 <module>osx-x86_64</module>
             </modules>
@@ -139,6 +196,12 @@
 
         <profile>
             <id>osx-aarch64</id>
+            <activation>
+                <os>
+                    <family>Mac</family>
+                    <arch>aarch64</arch>
+                </os>
+            </activation>
             <modules>
                 <module>osx-aarch64</module>
             </modules>
