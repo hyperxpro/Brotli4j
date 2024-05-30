@@ -17,6 +17,7 @@
 package com.aayushatharva.brotli4j.linux.s390x;
 
 import com.aayushatharva.brotli4j.service.BrotliNativeProvider;
+import java.util.regex.Pattern;
 
 /**
  * Service class to access the native lib in a JPMS context
@@ -30,6 +31,6 @@ public class NativeLoader implements BrotliNativeProvider {
 
     @Override
     public boolean isCurrentPlatform() {
-        return "linux".equalsIgnoreCase(System.getProperty("os.name")) && "s390x".equalsIgnoreCase(System.getProperty("os.arch"));
+        return Pattern.compile("linux( .*)?", Pattern.CASE_INSENSITIVE).matcher(System.getProperty("os.name")).matches() && "s390x".equalsIgnoreCase(System.getProperty("os.arch"));
     }
 }

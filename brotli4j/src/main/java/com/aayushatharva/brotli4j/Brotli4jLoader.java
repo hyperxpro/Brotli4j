@@ -51,14 +51,10 @@ public class Brotli4jLoader {
                 try {
                     String nativeLibName = System.mapLibraryName("brotli");
 
-                    System.out.println(nativeLibName);
-
                     Path tempDir = Files.createTempDirectory( "com_aayushatharva_brotli4j_").toAbsolutePath();
                     tempDir.toFile().deleteOnExit();
 
                     Path tempFile = tempDir.resolve(nativeLibName);
-
-                    System.out.println(tempFile);
 
                     String platform = null;
                     Class<?> loaderClassToUse = Brotli4jLoader.class; // Use this as a fallback for non-JPMS contexts
@@ -72,20 +68,14 @@ public class Brotli4jLoader {
                         }
                     }
 
-                    System.out.println(platform);
-
                     if (platform == null) {
                         throw new UnsatisfiedLinkError("Failed to find valid Brotli native library in classpath.");
                     }
 
                     String libPath = "/lib/" + platform + "/" + nativeLibName;
 
-                    System.out.println(libPath);
-
                     // Copy the native library to a temporary file and load it
                     try (InputStream in = loaderClassToUse.getResourceAsStream(libPath)) {
-
-                        System.out.println(in);
 
                         // If the library is not found, throw an exception.
                         if (in == null) {
@@ -94,14 +84,9 @@ public class Brotli4jLoader {
 
                         Files.copy(in, tempFile, StandardCopyOption.REPLACE_EXISTING);
 
-                        System.out.println(tempFile);
-                        System.out.println(Files.exists(tempFile));
-
                         System.load(tempFile.toString());
                     }
                 } catch (Throwable throwable) {
-                    System.out.println(throwable);
-
                     cause = throwable;
                 }
             }

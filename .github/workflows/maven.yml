@@ -195,7 +195,7 @@ jobs:
           done
 
       - name: Build
-        run: mvn -B -V -ntp --file pom.xml -P release "-Dmaven.test.skip=false" package
+        run: mvn -B -V -ntp --file pom.xml -P release "-Dmaven.test.skip=true" package
 
       - name: Upload build
         uses: actions/upload-artifact@v4
@@ -206,10 +206,11 @@ jobs:
 
   Linux-Test:
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         architecture:
           - name: x86_64
+            runs_on: ubuntu-24.04
             java_distro: 'temurin'
             java_name: x64
             linux_name: amd64
@@ -217,6 +218,7 @@ jobs:
             qemu_package_name: x86
             qemu_name: x86_64
           - name: x86
+            runs_on: ubuntu-22.04
             java_distro: 'liberica'
             java_name: x86
             linux_name: i386
@@ -224,6 +226,7 @@ jobs:
             qemu_package_name: x86
             qemu_name: i386
           - name: aarch64
+            runs_on: ubuntu-24.04
             java_distro: 'temurin'
             java_name: aarch64
             linux_name: arm64
@@ -231,13 +234,15 @@ jobs:
             qemu_package_name: arm
             qemu_name: aarch64
           - name: armv7
-            java_distro: 'liberica'
+            runs_on: ubuntu-24.04
+            java_distro: 'temurin'
             java_name: arm
             linux_name: armhf
             is_ports: true
             qemu_package_name: arm
             qemu_name: armhf
           - name: ppc64le
+            runs_on: ubuntu-24.04
             java_distro: 'temurin'
             java_name: ppc64le
             linux_name: ppc64el
@@ -245,6 +250,7 @@ jobs:
             qemu_package_name: ppc
             qemu_name: ppc64el
           - name: riscv64
+            runs_on: ubuntu-24.04
             java_distro: 'temurin'
             java_name: riscv64
             linux_name: riscv64
@@ -252,6 +258,7 @@ jobs:
             qemu_package_name: misc
             qemu_name: riscv64
           - name: s390x
+            runs_on: ubuntu-24.04
             java_distro: 'temurin'
             java_name: s390x
             linux_name: s390x
@@ -263,26 +270,34 @@ jobs:
         exclude:
           - architecture:
               name: armv7
-            java_version: 8
+              java_distro: 'temurin'
+            java_version: 17
+          - architecture:
+              name: armv7
+              java_distro: 'temurin'
+            java_version: 21
           - architecture:
               name: s390x
+              java_distro: 'temurin'
             java_version: 8
           - architecture:
               name: riscv64
+              java_distro: 'temurin'
             java_version: 8
           - architecture:
               name: riscv64
+              java_distro: 'temurin'
             java_version: 11
     needs: Linux-Build
 
     name: Linux-${{ matrix.architecture.name }}-Test-JDK${{ matrix.java_version }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.architecture.runs_on }}
 
     steps:
       - name: Setup QEMU
         run: |
           sudo dpkg --add-architecture ${{ matrix.architecture.linux_name }}
-          sudo rm /etc/apt/sources.list
+          sudo rm -f /etc/apt/sources.list /etc/apt/sources.list.d/ubuntu.sources
           if [[ ${{ matrix.architecture.is_ports }} != true ]]; then
               echo "deb [arch=amd64,${{ matrix.architecture.linux_name }}] http://azure.archive.ubuntu.com/ubuntu/ $(lsb_release -sc) main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/ubuntu.list
               echo "deb [arch=amd64,${{ matrix.architecture.linux_name }}] http://azure.archive.ubuntu.com/ubuntu/ $(lsb_release -sc)-updates main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/ubuntu-updates.list
@@ -301,15 +316,20 @@ jobs:
           sudo apt-get update -y
           sudo apt-get --fix-broken install
           
-          sudo apt-get install -y qemu-system-${{ matrix.architecture.qemu_package_name }} qemu-user qemu-utils \
+          sudo NEEDRESTART_SUSPEND=true apt-get install -y qemu-system-${{ matrix.architecture.qemu_package_name }} qemu-user qemu-utils \
                   libc6:amd64 libc6:${{ matrix.architecture.linux_name }} libstdc++6:amd64 libstdc++6:${{ matrix.architecture.linux_name }} libtinfo6:amd64 libtinfo6:${{ matrix.architecture.linux_name }} \
-                  zlib1g:amd64 zlib1g:${{ matrix.architecture.linux_name }}
+                  libatomic1:amd64 libatomic1:${{ matrix.architecture.linux_name }} zlib1g:amd64 zlib1g:${{ matrix.architecture.linux_name }}
           
           cd /opt
           sudo apt-get download bash:${{ matrix.architecture.linux_name }}
-          sudo mkdir -p bashdata && sudo ar x bash_*.deb --output=bashdata
+          sudo mkdir -p bashdata
+          sudo ar x bash_*.deb --output=bashdata
           sudo tar xf bashdata/data.tar.* -C bashdata
-          sudo mv bashdata/bin/bash /opt/bash
+          if [[ -f bashdata/usr/bin/bash ]]; then
+              sudo mv bashdata/usr/bin/bash /opt/bash
+          elif [[ -f bashdata/bin/bash ]]; then
+              sudo mv bashdata/bin/bash /opt/bash          
+          fi
           sudo rm -r bash_*.deb bashdata
 
       - name: Setup JDK
@@ -328,5 +348,104 @@ jobs:
 
       - name: Test
         run: |
-          ls /usr/bin /usr/local/bin | grep qemu
-          qemu-${{ matrix.architecture.qemu_name }} /opt/bash -c "$(which mvn) -B -V -ntp --file pom.xml -P release test"
+          qemu-${{ matrix.architecture.qemu_name }} /opt/bash -c "mvn -B -V -ntp --file pom.xml -P release test"
+
+  Windows-Test:
+    strategy:
+      fail-fast: false
+      matrix:
+        architecture:
+          - name: x86_64
+            runs_on: windows-2022
+            java_distro: 'temurin'
+            java_name: x64
+          - name: x86
+            runs_on: windows-2022
+            java_distro: 'temurin'
+            java_name: x86
+        java_version: [ 8, 11, 17, 21 ]
+
+        exclude:
+          - architecture:
+              name: x86
+              java_distro: 'temurin'
+            java_version: 21
+          - architecture:
+              name: aarch64
+              java_distro: 'liberica'
+            java_version: 8
+    needs: Windows-Build
+
+    name: Windows-${{ matrix.architecture.name }}-Test-JDK${{ matrix.java_version }}
+    runs-on: ${{ matrix.architecture.runs_on }}
+
+    steps:
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: ${{ matrix.architecture.java_distro }}
+          java-version: ${{ matrix.java_version }}
+          architecture: ${{ matrix.architecture.java_name }}
+          check-latest: true
+
+      - name: Download build
+        uses: actions/download-artifact@v4
+        with:
+          name: Windows-${{ matrix.architecture.name }}-Build-JDK${{ matrix.java_version }}
+          path: .
+
+      - name: Test
+        run: |
+          mvn -B -V -ntp --file pom.xml -P release test
+
+  OSX-Test:
+    strategy:
+      fail-fast: true
+      matrix:
+        architecture:
+          - name: x86_64
+            runs_on: macos-14
+            java_distro: 'temurin'
+            java_name: x64
+          - name: aarch64
+            runs_on: macos-14
+            java_distro: 'temurin'
+            java_name: aarch64
+        java_version: [ 8, 11, 17, 21 ]
+
+        include:
+          - architecture:
+              name: aarch64
+              runs_on: macos-14
+              java_distro: 'liberica'
+              java_name: aarch64
+            java_version: 8
+
+        exclude:
+          - architecture:
+              name: aarch64
+              java_distro: 'temurin'
+            java_version: 8
+    needs: OSX-Build
+
+    name: OSX-${{ matrix.architecture.name }}-Test-JDK${{ matrix.java_version }}
+    runs-on: ${{ matrix.architecture.runs_on }}
+
+    steps:
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: ${{ matrix.architecture.java_distro }}
+          java-version: ${{ matrix.java_version }}
+          architecture: ${{ matrix.architecture.java_name }}
+          check-latest: true
+
+      - name: Download build
+        uses: actions/download-artifact@v4
+        with:
+          name: OSX-${{ matrix.architecture.name }}-Build-JDK${{ matrix.java_version }}
+          path: .
+
+      - name: Test
+        run: |
+          mvn -B -V -ntp --file pom.xml -P release test

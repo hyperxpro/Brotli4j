@@ -17,6 +17,7 @@
 package com.aayushatharva.brotli4j.osx.aarch64;
 
 import com.aayushatharva.brotli4j.service.BrotliNativeProvider;
+import java.util.regex.Pattern;
 
 /**
  * Service class to access the native lib in a JPMS context
@@ -30,6 +31,6 @@ public class NativeLoader implements BrotliNativeProvider {
 
     @Override
     public boolean isCurrentPlatform() {
-        return "mac".equalsIgnoreCase(System.getProperty("os.name")) && "aarch64".equalsIgnoreCase(System.getProperty("os.arch"));
+        return Pattern.compile("mac( .*)?", Pattern.CASE_INSENSITIVE).matcher(System.getProperty("os.name")).matches() && "aarch64".equalsIgnoreCase(System.getProperty("os.arch"));
     }
 }

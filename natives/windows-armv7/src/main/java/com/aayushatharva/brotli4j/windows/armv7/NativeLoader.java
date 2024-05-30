@@ -17,6 +17,7 @@
 package com.aayushatharva.brotli4j.windows.armv7;
 
 import com.aayushatharva.brotli4j.service.BrotliNativeProvider;
+import java.util.regex.Pattern;
 
 /**
  * Service class to access the native lib in a JPMS context
@@ -31,6 +32,6 @@ public class NativeLoader implements BrotliNativeProvider {
     @Override
     public boolean isCurrentPlatform() {
         // TODO Check value on a real system
-        return "windows".equalsIgnoreCase(System.getProperty("os.name")) && "arm".equalsIgnoreCase(System.getProperty("os.arch"));
+        return Pattern.compile("windows( .*)?", Pattern.CASE_INSENSITIVE).matcher(System.getProperty("os.name")).matches() && "arm".equalsIgnoreCase(System.getProperty("os.arch"));
     }
 }

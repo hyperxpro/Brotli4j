@@ -192,7 +192,7 @@
             <activation>
                 <os>
                     <family>Windows</family>
-                    <arch>i386</arch> <!-- TODO Check value on a real system-->
+                    <arch>x86</arch>
                 </os>
             </activation>
             <dependencies>
