@@ -363,6 +363,10 @@ jobs:
             runs_on: windows-2022
             java_distro: 'temurin'
             java_name: x86
+          - name: aarch64
+            runs_on: self-hosted
+            java_distro: 'liberica'
+            java_name: aarch64
         java_version: [ 8, 11, 17, 21 ]
 
         exclude:
