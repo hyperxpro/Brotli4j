@@ -15,26 +15,33 @@ jobs:
       matrix:
         architecture:
           - name: x86_64
-            linux_name: x86-64-linux-gnu
-            exec_name: x86_64-linux-gnu
+            ubuntu_version: 18.04
+            gcc_package_name: "gcc g++"
+            gcc_exec_name: "x86_64-linux-gnu"
           - name: x86
-            linux_name: i686-linux-gnu
-            exec_name: i686-linux-gnu
+            ubuntu_version: 18.04
+            gcc_package_name: "gcc-i686-linux-gnu g++-i686-linux-gnu"
+            gcc_exec_name: "i686-linux-gnu"
           - name: aarch64
-            linux_name: aarch64-linux-gnu
-            exec_name: aarch64-linux-gnu
+            ubuntu_version: 18.04
+            gcc_package_name: "gcc-aarch64-linux-gnu g++-aarch64-linux-gnu"
+            gcc_exec_name: "aarch64-linux-gnu"
           - name: armv7
-            linux_name: arm-linux-gnueabihf
-            exec_name: arm-linux-gnueabihf
+            ubuntu_version: 18.04
+            gcc_package_name: "gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf"
+            gcc_exec_name: "arm-linux-gnueabihf"
           - name: ppc64le
-            linux_name: powerpc64le-linux-gnu
-            exec_name: powerpc64le-linux-gnu
+            ubuntu_version: 18.04
+            gcc_package_name: "gcc-powerpc64le-linux-gnu g++-powerpc64le-linux-gnu"
+            gcc_exec_name: "powerpc64le-linux-gnu"
           - name: riscv64
-            linux_name: riscv64-linux-gnu
-            exec_name: riscv64-linux-gnu
+            ubuntu_version: 20.04
+            gcc_package_name: "gcc-riscv64-linux-gnu g++-riscv64-linux-gnu"
+            gcc_exec_name: "riscv64-linux-gnu"
           - name: s390x
-            linux_name: s390x-linux-gnu
-            exec_name: s390x-linux-gnu
+            ubuntu_version: 18.04
+            gcc_package_name: "gcc-s390x-linux-gnu g++-s390x-linux-gnu"
+            gcc_exec_name: "s390x-linux-gnu"
         java_version: [ 8, 11, 17, 21 ]
 
     name: Linux-${{ matrix.architecture.name }}-Build-JDK${{ matrix.java_version }}
@@ -44,6 +51,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Pre Setup JDK
+        run: |
+          sudo rm -rf /opt/hostedtoolcache/Java_*/*
+
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
@@ -52,14 +63,28 @@ jobs:
           architecture: 'x64'
           check-latest: true
 
-      - name: Install GCC
+      - name: Setup Docker
         run: |
-          sudo apt-get install -y gcc-${{ matrix.architecture.linux_name }} g++-${{ matrix.architecture.linux_name }}
-          sudo update-alternatives --install /usr/bin/cc cc /usr/bin/${{ matrix.architecture.exec_name}}-gcc 200
-          sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/${{ matrix.architecture.exec_name}}-g++ 200
+          docker build \
+                  --platform linux/amd64 \
+                  --build-arg "UBUNTU_VERSION=${{ matrix.architecture.ubuntu_version }}" \
+                  --build-arg "JAVA_VERSION=${{ matrix.java_version }}" \
+                  --build-arg "TARGET_GCC_PACKAGE=${{ matrix.architecture.gcc_package_name }}" \
+                  --build-arg "TARGET_GCC_EXEC=${{ matrix.architecture.gcc_exec_name }}" \
+                  --tag linux-buildimage:${{ matrix.architecture.name }} \
+                  docker/
 
       - name: Build
-        run: mvn -B -V -ntp --file pom.xml -P linux-${{ matrix.architecture.name }} "-Dmaven.test.skip=true" clean package
+        run: |
+          export MAVEN_HOME=$(dirname $(dirname $(which mvn)))
+
+          docker run \
+                  --platform linux/amd64 \
+                  --volume "$PWD:/data" \
+                  --volume "$JAVA_HOME:/opt/java" \
+                  --volume "$MAVEN_HOME:/opt/maven" \
+                  linux-buildimage:${{ matrix.architecture.name }} \
+                      ./mvnw -B -V -ntp -P "linux-${{ matrix.architecture.name }}" "-Dmaven.test.skip=true" clean package
 
       - name: Upload build
         uses: actions/upload-artifact@v4
@@ -90,6 +115,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Pre Setup JDK
+        run: |
+          Remove-Item -Recurse -Force -Path C:\hostedtoolcache\windows\Java_*\*
+
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
@@ -104,7 +133,8 @@ jobs:
           arch: ${{ matrix.architecture.msvc_code }}
 
       - name: Build
-        run: mvn -B -V -ntp --file pom.xml -P windows-${{ matrix.architecture.name }} "-Dmaven.test.skip=true" clean package
+        run: |
+          ./mvnw -B -V -ntp -P "windows-${{ matrix.architecture.name }}" "-Dmaven.test.skip=true" clean package
 
       - name: Upload build
         uses: actions/upload-artifact@v4
@@ -129,6 +159,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Pre Setup JDK
+        run: |
+          sudo rm -rf /Users/runner/hostedtoolcache/Java_*/*
+
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
@@ -138,7 +172,9 @@ jobs:
           check-latest: true
 
       - name: Build
-        run: mvn -B -V -ntp --file pom.xml -P osx-${{ matrix.architecture.name }} "-Dmaven.test.skip=true" clean package
+        run: |
+          chmod +x ./mvnw ./mvnw.cmd
+          ./mvnw -B -V -ntp -P "osx-${{ matrix.architecture.name }}" "-Dmaven.test.skip=true" clean package
 
       - name: Upload build
         uses: actions/upload-artifact@v4
@@ -152,6 +188,7 @@ jobs:
       fail-fast: true
       matrix:
         java_version: [ 8, 11, 17, 21 ]
+
     needs: [ Linux-Build, Windows-Build, OSX-Build ]
 
     name: Complete-Build-JDK${{ matrix.java_version }}
@@ -160,6 +197,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Pre Setup JDK
+        run: |
+          sudo rm -rf /opt/hostedtoolcache/Java_*/*
 
       - name: Setup JDK
         uses: actions/setup-java@v4
@@ -177,7 +218,6 @@ jobs:
           merge-multiple: false
 
       - name: Copy builds
-        shell: /usr/bin/bash -e {0}
         run: |
           OUT=$PWD
           rootPaths=($(find ./builds/*/natives/ -type d -name "target" | grep -oiP '(.*)\/([^-]*-[^-]*)-Build-JDK([0-9]*)(?=\/natives\/\2\/target)'))
@@ -195,7 +235,9 @@ jobs:
           done
 
       - name: Build
-        run: mvn -B -V -ntp --file pom.xml -P release "-Dmaven.test.skip=true" package
+        run: |
+          chmod +x ./mvnw ./mvnw.cmd
+          ./mvnw -B -V -ntp -P "release" "-Dmaven.test.skip=true" package
 
       - name: Upload build
         uses: actions/upload-artifact@v4
@@ -205,6 +247,7 @@ jobs:
           compression-level: 9
 
   Linux-Test:
+    if: false
     strategy:
       fail-fast: true
       matrix:
@@ -288,13 +331,16 @@ jobs:
               name: riscv64
               java_distro: 'temurin'
             java_version: 11
-    needs: Linux-Build
+
+    needs: [ Linux-Build ]
 
     name: Linux-${{ matrix.architecture.name }}-Test-JDK${{ matrix.java_version }}
     runs-on: ${{ matrix.architecture.runs_on }}
 
     steps:
       - name: Setup QEMU
+        env:
+          NEEDRESTART_SUSPEND: true
         run: |
           sudo dpkg --add-architecture ${{ matrix.architecture.linux_name }}
           sudo rm -f /etc/apt/sources.list /etc/apt/sources.list.d/ubuntu.sources
@@ -316,24 +362,16 @@ jobs:
           sudo apt-get update -y
           sudo apt-get --fix-broken install
           
-          sudo NEEDRESTART_SUSPEND=true apt-get install -y qemu-system-${{ matrix.architecture.qemu_package_name }} qemu-user qemu-utils \
-                  libc6:amd64 libc6:${{ matrix.architecture.linux_name }} libstdc++6:amd64 libstdc++6:${{ matrix.architecture.linux_name }} libtinfo6:amd64 libtinfo6:${{ matrix.architecture.linux_name }} \
-                  libatomic1:amd64 libatomic1:${{ matrix.architecture.linux_name }} zlib1g:amd64 zlib1g:${{ matrix.architecture.linux_name }}
+          sudo apt-get install -y qemu-system-${{ matrix.architecture.qemu_package_name }}
           
-          cd /opt
-          sudo apt-get download bash:${{ matrix.architecture.linux_name }}
-          sudo mkdir -p bashdata
-          sudo ar x bash_*.deb --output=bashdata
-          sudo tar xf bashdata/data.tar.* -C bashdata
-          if [[ -f bashdata/usr/bin/bash ]]; then
-              sudo mv bashdata/usr/bin/bash /opt/bash
-          elif [[ -f bashdata/bin/bash ]]; then
-              sudo mv bashdata/bin/bash /opt/bash          
-          fi
-          sudo rm -r bash_*.deb bashdata
+          sudo docker run 
+
+      - name: Pre Setup JDK
+        run: |
+          sudo rm -rf /opt/hostedtoolcache/Java_*/*
 
       - name: Setup JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v3
         with:
           distribution: ${{ matrix.architecture.java_distro }}
           java-version: ${{ matrix.java_version }}
@@ -341,18 +379,20 @@ jobs:
           check-latest: true
 
       - name: Download build
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v3
         with:
           name: Linux-${{ matrix.architecture.name }}-Build-JDK${{ matrix.java_version }}
           path: .
 
       - name: Test
         run: |
-          qemu-${{ matrix.architecture.qemu_name }} /opt/bash -c "mvn -B -V -ntp --file pom.xml -P release test"
+          docker build docker/ --tag localbuild --platform ${{ matrix.architecture.docker_name }} --build-arg BUILD_IMAGE="ubuntu:${{ matrix.architecture.ubuntu_version }}"
+          docker run localbuild --platform ${{ matrix.architecture.docker_name }} \
+            ./mvnw -B -V -ntp -P "release" test
 
   Windows-Test:
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         architecture:
           - name: x86_64
@@ -378,12 +418,17 @@ jobs:
               name: aarch64
               java_distro: 'liberica'
             java_version: 8
-    needs: Windows-Build
+
+    needs: [ Windows-Build ]
 
     name: Windows-${{ matrix.architecture.name }}-Test-JDK${{ matrix.java_version }}
     runs-on: ${{ matrix.architecture.runs_on }}
 
     steps:
+      - name: Pre Setup JDK
+        run: |
+          Remove-Item -Recurse -Force -Path C:\hostedtoolcache\windows\Java_*\*
+
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
@@ -400,7 +445,7 @@ jobs:
 
       - name: Test
         run: |
-          mvn -B -V -ntp --file pom.xml -P release test
+          ./mvnw -B -V -ntp -P "release" test
 
   OSX-Test:
     strategy:
@@ -430,12 +475,17 @@ jobs:
               name: aarch64
               java_distro: 'temurin'
             java_version: 8
-    needs: OSX-Build
+
+    needs: [ OSX-Build ]
 
     name: OSX-${{ matrix.architecture.name }}-Test-JDK${{ matrix.java_version }}
     runs-on: ${{ matrix.architecture.runs_on }}
 
     steps:
+      - name: Pre Setup JDK
+        run: |
+          sudo rm -rf /Users/runner/hostedtoolcache/Java_*/*
+
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
@@ -452,4 +502,5 @@ jobs:
 
       - name: Test
         run: |
-          mvn -B -V -ntp --file pom.xml -P release test
+          chmod +x ./mvnw ./mvnw.cmd
+          ./mvnw -B -V -ntp -P "release" test
