@@ -6,21 +6,23 @@ Brotli4j provides Brotli compression and decompression for Java.
 
 ## Supported Platforms:
 
-| Module                 |  Architecture   |                                Tested On |
-|:-----------------------|:---------------:|-----------------------------------------:|
-| Windows (Server 2022)  |  x86_64 (x64)   |  JDK 8, JDK 11, JDK 17, JDK 21 (temurin) |
-| Windows (Server 2022)  |   x86 (i386)    |          JDK 8, JDK 11, JDK 17 (temurin) |
-| Windows (11)           | Aarch64 (arm64) |        JDK 11, JDK 17, JDK 21 (liberica) |
-| Windows                |   ARMv7 (arm)   |                                 Untested |
-| Linux (Ubuntu 24.04)   |  x86_64 (x64)   |  JDK 8, JDK 11, JDK 17, JDK 21 (temurin) |
-| Linux (Ubuntu 22.04)   |   x86 (i386)    | JDK 8, JDK 11, JDK 17, JDK 21 (liberica) |
-| Linux (Ubuntu 24.04)   | Aarch64 (arm64) |  JDK 8, JDK 11, JDK 17, JDK 21 (temurin) |
-| Linux (Ubuntu 24.04)   |   ARMv7 (arm)   |                  JDK 8, JDK 11 (temurin) |
-| Linux (Ubuntu 24.04)   |     ppc64le     |  JDK 8, JDK 11, JDK 17, JDK 21 (temurin) |
-| Linux (Ubuntu 24.04)   |      s390x      |         JDK 11, JDK 17, JDK 21 (temurin) |
-| Linux (Ubuntu 24.04)   |     riscv64     |                 JDK 17, JDK 21 (temurin) |
-| macOS (14 Sonoma)      |  x86_64 (x64)   |  JDK 8, JDK 11, JDK 17, JDK 21 (temurin) |
-| macOS (14 Sonoma)      | Aarch64 (arm64) |         JDK 11, JDK 17, JDK 21 (temurin) |
+| Module  |  Architecture   |            Built On |           Tested On |                    Tested JDKS |
+|:--------|:---------------:|--------------------:|--------------------:|-------------------------------:|
+| Windows |  x86_64 (x64)   | Windows Server 2022 | Windows Server 2022 |  JDK 8, JDK 11, JDK 17, JDK 21 |           
+| Windows |   x86 (i386)    | Windows Server 2022 | Windows Server 2022 |          JDK 8, JDK 11, JDK 17 |           
+| Windows | aarch64 (arm64) | Windows Server 2022 |          Windows 11 |         JDK 11, JDK 17, JDK 21 |           
+| Windows |   ARMv7 (arm)   | Windows Server 2022 |            Untested |                       Untested |           
+| Linux   |  x86_64 (x64)   |        Ubuntu 18.04 | Ubuntu 18.04, 24.04 |  JDK 8, JDK 11, JDK 17, JDK 21 |           
+| Linux   |   x86 (i386)    |        Ubuntu 18.04 |        Ubuntu 22.04 |  JDK 8, JDK 11, JDK 17, JDK 21 |           
+| Linux   | aarch64 (arm64) |        Ubuntu 18.04 | Ubuntu 18.04, 24.04 |  JDK 8, JDK 11, JDK 17, JDK 21 |           
+| Linux   |   armv7 (arm)   |        Ubuntu 18.04 |        Ubuntu 24.04 |                  JDK 8, JDK 11 |           
+| Linux   |     ppc64le     |        Ubuntu 18.04 |        Ubuntu 24.04 |  JDK 8, JDK 11, JDK 17, JDK 21 |
+| Linux   |      s390x      |        Ubuntu 18.04 |        Ubuntu 24.04 |         JDK 11, JDK 17, JDK 21 |           
+| Linux   |     riscv64     |        Ubuntu 18.04 |        Ubuntu 24.04 |                 JDK 17, JDK 21 |
+| macOS   |  x86_64 (x64)   |            MacOS 14 |            MacOS 14 |  JDK 8, JDK 11, JDK 17, JDK 21 |           
+| macOS   | aarch64 (arm64) |            MacOS 14 |            MacOS 14 |  JDK 8, JDK 11, JDK 17, JDK 21 |           
+
+All platforms are built using JDK 8
 
 #### *Install [Microsoft Visual C++ Redistributable](https://learn.microsoft.com/en-US/cpp/windows/latest-supported-vc-redist?view=msvc-170) before running this library on Windows
 
