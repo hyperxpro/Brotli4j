@@ -7,6 +7,12 @@ on:
   pull_request:
 
   workflow_dispatch:
+    inputs:
+      keep_intermediate_builds:
+        description: Keep intermediate builds
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   Linux-Build:
@@ -35,7 +41,7 @@ jobs:
             gcc_package_name: "gcc-powerpc64le-linux-gnu g++-powerpc64le-linux-gnu"
             gcc_exec_name: "powerpc64le-linux-gnu"
           - name: riscv64
-            ubuntu_version: 20.04
+            ubuntu_version: 18.04
             gcc_package_name: "gcc-riscv64-linux-gnu g++-riscv64-linux-gnu"
             gcc_exec_name: "riscv64-linux-gnu"
           - name: s390x
@@ -63,11 +69,11 @@ jobs:
           architecture: 'x64'
           check-latest: true
 
-      - name: Setup Docker
+      - name: Setup Build
         run: |
           docker build \
                   --platform linux/amd64 \
-                  --build-arg "UBUNTU_VERSION=${{ matrix.architecture.ubuntu_version }}" \
+                  --build-arg "UBUNTU_IMAGE=amd64/ubuntu:${{ matrix.architecture.ubuntu_version }}" \
                   --build-arg "JAVA_VERSION=${{ matrix.java_version }}" \
                   --build-arg "TARGET_GCC_PACKAGE=${{ matrix.architecture.gcc_package_name }}" \
                   --build-arg "TARGET_GCC_EXEC=${{ matrix.architecture.gcc_exec_name }}" \
@@ -191,7 +197,8 @@ jobs:
       matrix:
         java_version: [ 8, 11, 17, 21 ]
 
-    needs: [ Linux-Build, Windows-Build, OSX-Build ]
+    needs: [ Linux-Build, Windows-Build, OSX-Build, Linux-Test-Docker, Linux-Test-QEMU, Windows-Test, OSX-Test ]
+    if: ${{ always() && !cancelled() }}
 
     name: Complete-Build-JDK${{ matrix.java_version }}
     runs-on: ubuntu-latest
@@ -212,23 +219,14 @@ jobs:
           architecture: 'x64'
           check-latest: true
 
-      - name: Setup Docker
-        run: |
-          docker build \
-                  --platform linux/amd64 \
-                  --build-arg "UBUNTU_VERSION=18.04" \
-                  --build-arg "JAVA_VERSION=${{ matrix.java_version }}" \
-                  --tag linux-buildimage:complete \
-                  docker/completebuild/
-
-      - name: Download builds
+      - name: Download intermediate builds
         uses: actions/download-artifact@v4
         with:
           pattern: "*-JDK${{ matrix.java_version }}"
           path: builds/
           merge-multiple: false
 
-      - name: Copy builds
+      - name: Merge intermediate builds
         run: |
           OUT=$PWD
           rootPaths=($(find ./builds/*/natives/ -type d -name "target" | grep -oiP '(.*)\/([^-]*-[^-]*)-Build-JDK([0-9]*)(?=\/natives\/\2\/target)'))
@@ -245,6 +243,16 @@ jobs:
             cd $OUT
           done
 
+
+      - name: Setup Build
+        run: |
+          docker build \
+                  --platform linux/amd64 \
+                  --build-arg "UBUNTU_IMAGE=amd64/ubuntu:18.04" \
+                  --build-arg "JAVA_VERSION=${{ matrix.java_version }}" \
+                  --tag linux-buildimage:complete \
+                  docker/completebuild/
+
       - name: Build
         run: |
           chmod +x ./mvnw ./mvnw.cmd
@@ -259,6 +267,13 @@ jobs:
                   linux-buildimage:complete \
                       ./mvnw -B -V -ntp -P "release" "-Dmaven.test.skip=true" package
 
+      - name: Remove intermediate builds
+        if: ${{ !(inputs.keep_intermediate_builds == true) }}
+        continue-on-error: true
+        uses: geekyeggo/delete-artifact@v5
+        with:
+          name: '*-JDK${{ matrix.java_version }}'
+
       - name: Upload build
         uses: actions/upload-artifact@v4
         with:
@@ -266,8 +281,80 @@ jobs:
           path: .
           compression-level: 9
 
-  Linux-Test:
-    if: false
+  Linux-Test-Docker:
+    strategy:
+      fail-fast: true
+      matrix:
+        architecture:
+          - name: x86_64
+            ubuntu_version: 18.04
+            ubuntu_docker_arch: amd64
+            java_distro: 'temurin'
+            java_name: x64
+            docker_name: linux/amd64
+          - name: aarch64
+            ubuntu_version: 18.04
+            ubuntu_docker_arch: arm64v8
+            java_distro: 'temurin'
+            java_name: aarch64
+            docker_name: linux/aarch64
+        java_version: [ 8, 11, 17, 21 ]
+
+    needs: [ Linux-Build ]
+
+    name: Linux-${{ matrix.architecture.name }}-Test-JDK${{ matrix.java_version }}-Docker
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Pre Setup JDK
+        run: |
+          sudo rm -rf /opt/hostedtoolcache/Java_*/*
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: ${{ matrix.architecture.java_distro }}
+          java-version: ${{ matrix.java_version }}
+          architecture: ${{ matrix.architecture.java_name }}
+          check-latest: true
+
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: ${{ matrix.architecture.docker_name }}
+
+      - name: Download build
+        uses: actions/download-artifact@v4
+        with:
+          name: Linux-${{ matrix.architecture.name }}-Build-JDK${{ matrix.java_version }}
+          path: .
+
+      - name: Setup Test
+        run: |
+          docker build \
+                  --platform ${{ matrix.architecture.docker_name }} \
+                  --build-arg "UBUNTU_IMAGE=${{ matrix.architecture.ubuntu_docker_arch }}/ubuntu:${{ matrix.architecture.ubuntu_version }}" \
+                  --build-arg "JAVA_VERSION=${{ matrix.java_version }}" \
+                  --build-arg "TARGET_GCC_PACKAGE=${{ matrix.architecture.gcc_package_name }}" \
+                  --build-arg "TARGET_GCC_EXEC=${{ matrix.architecture.gcc_exec_name }}" \
+                  --tag linux-testimage:${{ matrix.architecture.name }} \
+                  docker/test/
+
+      - name: Test
+        run: |
+          chmod +x ./mvnw ./mvnw.cmd
+
+          export MAVEN_HOME=$(dirname $(dirname $(which mvn)))
+
+          docker run \
+                  --platform ${{ matrix.architecture.docker_name }} \
+                  --volume "$PWD:/data" \
+                  --volume "$JAVA_HOME:/opt/java" \
+                  --volume "$MAVEN_HOME:/opt/maven" \
+                  linux-testimage:${{ matrix.architecture.name }} \
+                      ./mvnw -B -V -ntp -P "release" test
+
+  Linux-Test-QEMU:
     strategy:
       fail-fast: true
       matrix:
@@ -311,7 +398,7 @@ jobs:
             linux_name: ppc64el
             is_ports: true
             qemu_package_name: ppc
-            qemu_name: ppc64el
+            qemu_name: ppc64le
           - name: riscv64
             runs_on: ubuntu-24.04
             java_distro: 'temurin'
@@ -354,13 +441,29 @@ jobs:
 
     needs: [ Linux-Build ]
 
-    name: Linux-${{ matrix.architecture.name }}-Test-JDK${{ matrix.java_version }}
+    name: Linux-${{ matrix.architecture.name }}-Test-JDK${{ matrix.java_version }}-QEMU
     runs-on: ${{ matrix.architecture.runs_on }}
 
     steps:
+      - name: Pre Setup JDK
+        run: |
+          sudo rm -rf /opt/hostedtoolcache/Java_*/*
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: ${{ matrix.architecture.java_distro }}
+          java-version: ${{ matrix.java_version }}
+          architecture: ${{ matrix.architecture.java_name }}
+          check-latest: true
+
+      - name: Download build
+        uses: actions/download-artifact@v4
+        with:
+          name: Linux-${{ matrix.architecture.name }}-Build-JDK${{ matrix.java_version }}
+          path: .
+
       - name: Setup QEMU
-        env:
-          NEEDRESTART_SUSPEND: true
         run: |
           sudo dpkg --add-architecture ${{ matrix.architecture.linux_name }}
           sudo rm -f /etc/apt/sources.list /etc/apt/sources.list.d/ubuntu.sources
@@ -382,33 +485,27 @@ jobs:
           sudo apt-get update -y
           sudo apt-get --fix-broken install
           
-          sudo apt-get install -y qemu-system-${{ matrix.architecture.qemu_package_name }}
+          sudo NEEDRESTART_SUSPEND=true apt-get install -y qemu-system-${{ matrix.architecture.qemu_package_name }} qemu-user qemu-utils \
+                  libc6:amd64 libc6:${{ matrix.architecture.linux_name }} libstdc++6:amd64 libstdc++6:${{ matrix.architecture.linux_name }} libtinfo6:amd64 libtinfo6:${{ matrix.architecture.linux_name }} \
+                  libatomic1:amd64 libatomic1:${{ matrix.architecture.linux_name }} zlib1g:amd64 zlib1g:${{ matrix.architecture.linux_name }}
           
-          sudo docker run 
-
-      - name: Pre Setup JDK
-        run: |
-          sudo rm -rf /opt/hostedtoolcache/Java_*/*
-
-      - name: Setup JDK
-        uses: actions/setup-java@v3
-        with:
-          distribution: ${{ matrix.architecture.java_distro }}
-          java-version: ${{ matrix.java_version }}
-          architecture: ${{ matrix.architecture.java_name }}
-          check-latest: true
-
-      - name: Download build
-        uses: actions/download-artifact@v3
-        with:
-          name: Linux-${{ matrix.architecture.name }}-Build-JDK${{ matrix.java_version }}
-          path: .
+          cd /opt
+          sudo apt-get download bash:${{ matrix.architecture.linux_name }}
+          sudo mkdir -p bashdata
+          sudo ar x bash_*.deb --output=bashdata
+          sudo tar xf bashdata/data.tar.* -C bashdata
+          if [[ -f bashdata/usr/bin/bash ]]; then
+              sudo mv bashdata/usr/bin/bash /opt/bash
+          elif [[ -f bashdata/bin/bash ]]; then
+              sudo mv bashdata/bin/bash /opt/bash          
+          fi
+          sudo rm -r bash_*.deb bashdata
 
       - name: Test
         run: |
-          docker build docker/ --tag localbuild --platform ${{ matrix.architecture.docker_name }} --build-arg BUILD_IMAGE="ubuntu:${{ matrix.architecture.ubuntu_version }}"
-          docker run localbuild --platform ${{ matrix.architecture.docker_name }} \
-            ./mvnw -B -V -ntp -P "release" test
+          chmod +x ./mvnw ./mvnw.cmd
+
+          qemu-${{ matrix.architecture.qemu_name }} /opt/bash -c "./mvnw -B -V -ntp -P \"release\" test"
 
   Windows-Test:
     strategy:
@@ -423,10 +520,6 @@ jobs:
             runs_on: windows-2022
             java_distro: 'temurin'
             java_name: x86
-          - name: aarch64
-            runs_on: self-hosted
-            java_distro: 'liberica'
-            java_name: aarch64
         java_version: [ 8, 11, 17, 21 ]
 
         exclude:
@@ -478,23 +571,9 @@ jobs:
             java_name: x64
           - name: aarch64
             runs_on: macos-14
-            java_distro: 'temurin'
+            java_distro: 'liberica'
             java_name: aarch64
         java_version: [ 8, 11, 17, 21 ]
-
-        include:
-          - architecture:
-              name: aarch64
-              runs_on: macos-14
-              java_distro: 'liberica'
-              java_name: aarch64
-            java_version: 8
-
-        exclude:
-          - architecture:
-              name: aarch64
-              java_distro: 'temurin'
-            java_version: 8
 
     needs: [ OSX-Build ]
 
