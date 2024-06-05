@@ -72,10 +72,12 @@ jobs:
                   --build-arg "TARGET_GCC_PACKAGE=${{ matrix.architecture.gcc_package_name }}" \
                   --build-arg "TARGET_GCC_EXEC=${{ matrix.architecture.gcc_exec_name }}" \
                   --tag linux-buildimage:${{ matrix.architecture.name }} \
-                  docker/
+                  docker/build/
 
       - name: Build
         run: |
+          chmod +x ./mvnw ./mvnw.cmd
+
           export MAVEN_HOME=$(dirname $(dirname $(which mvn)))
 
           docker run \
@@ -210,6 +212,15 @@ jobs:
           architecture: 'x64'
           check-latest: true
 
+      - name: Setup Docker
+        run: |
+          docker build \
+                  --platform linux/amd64 \
+                  --build-arg "UBUNTU_VERSION=18.04" \
+                  --build-arg "JAVA_VERSION=${{ matrix.java_version }}" \
+                  --tag linux-buildimage:complete \
+                  docker/completebuild/
+
       - name: Download builds
         uses: actions/download-artifact@v4
         with:
@@ -237,7 +248,16 @@ jobs:
       - name: Build
         run: |
           chmod +x ./mvnw ./mvnw.cmd
-          ./mvnw -B -V -ntp -P "release" "-Dmaven.test.skip=true" package
+
+          export MAVEN_HOME=$(dirname $(dirname $(which mvn)))
+
+          docker run \
+                  --platform linux/amd64 \
+                  --volume "$PWD:/data" \
+                  --volume "$JAVA_HOME:/opt/java" \
+                  --volume "$MAVEN_HOME:/opt/maven" \
+                  linux-buildimage:complete \
+                      ./mvnw -B -V -ntp -P "release" "-Dmaven.test.skip=true" package
 
       - name: Upload build
         uses: actions/upload-artifact@v4
