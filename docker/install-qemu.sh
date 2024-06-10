@@ -1,3 +1,5 @@
+#!/bin/bash
+
 sudo dpkg --add-architecture "$1"
 sudo rm -f /etc/apt/sources.list /etc/apt/sources.list.d/ubuntu.sources
 if [[ $2 != true ]]; then

@@ -26,31 +26,31 @@ jobs:
       matrix:
         architecture:
           - name: x86_64
-            ubuntu_version: 18.04
-            gcc_package_name: "gcc g++"
-            gcc_exec_name: "x86_64-linux-gnu"
+            centos_version: "6-gcc7"
+            gcc_package_name: "gcc gcc-c++"
+            gcc_exec_name: "x86_64-redhat-linux-gnu"
           - name: x86
-            ubuntu_version: 18.04
+            ubuntu_version: "18.04"
             gcc_package_name: "gcc-i686-linux-gnu g++-i686-linux-gnu"
             gcc_exec_name: "i686-linux-gnu"
           - name: aarch64
-            ubuntu_version: 18.04
+            ubuntu_version: "18.04"
             gcc_package_name: "gcc-aarch64-linux-gnu g++-aarch64-linux-gnu"
             gcc_exec_name: "aarch64-linux-gnu"
           - name: armv7
-            ubuntu_version: 18.04
+            ubuntu_version: "18.04"
             gcc_package_name: "gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf"
             gcc_exec_name: "arm-linux-gnueabihf"
           - name: ppc64le
-            ubuntu_version: 18.04
+            ubuntu_version: "18.04"
             gcc_package_name: "gcc-powerpc64le-linux-gnu g++-powerpc64le-linux-gnu"
             gcc_exec_name: "powerpc64le-linux-gnu"
           - name: riscv64
-            ubuntu_version: 18.04
+            ubuntu_version: "18.04"
             gcc_package_name: "gcc-riscv64-linux-gnu g++-riscv64-linux-gnu"
             gcc_exec_name: "riscv64-linux-gnu"
           - name: s390x
-            ubuntu_version: 18.04
+            ubuntu_version: "18.04"
             gcc_package_name: "gcc-s390x-linux-gnu g++-s390x-linux-gnu"
             gcc_exec_name: "s390x-linux-gnu"
         java_version: [ 8, 11, 17, 21 ]
@@ -69,32 +69,40 @@ jobs:
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
+          distribution: 'corretto'
           java-version: ${{ matrix.java_version }}
           architecture: 'x64'
           check-latest: true
 
-      - name: Setup Build
+      - name: Setup Ubuntu Build
+        if: ${{ matrix.architecture.ubuntu_version }}
         run: |
           docker build \
               --platform linux/amd64 \
               --build-arg "DOCKER_IMAGE=amd64/ubuntu:${{ matrix.architecture.ubuntu_version }}" \
-              --build-arg "JAVA_VERSION=${{ matrix.java_version }}" \
               --build-arg "TARGET_GCC_PACKAGE=${{ matrix.architecture.gcc_package_name }}" \
               --build-arg "TARGET_GCC_EXEC=${{ matrix.architecture.gcc_exec_name }}" \
               --tag linux-buildimage:${{ matrix.architecture.name }} \
               docker/build/
 
+      - name: Setup CentOS Build
+        if: ${{ matrix.architecture.centos_version }}
+        run: |
+          docker build \
+              --platform linux/amd64 \
+              --build-arg "DOCKER_IMAGE=gatlingcorp/centos:${{ matrix.architecture.centos_version }}" \
+              --build-arg "TARGET_GCC_PACKAGE=${{ matrix.architecture.gcc_package_name }}" \
+              --build-arg "TARGET_GCC_EXEC=${{ matrix.architecture.gcc_exec_name }}" \
+              --tag linux-buildimage:${{ matrix.architecture.name }} \
+              docker/centosbuild/
+
       - name: Build
         run: |
-          export MAVEN_HOME=$(dirname $(dirname $(which mvn)))
-
           chmod +x ./mvnw ./mvnw.cmd
           docker run \
               --platform linux/amd64 \
               --volume "$PWD:/data" \
               --volume "$JAVA_HOME:/opt/java" \
-              --volume "$MAVEN_HOME:/opt/maven" \
               linux-buildimage:${{ matrix.architecture.name }} \
                   ./mvnw -B -V -ntp -P "linux-${{ matrix.architecture.name }}" "-Dmaven.test.skip=true" clean package
 
@@ -245,14 +253,11 @@ jobs:
 
       - name: Build
         run: |
-          export MAVEN_HOME=$(dirname $(dirname $(which mvn)))
-
           chmod +x ./mvnw ./mvnw.cmd
           docker run \
               --platform linux/amd64 \
               --volume "$PWD:/data" \
               --volume "$JAVA_HOME:/opt/java" \
-              --volume "$MAVEN_HOME:/opt/maven" \
               linux-buildimage:complete \
                   ./mvnw -B -V -ntp -P "release" "-Dmaven.test.skip=true" package
 
@@ -285,7 +290,7 @@ jobs:
             java_distro: 'temurin'
             java_name: aarch64
             docker_name: linux/aarch64
-        ubuntu_version: [ 16.04, 18.04, 20.04, 22.04, 24.04 ]
+        ubuntu_version: [ "16.04", "18.04", "20.04", "22.04", "24.04" ]
         java_version: [ 8, 11, 17, 21 ]
 
     needs: [ Linux-Build ]
@@ -328,14 +333,11 @@ jobs:
 
       - name: Test
         run: |
-          export MAVEN_HOME=$(dirname $(dirname $(which mvn)))
-
           chmod +x ./mvnw ./mvnw.cmd
           docker run \
               --platform ${{ matrix.architecture.docker_name }} \
               --volume "$PWD:/data" \
               --volume "$JAVA_HOME:/opt/java" \
-              --volume "$MAVEN_HOME:/opt/maven" \
               linux-testimage:${{ matrix.architecture.name }} \
                   ./mvnw -B -V -ntp -P "release" test
 

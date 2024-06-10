@@ -1,3 +1,5 @@
+#!/bin/bash
+
 OUT="$PWD"
 rootPaths=($(find ./builds/*/natives/ -type d -name "target" | grep -oiP '(.*)\/([^-]*-[^-]*)-Build-JDK([0-9]*)(?=\/natives\/\2\/target)'))
 paths=($(find ./builds/*/natives/ -type d -name "target" | grep -oiP '(?:(.*)\/([^-]*-[^-]*)-Build-JDK([0-9]*)\/)natives\/\2\/target'))
