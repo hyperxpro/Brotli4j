@@ -8,6 +8,11 @@ on:
 
   workflow_dispatch:
     inputs:
+      run_all_tests:
+        description: Run extra tests on different ubuntu versions
+        required: false
+        type: boolean
+        default: false
       keep_intermediate_builds:
         description: Keep intermediate builds
         required: false
@@ -82,10 +87,9 @@ jobs:
 
       - name: Build
         run: |
-          chmod +x ./mvnw ./mvnw.cmd
-
           export MAVEN_HOME=$(dirname $(dirname $(which mvn)))
 
+          chmod +x ./mvnw ./mvnw.cmd
           docker run \
               --platform linux/amd64 \
               --volume "$PWD:/data" \
@@ -228,36 +232,22 @@ jobs:
 
       - name: Merge intermediate builds
         run: |
-          OUT=$PWD
-          rootPaths=($(find ./builds/*/natives/ -type d -name "target" | grep -oiP '(.*)\/([^-]*-[^-]*)-Build-JDK([0-9]*)(?=\/natives\/\2\/target)'))
-          paths=($(find ./builds/*/natives/ -type d -name "target" | grep -oiP '(?:(.*)\/([^-]*-[^-]*)-Build-JDK([0-9]*)\/)natives\/\2\/target'))
-          for i in "${!paths[@]}"; do
-            rootPath="${rootPaths[$i]}"
-            rootPathLen="${#rootPath}"
-            path="${paths[$i]}"
-          
-            cd $rootPath
-            path=.${path:rootPathLen:256}
-          
-            cp -r --parent $path $OUT
-            cd $OUT
-          done
+          chmod +x docker/merge-builds.sh
+          docker/merge-builds.sh
 
       - name: Setup Build
         run: |
           docker build \
               --platform linux/amd64 \
               --build-arg "DOCKER_IMAGE=amd64/ubuntu:18.04" \
-              --build-arg "JAVA_VERSION=${{ matrix.java_version }}" \
               --tag linux-buildimage:complete \
               docker/completebuild/
 
       - name: Build
         run: |
-          chmod +x ./mvnw ./mvnw.cmd
-
           export MAVEN_HOME=$(dirname $(dirname $(which mvn)))
 
+          chmod +x ./mvnw ./mvnw.cmd
           docker run \
               --platform linux/amd64 \
               --volume "$PWD:/data" \
@@ -286,22 +276,22 @@ jobs:
       matrix:
         architecture:
           - name: x86_64
-            ubuntu_version: 18.04
             ubuntu_docker_arch: amd64
             java_distro: 'temurin'
             java_name: x64
             docker_name: linux/amd64
           - name: aarch64
-            ubuntu_version: 18.04
             ubuntu_docker_arch: arm64v8
             java_distro: 'temurin'
             java_name: aarch64
             docker_name: linux/aarch64
+        ubuntu_version: [ 16.04, 18.04, 20.04, 22.04, 24.04 ]
         java_version: [ 8, 11, 17, 21 ]
 
     needs: [ Linux-Build ]
+    if: ${{ inputs.run_all_tests == true }}
 
-    name: Linux-${{ matrix.architecture.name }}-Test-JDK${{ matrix.java_version }}-Docker
+    name: Linux-${{ matrix.architecture.name }}-Test-JDK${{ matrix.java_version }}-Docker-Ubuntu_${{ matrix.ubuntu_version }}
     runs-on: ubuntu-latest
 
     steps:
@@ -332,19 +322,15 @@ jobs:
         run: |
           docker build \
               --platform ${{ matrix.architecture.docker_name }} \
-              --build-arg "DOCKER_IMAGE=${{ matrix.architecture.ubuntu_docker_arch }}/ubuntu:${{ matrix.architecture.ubuntu_version }}" \
-              --build-arg "JAVA_VERSION=${{ matrix.java_version }}" \
-              --build-arg "TARGET_GCC_PACKAGE=${{ matrix.architecture.gcc_package_name }}" \
-              --build-arg "TARGET_GCC_EXEC=${{ matrix.architecture.gcc_exec_name }}" \
+              --build-arg "DOCKER_IMAGE=${{ matrix.architecture.ubuntu_docker_arch }}/ubuntu:${{ matrix.ubuntu_version }}" \
               --tag linux-testimage:${{ matrix.architecture.name }} \
               docker/test/
 
       - name: Test
         run: |
-          chmod +x ./mvnw ./mvnw.cmd
-
           export MAVEN_HOME=$(dirname $(dirname $(which mvn)))
 
+          chmod +x ./mvnw ./mvnw.cmd
           docker run \
               --platform ${{ matrix.architecture.docker_name }} \
               --volume "$PWD:/data" \
@@ -470,7 +456,6 @@ jobs:
       - name: Test
         run: |
           chmod +x ./mvnw ./mvnw.cmd
-
           qemu-${{ matrix.architecture.qemu_name }} /opt/bash -c "./mvnw -B -V -ntp -P \"release\" test"
 
   Windows-Test:
