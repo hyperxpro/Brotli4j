@@ -1,10 +1,10 @@
-ARG UBUNTU_IMAGE
-FROM ${UBUNTU_IMAGE}
+ARG DOCKER_IMAGE
+FROM ${DOCKER_IMAGE}
 USER root
 
 RUN apt-get update -y && \
     apt-get install -y \
-        libc6 libstdc++6 libatomic1 zlib1g && \
+        "libc6" "libstdc++6" "libatomic1" "zlib1g" && \
     apt-get clean
 
 VOLUME "/opt/java"

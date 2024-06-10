@@ -72,13 +72,13 @@ jobs:
       - name: Setup Build
         run: |
           docker build \
-                  --platform linux/amd64 \
-                  --build-arg "UBUNTU_IMAGE=amd64/ubuntu:${{ matrix.architecture.ubuntu_version }}" \
-                  --build-arg "JAVA_VERSION=${{ matrix.java_version }}" \
-                  --build-arg "TARGET_GCC_PACKAGE=${{ matrix.architecture.gcc_package_name }}" \
-                  --build-arg "TARGET_GCC_EXEC=${{ matrix.architecture.gcc_exec_name }}" \
-                  --tag linux-buildimage:${{ matrix.architecture.name }} \
-                  docker/build/
+              --platform linux/amd64 \
+              --build-arg "DOCKER_IMAGE=amd64/ubuntu:${{ matrix.architecture.ubuntu_version }}" \
+              --build-arg "JAVA_VERSION=${{ matrix.java_version }}" \
+              --build-arg "TARGET_GCC_PACKAGE=${{ matrix.architecture.gcc_package_name }}" \
+              --build-arg "TARGET_GCC_EXEC=${{ matrix.architecture.gcc_exec_name }}" \
+              --tag linux-buildimage:${{ matrix.architecture.name }} \
+              docker/build/
 
       - name: Build
         run: |
@@ -87,12 +87,12 @@ jobs:
           export MAVEN_HOME=$(dirname $(dirname $(which mvn)))
 
           docker run \
-                  --platform linux/amd64 \
-                  --volume "$PWD:/data" \
-                  --volume "$JAVA_HOME:/opt/java" \
-                  --volume "$MAVEN_HOME:/opt/maven" \
-                  linux-buildimage:${{ matrix.architecture.name }} \
-                      ./mvnw -B -V -ntp -P "linux-${{ matrix.architecture.name }}" "-Dmaven.test.skip=true" clean package
+              --platform linux/amd64 \
+              --volume "$PWD:/data" \
+              --volume "$JAVA_HOME:/opt/java" \
+              --volume "$MAVEN_HOME:/opt/maven" \
+              linux-buildimage:${{ matrix.architecture.name }} \
+                  ./mvnw -B -V -ntp -P "linux-${{ matrix.architecture.name }}" "-Dmaven.test.skip=true" clean package
 
       - name: Upload build
         uses: actions/upload-artifact@v4
@@ -246,11 +246,11 @@ jobs:
       - name: Setup Build
         run: |
           docker build \
-                  --platform linux/amd64 \
-                  --build-arg "UBUNTU_IMAGE=amd64/ubuntu:18.04" \
-                  --build-arg "JAVA_VERSION=${{ matrix.java_version }}" \
-                  --tag linux-buildimage:complete \
-                  docker/completebuild/
+              --platform linux/amd64 \
+              --build-arg "DOCKER_IMAGE=amd64/ubuntu:18.04" \
+              --build-arg "JAVA_VERSION=${{ matrix.java_version }}" \
+              --tag linux-buildimage:complete \
+              docker/completebuild/
 
       - name: Build
         run: |
@@ -259,12 +259,12 @@ jobs:
           export MAVEN_HOME=$(dirname $(dirname $(which mvn)))
 
           docker run \
-                  --platform linux/amd64 \
-                  --volume "$PWD:/data" \
-                  --volume "$JAVA_HOME:/opt/java" \
-                  --volume "$MAVEN_HOME:/opt/maven" \
-                  linux-buildimage:complete \
-                      ./mvnw -B -V -ntp -P "release" "-Dmaven.test.skip=true" package
+              --platform linux/amd64 \
+              --volume "$PWD:/data" \
+              --volume "$JAVA_HOME:/opt/java" \
+              --volume "$MAVEN_HOME:/opt/maven" \
+              linux-buildimage:complete \
+                  ./mvnw -B -V -ntp -P "release" "-Dmaven.test.skip=true" package
 
       - name: Remove intermediate builds
         if: ${{ !(inputs.keep_intermediate_builds == true) }}
@@ -331,13 +331,13 @@ jobs:
       - name: Setup Test
         run: |
           docker build \
-                  --platform ${{ matrix.architecture.docker_name }} \
-                  --build-arg "UBUNTU_IMAGE=${{ matrix.architecture.ubuntu_docker_arch }}/ubuntu:${{ matrix.architecture.ubuntu_version }}" \
-                  --build-arg "JAVA_VERSION=${{ matrix.java_version }}" \
-                  --build-arg "TARGET_GCC_PACKAGE=${{ matrix.architecture.gcc_package_name }}" \
-                  --build-arg "TARGET_GCC_EXEC=${{ matrix.architecture.gcc_exec_name }}" \
-                  --tag linux-testimage:${{ matrix.architecture.name }} \
-                  docker/test/
+              --platform ${{ matrix.architecture.docker_name }} \
+              --build-arg "DOCKER_IMAGE=${{ matrix.architecture.ubuntu_docker_arch }}/ubuntu:${{ matrix.architecture.ubuntu_version }}" \
+              --build-arg "JAVA_VERSION=${{ matrix.java_version }}" \
+              --build-arg "TARGET_GCC_PACKAGE=${{ matrix.architecture.gcc_package_name }}" \
+              --build-arg "TARGET_GCC_EXEC=${{ matrix.architecture.gcc_exec_name }}" \
+              --tag linux-testimage:${{ matrix.architecture.name }} \
+              docker/test/
 
       - name: Test
         run: |
@@ -346,12 +346,12 @@ jobs:
           export MAVEN_HOME=$(dirname $(dirname $(which mvn)))
 
           docker run \
-                  --platform ${{ matrix.architecture.docker_name }} \
-                  --volume "$PWD:/data" \
-                  --volume "$JAVA_HOME:/opt/java" \
-                  --volume "$MAVEN_HOME:/opt/maven" \
-                  linux-testimage:${{ matrix.architecture.name }} \
-                      ./mvnw -B -V -ntp -P "release" test
+              --platform ${{ matrix.architecture.docker_name }} \
+              --volume "$PWD:/data" \
+              --volume "$JAVA_HOME:/opt/java" \
+              --volume "$MAVEN_HOME:/opt/maven" \
+              linux-testimage:${{ matrix.architecture.name }} \
+                  ./mvnw -B -V -ntp -P "release" test
 
   Linux-Test-QEMU:
     strategy:
@@ -464,41 +464,8 @@ jobs:
 
       - name: Setup QEMU
         run: |
-          sudo dpkg --add-architecture ${{ matrix.architecture.linux_name }}
-          sudo rm -f /etc/apt/sources.list /etc/apt/sources.list.d/ubuntu.sources
-          if [[ ${{ matrix.architecture.is_ports }} != true ]]; then
-              echo "deb [arch=amd64,${{ matrix.architecture.linux_name }}] http://azure.archive.ubuntu.com/ubuntu/ $(lsb_release -sc) main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/ubuntu.list
-              echo "deb [arch=amd64,${{ matrix.architecture.linux_name }}] http://azure.archive.ubuntu.com/ubuntu/ $(lsb_release -sc)-updates main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/ubuntu-updates.list
-              echo "deb [arch=amd64,${{ matrix.architecture.linux_name }}] http://azure.archive.ubuntu.com/ubuntu/ $(lsb_release -sc)-security main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/ubuntu-security.list          
-          else
-              echo "deb [arch=amd64] http://azure.archive.ubuntu.com/ubuntu/ $(lsb_release -sc) main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/ubuntu.list
-              echo "deb [arch=amd64] http://azure.archive.ubuntu.com/ubuntu/ $(lsb_release -sc)-updates main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/ubuntu-updates.list
-              echo "deb [arch=amd64] http://azure.archive.ubuntu.com/ubuntu/ $(lsb_release -sc)-security main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/ubuntu-security.list
-          fi
-          if [[ ${{ matrix.architecture.is_ports}} == true ]]; then
-              echo "deb [arch=${{ matrix.architecture.linux_name  }}] http://azure.ports.ubuntu.com/ubuntu-ports/ $(lsb_release -sc) main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/ubuntu-ports.list
-              echo "deb [arch=${{ matrix.architecture.linux_name }}] http://azure.ports.ubuntu.com/ubuntu-ports/ $(lsb_release -sc)-updates main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/ubuntu-ports-updates.list
-              echo "deb [arch=${{ matrix.architecture.linux_name }}] http://azure.ports.ubuntu.com/ubuntu-ports/ $(lsb_release -sc)-security main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/ubuntu-ports-security.list
-          fi
-          
-          sudo apt-get update -y
-          sudo apt-get --fix-broken install
-          
-          sudo NEEDRESTART_SUSPEND=true apt-get install -y qemu-system-${{ matrix.architecture.qemu_package_name }} qemu-user qemu-utils \
-                  libc6:amd64 libc6:${{ matrix.architecture.linux_name }} libstdc++6:amd64 libstdc++6:${{ matrix.architecture.linux_name }} libtinfo6:amd64 libtinfo6:${{ matrix.architecture.linux_name }} \
-                  libatomic1:amd64 libatomic1:${{ matrix.architecture.linux_name }} zlib1g:amd64 zlib1g:${{ matrix.architecture.linux_name }}
-          
-          cd /opt
-          sudo apt-get download bash:${{ matrix.architecture.linux_name }}
-          sudo mkdir -p bashdata
-          sudo ar x bash_*.deb --output=bashdata
-          sudo tar xf bashdata/data.tar.* -C bashdata
-          if [[ -f bashdata/usr/bin/bash ]]; then
-              sudo mv bashdata/usr/bin/bash /opt/bash
-          elif [[ -f bashdata/bin/bash ]]; then
-              sudo mv bashdata/bin/bash /opt/bash          
-          fi
-          sudo rm -r bash_*.deb bashdata
+          chmod +x docker/install-qemu.sh
+          docker/install-qemu.sh "${{ matrix.architecture.linux_name }}" "${{ matrix.architecture.is_ports }}" "${{ matrix.architecture.qemu_package_name }}"
 
       - name: Test
         run: |
