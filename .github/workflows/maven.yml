@@ -137,7 +137,9 @@ jobs:
 
       - name: Pre Setup JDK
         run: |
-          Remove-Item -Recurse -Force -Path C:\hostedtoolcache\windows\Java_*\*
+          if (Test-Path C:\hostedtoolcache\windows) {
+            Remove-Item -Recurse -Force -Path C:\hostedtoolcache\windows\Java_*\*
+          }
 
       - name: Setup JDK
         uses: actions/setup-java@v4
@@ -497,7 +499,9 @@ jobs:
     steps:
       - name: Pre Setup JDK
         run: |
-          Remove-Item -Recurse -Force -Path C:\hostedtoolcache\windows\Java_*\*
+          if (Test-Path "C:\hostedtoolcache\windows") {
+            Remove-Item -Recurse -Force -Path C:\hostedtoolcache\windows\Java_*\*
+          }
 
       - name: Setup JDK
         uses: actions/setup-java@v4
