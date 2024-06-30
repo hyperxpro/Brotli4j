@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2020-2023, Aayush Atharva
+ *    Copyright (c) 2020-2024, Aayush Atharva
  *
  *    Brotli4j licenses this file to you under the
  *    Apache License, Version 2.0 (the "License");
@@ -27,4 +27,11 @@ public interface BrotliNativeProvider {
      * @return The name of the native, e.g. linux-x86_64 or osx-aarch64
      */
     String platformName();
+
+    /**
+     * Returns weather the current platform is equal to this providers platform
+     *
+     * @return Weather the current platform is equal to this providers platform
+     */
+    boolean isCurrentPlatform();
 }

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.5)
 
 project (brotli4j)
 
@@ -21,8 +21,8 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     SET (CMAKE_BUILD_TYPE Release)
 endif()
 message(STATUS "Build type is '${CMAKE_BUILD_TYPE}'")
-SET (CMAKE_C_FLAGS "-flto")
-SET (CMAKE_CXX_FLAGS "-Wall -flto")
+SET (CMAKE_C_FLAGS "")
+SET (CMAKE_CXX_FLAGS "-Wall")
 
 SET (CMAKE_CXX_STANDARD 11)
 SET (CMAKE_CXX_STANDARD_REQUIRED ON)

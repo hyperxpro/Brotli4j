@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright 2020-2023, Aayush Atharva
+  Copyright 2020-2024, Aayush Atharva
 
   Brotli4j licenses this file to you under the
   Apache License, Version 2.0 (the "License");
@@ -23,7 +23,7 @@
     <parent>
         <groupId>com.aayushatharva.brotli4j</groupId>
         <artifactId>brotli4j-parent</artifactId>
-        <version>1.16.0</version>
+        <version>1.17.0</version>
     </parent>
 
     <artifactId>all</artifactId>
@@ -39,9 +39,19 @@
                 <artifactId>brotli4j</artifactId>
                 <version>${project.version}</version>
             </dependency>
-	    <dependency>
+            <dependency>
                 <groupId>com.aayushatharva.brotli4j</groupId>
                 <artifactId>service</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.aayushatharva.brotli4j</groupId>
+                <artifactId>native-linux-x86_64</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.aayushatharva.brotli4j</groupId>
+                <artifactId>native-linux-x86</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -56,7 +66,7 @@
             </dependency>
             <dependency>
                 <groupId>com.aayushatharva.brotli4j</groupId>
-                <artifactId>native-linux-x86_64</artifactId>
+                <artifactId>native-linux-ppc64le</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -66,17 +76,27 @@
             </dependency>
             <dependency>
                 <groupId>com.aayushatharva.brotli4j</groupId>
-                <artifactId>native-linux-ppc64le</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.aayushatharva.brotli4j</groupId>
                 <artifactId>native-linux-riscv64</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.aayushatharva.brotli4j</groupId>
-                <artifactId>native-osx-aarch64</artifactId>
+                <artifactId>native-windows-x86_64</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.aayushatharva.brotli4j</groupId>
+                <artifactId>native-windows-x86</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+             <dependency>
+                <groupId>com.aayushatharva.brotli4j</groupId>
+                <artifactId>native-windows-aarch64</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.aayushatharva.brotli4j</groupId>
+                <artifactId>native-windows-armv7</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -86,14 +106,9 @@
             </dependency>
             <dependency>
                 <groupId>com.aayushatharva.brotli4j</groupId>
-                <artifactId>native-windows-x86_64</artifactId>
+                <artifactId>native-osx-aarch64</artifactId>
                 <version>${project.version}</version>
             </dependency>
-             <dependency>
-                <groupId>com.aayushatharva.brotli4j</groupId>
-                <artifactId>native-windows-aarch64</artifactId>
-                <version>${project.version}</version>
-            </dependency>           
         </dependencies>
     </dependencyManagement>
 

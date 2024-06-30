@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright (c) 2020-2023, Aayush Atharva
+  Copyright (c) 2020-2024, Aayush Atharva
 
   Brotli4j licenses this file to you under the
   Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@
     <parent>
         <artifactId>brotli4j-parent</artifactId>
         <groupId>com.aayushatharva.brotli4j</groupId>
-        <version>1.16.0</version>
+        <version>1.17.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -60,34 +60,17 @@
         </profile>
 
         <profile>
-            <id>linux-s390x</id>
+            <id>linux-x86</id>
             <activation>
                 <os>
                     <family>Linux</family>
-                    <arch>s390x</arch>
+                    <arch>i386</arch>
                 </os>
             </activation>
             <dependencies>
                 <dependency>
                     <groupId>com.aayushatharva.brotli4j</groupId>
-                    <artifactId>native-linux-s390x</artifactId>
-                    <version>${project.parent.version}</version>
-                </dependency>
-            </dependencies>
-        </profile>
-
-        <profile>
-            <id>linux-ppc64le</id>
-            <activation>
-                <os>
-                    <family>Linux</family>
-                    <arch>ppc64le</arch>
-                </os>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.aayushatharva.brotli4j</groupId>
-                    <artifactId>native-linux-ppc64le</artifactId>
+                    <artifactId>native-linux-x86</artifactId>
                     <version>${project.parent.version}</version>
                 </dependency>
             </dependencies>
@@ -128,6 +111,40 @@
         </profile>
 
         <profile>
+            <id>linux-ppc64le</id>
+            <activation>
+                <os>
+                    <family>Linux</family>
+                    <arch>ppc64le</arch>
+                </os>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.aayushatharva.brotli4j</groupId>
+                    <artifactId>native-linux-ppc64le</artifactId>
+                    <version>${project.parent.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>linux-s390x</id>
+            <activation>
+                <os>
+                    <family>Linux</family>
+                    <arch>s390x</arch>
+                </os>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.aayushatharva.brotli4j</groupId>
+                    <artifactId>native-linux-s390x</artifactId>
+                    <version>${project.parent.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
             <id>linux-riscv64</id>
             <activation>
                 <os>
@@ -162,6 +179,23 @@
         </profile>
 
         <profile>
+            <id>windows-x86</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                    <arch>x86</arch>
+                </os>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.aayushatharva.brotli4j</groupId>
+                    <artifactId>native-windows-x86</artifactId>
+                    <version>${project.parent.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
             <id>windows-aarch64</id>
             <activation>
                 <os>
@@ -173,6 +207,23 @@
                 <dependency>
                     <groupId>com.aayushatharva.brotli4j</groupId>
                     <artifactId>native-windows-aarch64</artifactId>
+                    <version>${project.parent.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>windows-armv7</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                    <arch>arm</arch> <!-- TODO Check value on a real system-->
+                </os>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.aayushatharva.brotli4j</groupId>
+                    <artifactId>native-windows-armv7</artifactId>
                     <version>${project.parent.version}</version>
                 </dependency>
             </dependencies>

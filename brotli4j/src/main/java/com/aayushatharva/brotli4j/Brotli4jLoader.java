@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2020-2023, Aayush Atharva
+ *    Copyright (c) 2020-2024, Aayush Atharva
  *
  *    Brotli4j licenses this file to you under the
  *    Apache License, Version 2.0 (the "License");
@@ -19,9 +19,9 @@ package com.aayushatharva.brotli4j;
 import com.aayushatharva.brotli4j.common.annotations.Local;
 import com.aayushatharva.brotli4j.service.BrotliNativeProvider;
 
-import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ServiceLoader;
 
@@ -47,40 +47,44 @@ public class Brotli4jLoader {
         } else {
             try {
                 System.loadLibrary("brotli");
-            } catch (Throwable t) {
+            } catch (Throwable _throwable) {
                 try {
                     String nativeLibName = System.mapLibraryName("brotli");
-                    String platform = getPlatform();
-                    String libPath = "/lib/" + platform + '/' + nativeLibName;
 
-                    File tempDir = new File(System.getProperty("java.io.tmpdir"), "com_aayushatharva_brotli4j_" + System.nanoTime());
-                    tempDir.mkdir();
-                    tempDir.deleteOnExit();
+                    Path tempDir = Files.createTempDirectory( "com_aayushatharva_brotli4j_").toAbsolutePath();
+                    tempDir.toFile().deleteOnExit();
 
-                    File tempFile = new File(tempDir, nativeLibName);
+                    Path tempFile = tempDir.resolve(nativeLibName);
 
+                    String platform = null;
                     Class<?> loaderClassToUse = Brotli4jLoader.class; // Use this as a fallback for non-JPMS contexts
                     // In Java9+ with JPMS enabled, we need a class in the jar that contains the file to be able to access its content
                     ServiceLoader<BrotliNativeProvider> nativeProviders = ServiceLoader.load(BrotliNativeProvider.class, Brotli4jLoader.class.getClassLoader());
                     for (BrotliNativeProvider nativeProvider : nativeProviders) {
-                        if (nativeProvider.platformName().equals(platform)) {
+                        if (nativeProvider.isCurrentPlatform()) {
+                            platform = nativeProvider.platformName();
                             loaderClassToUse = nativeProvider.getClass();
                             break;
                         }
                     }
+
+                    if (platform == null) {
+                        throw new UnsatisfiedLinkError("Failed to find valid Brotli native library in classpath.");
+                    }
+
+                    String libPath = "/lib/" + platform + "/" + nativeLibName;
 
                     // Copy the native library to a temporary file and load it
                     try (InputStream in = loaderClassToUse.getResourceAsStream(libPath)) {
 
                         // If the library is not found, throw an exception.
                         if (in == null) {
-                            throw new UnsatisfiedLinkError("Failed to find Brotli native library in classpath: " + libPath);
+                            throw new UnsatisfiedLinkError("Failed to open Brotli native library: " + libPath);
                         }
 
-                        Files.copy(in, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                        System.load(tempFile.getAbsolutePath());
-                    } finally {
-                        tempFile.deleteOnExit();
+                        Files.copy(in, tempFile, StandardCopyOption.REPLACE_EXISTING);
+
+                        System.load(tempFile.toString());
                     }
                 } catch (Throwable throwable) {
                     cause = throwable;
@@ -113,39 +117,5 @@ public class Brotli4jLoader {
 
     public static Throwable getUnavailabilityCause() {
         return UNAVAILABILITY_CAUSE;
-    }
-
-    private static String getPlatform() {
-        String osName = System.getProperty("os.name");
-        String archName = System.getProperty("os.arch");
-
-        if ("Linux".equalsIgnoreCase(osName)) {
-            if ("amd64".equalsIgnoreCase(archName)) {
-                return "linux-x86_64";
-            } else if ("aarch64".equalsIgnoreCase(archName)) {
-                return "linux-aarch64";
-            } else if ("arm".equalsIgnoreCase(archName)) {
-                return "linux-armv7";
-            } else if ("s390x".equalsIgnoreCase(archName)) {
-                return "linux-s390x";
-            } else if ("ppc64le".equalsIgnoreCase(archName)) {
-                return "linux-ppc64le";
-            } else if ("riscv64".equalsIgnoreCase(archName)) {
-                return "linux-riscv64";
-            }
-        } else if (osName.startsWith("Windows")) {
-            if ("amd64".equalsIgnoreCase(archName)) {
-                return "windows-x86_64";
-            } else if ("aarch64".equalsIgnoreCase(archName)) {
-                return "windows-aarch64";
-            }
-        } else if (osName.startsWith("Mac")) {
-            if ("x86_64".equalsIgnoreCase(archName)) {
-                return "osx-x86_64";
-            } else if ("aarch64".equalsIgnoreCase(archName)) {
-                return "osx-aarch64";
-            }
-        }
-        throw new UnsupportedOperationException("Unsupported OS and Architecture: " + osName + ", " + archName);
     }
 }
