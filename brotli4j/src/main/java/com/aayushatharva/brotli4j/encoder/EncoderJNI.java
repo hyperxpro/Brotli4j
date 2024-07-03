@@ -23,7 +23,7 @@ public class EncoderJNI {
     private static native ByteBuffer nativePrepareDictionary(ByteBuffer dictionary, long type);
     private static native void nativeDestroyDictionary(ByteBuffer dictionary);
 
-    enum Operation {
+    public enum Operation {
         PROCESS,
         FLUSH,
         FINISH
