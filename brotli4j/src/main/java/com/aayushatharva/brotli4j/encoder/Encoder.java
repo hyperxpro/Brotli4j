@@ -35,7 +35,7 @@ public class Encoder {
      * @param params          encoding parameters
      * @param inputBufferSize read buffer size
      */
-    Encoder(WritableByteChannel destination, Parameters params, int inputBufferSize) throws IOException {
+    public Encoder(WritableByteChannel destination, Parameters params, int inputBufferSize) throws IOException {
         if (inputBufferSize <= 0) {
             throw new IllegalArgumentException("buffer size must be positive");
         }
