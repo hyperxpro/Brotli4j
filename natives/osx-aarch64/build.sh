@@ -13,7 +13,7 @@ function exitWithError() {
 mkdir -p "$TARGET_CLASSES_PATH"
 
 cd "$TARGET_PATH"
-cmake -DCMAKE_OSX_ARCHITECTURES=arm64 ../../../ || exitWithError $?
+cmake -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_OSX_ARCHITECTURES=arm64 ../../../ || exitWithError $?
 make || exitWithError $?
 rm -f "$CURPATH/${TARGET_CLASSES_PATH}/libbrotli.dylib"
 cp "./libbrotli.dylib" "$CURPATH/${TARGET_CLASSES_PATH}" || exitWithError $?

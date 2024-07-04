@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2020-2023, Aayush Atharva
+ *    Copyright (c) 2020-2024, Aayush Atharva
  *
  *    Brotli4j licenses this file to you under the
  *    Apache License, Version 2.0 (the "License");
@@ -17,6 +17,7 @@
 package com.aayushatharva.brotli4j.windows.aarch64;
 
 import com.aayushatharva.brotli4j.service.BrotliNativeProvider;
+import java.util.regex.Pattern;
 
 /**
  * Service class to access the native lib in a JPMS context
@@ -26,5 +27,10 @@ public class NativeLoader implements BrotliNativeProvider {
     @Override
     public String platformName() {
         return "windows-aarch64";
+    }
+
+    @Override
+    public boolean isCurrentPlatform() {
+        return Pattern.compile("windows( .*)?", Pattern.CASE_INSENSITIVE).matcher(System.getProperty("os.name")).matches() && "aarch64".equalsIgnoreCase(System.getProperty("os.arch"));
     }
 }

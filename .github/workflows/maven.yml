@@ -1,771 +1,566 @@
-name: Java CI with Maven
+name: Build
 
 on:
   push:
     branches:
-      - main
+      - "*"
   pull_request:
 
   workflow_dispatch:
     inputs:
-      name:
-        description: 'Github Actions'
-        required: true
-        default: 'Github Actions'
+      run_all_tests:
+        description: Run extra tests on different ubuntu versions
+        required: false
+        type: boolean
+        default: false
+      keep_intermediate_builds:
+        description: Keep intermediate builds
+        required: false
+        type: boolean
+        default: false
 
 jobs:
+  Linux-Build:
+    strategy:
+      fail-fast: true
+      matrix:
+        architecture:
+          - name: x86_64
+            centos_version: "6-gcc7"
+            gcc_package_name: "gcc gcc-c++"
+            gcc_exec_name: "x86_64-redhat-linux-gnu"
+          - name: x86
+            ubuntu_version: "18.04"
+            gcc_package_name: "gcc-i686-linux-gnu g++-i686-linux-gnu"
+            gcc_exec_name: "i686-linux-gnu"
+          - name: aarch64
+            ubuntu_version: "18.04"
+            gcc_package_name: "gcc-aarch64-linux-gnu g++-aarch64-linux-gnu"
+            gcc_exec_name: "aarch64-linux-gnu"
+          - name: armv7
+            ubuntu_version: "18.04"
+            gcc_package_name: "gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf"
+            gcc_exec_name: "arm-linux-gnueabihf"
+          - name: ppc64le
+            ubuntu_version: "18.04"
+            gcc_package_name: "gcc-powerpc64le-linux-gnu g++-powerpc64le-linux-gnu"
+            gcc_exec_name: "powerpc64le-linux-gnu"
+          - name: riscv64
+            ubuntu_version: "18.04"
+            gcc_package_name: "gcc-riscv64-linux-gnu g++-riscv64-linux-gnu"
+            gcc_exec_name: "riscv64-linux-gnu"
+          - name: s390x
+            ubuntu_version: "18.04"
+            gcc_package_name: "gcc-s390x-linux-gnu g++-s390x-linux-gnu"
+            gcc_exec_name: "s390x-linux-gnu"
+        java_version: [ 8, 11, 17, 21 ]
 
-  MacOS-x86_64-Build-JDK8:
-    runs-on: macos-latest
+    name: Linux-${{ matrix.architecture.name }}-Build-JDK${{ matrix.java_version }}
+    runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK 8
-        uses: actions/setup-java@v3
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Pre Setup JDK
+        run: |
+          sudo rm -rf /opt/hostedtoolcache/Java_*/*
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
         with:
           distribution: 'corretto'
-          java-version: 8
-          architecture: x64
-      - name: Build with Maven
-        run: mvn -B --show-version -ntp clean package --file pom.xml
-      - name: Upload the build
-        uses: actions/upload-artifact@v3
+          java-version: ${{ matrix.java_version }}
+          architecture: 'x64'
+          check-latest: true
+
+      - name: Setup Ubuntu Build
+        if: ${{ matrix.architecture.ubuntu_version }}
+        run: |
+          docker build \
+              --platform linux/amd64 \
+              --build-arg "DOCKER_IMAGE=amd64/ubuntu:${{ matrix.architecture.ubuntu_version }}" \
+              --build-arg "TARGET_GCC_PACKAGE=${{ matrix.architecture.gcc_package_name }}" \
+              --build-arg "TARGET_GCC_EXEC=${{ matrix.architecture.gcc_exec_name }}" \
+              --tag linux-buildimage:${{ matrix.architecture.name }} \
+              docker/build/
+
+      - name: Setup CentOS Build
+        if: ${{ matrix.architecture.centos_version }}
+        run: |
+          docker build \
+              --platform linux/amd64 \
+              --build-arg "DOCKER_IMAGE=gatlingcorp/centos:${{ matrix.architecture.centos_version }}" \
+              --build-arg "TARGET_GCC_PACKAGE=${{ matrix.architecture.gcc_package_name }}" \
+              --build-arg "TARGET_GCC_EXEC=${{ matrix.architecture.gcc_exec_name }}" \
+              --tag linux-buildimage:${{ matrix.architecture.name }} \
+              docker/centosbuild/
+
+      - name: Build
+        run: |
+          chmod +x ./mvnw ./mvnw.cmd
+          docker run \
+              --platform linux/amd64 \
+              --volume "$PWD:/data" \
+              --volume "$JAVA_HOME:/opt/java" \
+              linux-buildimage:${{ matrix.architecture.name }} \
+                  ./mvnw -B -V -ntp -P "linux-${{ matrix.architecture.name }}" "-Dmaven.test.skip=true" clean package
+
+      - name: Upload build
+        uses: actions/upload-artifact@v4
         with:
-          name: MacOS-x86_64-Build-JDK8
-          path: /Users/runner/work/Brotli4j/
-
-  MacOS-x86_64-Build-JDK11:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK 11
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'corretto'
-          java-version: 11
-          architecture: x64
-      - name: Build with Maven
-        run: mvn -B --show-version -ntp --file pom.xml clean package
-
-  MacOS-x86_64-Build-JDK17:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'corretto'
-          java-version: 17
-          architecture: x64
-      - name: Build with Maven
-        run: mvn -B --show-version -ntp --file pom.xml clean package
-
-  MacOS-x86_64-Build-JDK21:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK 21
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'corretto'
-          java-version: 21
-          architecture: x64
-      - name: Build with Maven
-        run: mvn -B --show-version -ntp --file pom.xml clean package
-
-  Linux-x86_64-Build-JDK8:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: build centos6
-        run: docker-compose -f docker/docker-compose.yml run build
-      - name: Upload the build
-        uses: actions/upload-artifact@v3
-        with:
-          name: Linux-x86_64-Build-JDK8
-          path: /home/runner/work/Brotli4j/
-
-  Linux-x86_64-Build-JDK11:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: build centos6
-        run: docker-compose -f docker/docker-compose11.yml run build
-
-  Linux-x86_64-Build-JDK17:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: build centos6
-        run: docker-compose -f docker/docker-compose17.yml run build
-
-  Linux-x86_64-Build-JDK21:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: build centos6
-        run: docker-compose -f docker/docker-compose21.yml run build
-
-  Linux-Aarch64-Build-JDK8:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/cache@v3
-        env:
-          cache-name: cache-m2-repository-${{ runner.os }}-jdk8-aarch64
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-pr-${{ env.cache-name }}-
-            ${{ runner.os }}-pr-
-      - uses: uraimo/run-on-arch-action@v2.4.0
-        name: Run commands
-        id: runcmd
-        with:
-          arch: aarch64
-          distro: ubuntu18.04
-          
-          # Not required, but speeds up builds by storing container images in
-          # a GitHub package registry.
-          githubToken: ${{ github.token }}
-
-          # Mount the .m2/repository
-          dockerRunArgs: |
-            --platform linux/arm64
-            --volume "/home/runner/.m2/repository/:/root/.m2/repository"
-
-          # Install dependencies
-          install: |
-            apt-get update
-            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential
-
-            curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | bash && . ~/.jabba/jabba.sh
-            jabba install 1.8.0-custom=tgz+https://corretto.aws/downloads/resources/8.352.08.1/amazon-corretto-8.352.08.1-linux-aarch64.tar.gz -o /jdk
-          
-          run: |
-            export JAVA_HOME="/jdk"
-            chmod +x ./mvnw
-            ./mvnw -B --show-version -ntp clean package
-
-      - name: Upload the build
-        uses: actions/upload-artifact@v3
-        with:
-          name: Linux-Aarch64-Build-JDK8
-          path: /home/runner/work/Brotli4j/
-
-  Linux-Aarch64-Build-JDK11:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/cache@v3
-        env:
-          cache-name: cache-m2-repository-${{ runner.os }}-jdk11-aarch64
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
-      - uses: uraimo/run-on-arch-action@v2.4.0
-        name: Run commands
-        id: runcmd
-        with:
-          arch: aarch64
-          distro: ubuntu18.04
-
-          # Not required, but speeds up builds by storing container images in
-          # a GitHub package registry.
-          githubToken: ${{ github.token }}
-
-          # Mount the .m2/repository
-          dockerRunArgs: |
-            --platform linux/arm64
-            --volume "/home/runner/.m2/repository/:/root/.m2/repository"
-
-          # Install dependencies
-          install: |
-            apt-get update
-            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential
-
-            curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | bash && . ~/.jabba/jabba.sh
-            jabba install 11.0.0-custom=tgz+https://corretto.aws/downloads/resources/11.0.17.8.1/amazon-corretto-11.0.17.8.1-linux-aarch64.tar.gz -o /jdk
-          
-          run: |
-            export JAVA_HOME="/jdk"
-            chmod +x ./mvnw
-            ./mvnw -B --show-version -ntp clean package
-
-  Linux-Aarch64-Build-JDK17:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/cache@v3
-        env:
-          cache-name: cache-m2-repository-${{ runner.os }}-jdk17-aarch64
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
-      - uses: uraimo/run-on-arch-action@v2.4.0
-        name: Run commands
-        id: runcmd
-        with:
-          arch: aarch64
-          distro: ubuntu18.04
-
-          # Not required, but speeds up builds by storing container images in
-          # a GitHub package registry.
-          githubToken: ${{ github.token }}
-
-          # Mount the .m2/repository
-          dockerRunArgs: |
-            --platform linux/arm64
-            --volume "/home/runner/.m2/repository/:/root/.m2/repository"
-
-          # Install dependencies
-          install: |
-            apt-get update
-            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential
-
-            curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | bash && . ~/.jabba/jabba.sh
-            jabba install 17.0.0-custom=tgz+https://corretto.aws/downloads/resources/17.0.5.8.1/amazon-corretto-17.0.5.8.1-linux-aarch64.tar.gz -o /jdk
-          
-          run: |
-            export MAVEN_OPTS="-Djdk.lang.Process.launchMechanism=vfork"
-            export JAVA_HOME="/jdk"
-            chmod +x ./mvnw
-            ./mvnw -B --show-version -ntp clean package
-
-  Linux-Aarch64-Build-JDK21:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/cache@v3
-        env:
-          cache-name: cache-m2-repository-${{ runner.os }}-jdk21-aarch64
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
-      - uses: uraimo/run-on-arch-action@v2.4.0
-        name: Run commands
-        id: runcmd
-        with:
-          arch: aarch64
-          distro: ubuntu20.04
-
-          # Not required, but speeds up builds by storing container images in
-          # a GitHub package registry.
-          githubToken: ${{ github.token }}
-
-          # Mount the .m2/repository
-          dockerRunArgs: |
-            --platform linux/arm64
-            --volume "/home/runner/.m2/repository/:/root/.m2/repository"
-
-          # Install dependencies
-          install: |
-            apt-get update
-            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential
-            
-            curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | bash && . ~/.jabba/jabba.sh
-            jabba install 21.0.1-custom=tgz+https://corretto.aws/downloads/resources/21.0.1.12.1/amazon-corretto-21.0.1.12.1-linux-aarch64.tar.gz -o /jdk
-
-          run: |
-            export MAVEN_OPTS="-Djdk.lang.Process.launchMechanism=vfork"
-            export JAVA_HOME="/jdk"
-            chmod +x ./mvnw
-            ./mvnw -B --show-version -ntp clean package
-
-  Linux-ArmV7-Build-JDK8:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/cache@v3
-        env:
-          cache-name: cache-m2-repository-${{ runner.os }}-jdk8-arm7
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
-      - uses: uraimo/run-on-arch-action@v2.4.0
-        name: Run commands
-        id: runcmd
-        with:
-          arch: armv7
-          distro: ubuntu18.04
-
-          # Not required, but speeds up builds by storing container images in
-          # a GitHub package registry.
-          githubToken: ${{ github.token }}
-
-          # Mount the .m2/repository
-          dockerRunArgs: |
-            --platform linux/arm/v7
-            --volume "/home/runner/.m2/repository/:/root/.m2/repository"
-
-          # Install dependencies
-          install: |
-            apt-get update
-            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential
-
-            curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | bash && . ~/.jabba/jabba.sh
-            jabba install 1.8.0-custom=tgz+https://cdn.azul.com/zulu-embedded/bin/zulu8.66.0.15-ca-jdk8.0.352-linux_aarch32hf.tar.gz -o /jdk
-          
-          run: |
-            export JAVA_HOME="/jdk"
-            chmod +x ./mvnw
-            ./mvnw -B --show-version -ntp clean package
-
-      - name: Upload the build
-        uses: actions/upload-artifact@v3
-        with:
-          name: Linux-ArmV7-Build-JDK8
-          path: /home/runner/work/Brotli4j/
-
-  Linux-ArmV7-Build-JDK11:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/cache@v3
-        env:
-          cache-name: cache-m2-repository-${{ runner.os }}-jdk11-armv7
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
-      - uses: uraimo/run-on-arch-action@v2.4.0
-        name: Run commands
-        id: runcmd
-        with:
-          arch: armv7
-          distro: ubuntu18.04
-
-          # Not required, but speeds up builds by storing container images in
-          # a GitHub package registry.
-          githubToken: ${{ github.token }}
-
-          # Mount the .m2/repository
-          dockerRunArgs: |
-            --platform linux/arm/v7
-            --volume "/home/runner/.m2/repository/:/root/.m2/repository"
-
-          # Install dependencies
-          install: |
-            apt-get update
-            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential
-
-            curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | bash && . ~/.jabba/jabba.sh
-            jabba install 11.0.0-custom=tgz+https://cdn.azul.com/zulu-embedded/bin/zulu11.60.19-ca-jdk11.0.17-linux_aarch32hf.tar.gz -o /jdk
-
-          run: |
-            export JAVA_HOME="/jdk"
-            chmod +x ./mvnw
-            ./mvnw -B --show-version -ntp clean package
-
-  Linux-ArmV7-Build-JDK17:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/cache@v3
-        env:
-          cache-name: cache-m2-repository-${{ runner.os }}-jdk11-armv7
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
-      - uses: uraimo/run-on-arch-action@v2.4.0
-        name: Run commands
-        id: runcmd
-        with:
-          arch: armv7
-          distro: ubuntu18.04
-
-          # Not required, but speeds up builds by storing container images in
-          # a GitHub package registry.
-          githubToken: ${{ github.token }}
-
-          # Mount the .m2/repository
-          dockerRunArgs: |
-            --platform linux/arm/v7
-            --volume "/home/runner/.m2/repository/:/root/.m2/repository"
-
-          # Install dependencies
-          install: |
-            apt-get update
-            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential apt-transport-https wget
-            
-            mkdir -p /etc/apt/keyrings
-            wget -O - https://packages.adoptium.net/artifactory/api/gpg/key/public | tee /etc/apt/keyrings/adoptium.asc
-            echo "deb [signed-by=/etc/apt/keyrings/adoptium.asc] https://packages.adoptium.net/artifactory/deb $(awk -F= '/^VERSION_CODENAME/{print$2}' /etc/os-release) main" | tee /etc/apt/sources.list.d/adoptium.list
-
-            apt-get update
-            apt install temurin-17-jdk -y
-          run: |
-            export MAVEN_OPTS="-Djdk.lang.Process.launchMechanism=vfork"
-            chmod +x ./mvnw
-            ./mvnw -B --show-version -ntp clean package
-
-  Linux-s390x-Build-JDK8:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/cache@v3
-        env:
-          cache-name: cache-m2-repository-${{ runner.os }}-jdk8-s390x
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
-      - uses: uraimo/run-on-arch-action@v2.4.0
-        name: Run commands
-        id: runcmd
-        with:
-          arch: s390x
-          distro: ubuntu18.04
-
-          # Not required, but speeds up builds by storing container images in
-          # a GitHub package registry.
-          githubToken: ${{ github.token }}
-
-          # Mount the .m2/repository
-          dockerRunArgs: |
-            --platform linux/s390x
-            --volume "/home/runner/.m2/repository/:/root/.m2/repository"
-
-          # Install dependencies
-          install: |
-            apt-get update
-            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential openjdk-8-jdk
-          
-          run: |
-            chmod +x ./mvnw
-            ./mvnw -B --show-version -ntp clean package
-
-      - name: Upload the build
-        uses: actions/upload-artifact@v3
-        with:
-          name: Linux-s390x-Build-JDK8
-          path: /home/runner/work/Brotli4j/
-
-  Linux-s390x-Build-JDK11:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/cache@v3
-        env:
-          cache-name: cache-m2-repository-${{ runner.os }}-jdk8-s390x
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
-      - uses: uraimo/run-on-arch-action@v2.4.0
-        name: Run commands
-        id: runcmd
-        with:
-          arch: s390x
-          distro: ubuntu18.04
-
-          # Not required, but speeds up builds by storing container images in
-          # a GitHub package registry.
-          githubToken: ${{ github.token }}
-
-          # Mount the .m2/repository
-          dockerRunArgs: |
-            --platform linux/s390x
-            --volume "/home/runner/.m2/repository/:/root/.m2/repository"
-
-          # Install dependencies
-          install: |
-            apt-get update
-            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential openjdk-11-jdk
-
-          run: |
-            chmod +x ./mvnw
-            ./mvnw -B --show-version -ntp clean package
-
-  Linux-ppc64le-Build-JDK8:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/cache@v3
-        env:
-          cache-name: cache-m2-repository-${{ runner.os }}-jdk8-ppc64le
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
-      - uses: uraimo/run-on-arch-action@v2.3.0
-        name: Run commands
-        id: runcmd
-        with:
-          arch: ppc64le
-          distro: ubuntu18.04
-
-          # Not required, but speeds up builds by storing container images in
-          # a GitHub package registry.
-          githubToken: ${{ github.token }}
-
-          # Mount the .m2/repository
-          dockerRunArgs: |
-            --platform linux/ppc64le
-            --volume "/home/runner/.m2/repository/:/root/.m2/repository"
-          # Install dependencies
-          install: |
-            apt-get update
-            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential openjdk-8-jdk
-          
-          run: |
-            chmod +x ./mvnw
-            ./mvnw -B -ntp clean package
-      - name: Upload the build
-        uses: actions/upload-artifact@v3
-        with:
-          name: Linux-ppc64le-Build-JDK8
-          path: /home/runner/work/Brotli4j/
-
-  Linux-ppc64le-Build-JDK11:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/cache@v3
-        env:
-          cache-name: cache-m2-repository-${{ runner.os }}-jdk11-ppc64le
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
-      - uses: uraimo/run-on-arch-action@v2.3.0
-        name: Run commands
-        id: runcmd
-        with:
-          arch: ppc64le
-          distro: ubuntu18.04
-
-          # Not required, but speeds up builds by storing container images in
-          # a GitHub package registry.
-          githubToken: ${{ github.token }}
-
-          # Mount the .m2/repository
-          dockerRunArgs: |
-            --platform linux/ppc64le
-            --volume "/home/runner/.m2/repository/:/root/.m2/repository"
-          # Install dependencies
-          install: |
-            apt-get update
-            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential openjdk-11-jdk
-          run: |
-            chmod +x ./mvnw
-            ./mvnw -B -ntp clean package          
-
-  Linux-riscv64-Build-JDK11:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/cache@v3
-        env:
-          cache-name: cache-m2-repository-${{ runner.os }}-jdk11-riscv64
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
-
-      - uses: uraimo/run-on-arch-action@v2.4.0
-        name: Run commands
-        id: runcmd
-        with:
-          arch: riscv64
-          distro: ubuntu20.04
-
-          # Not required, but speeds up builds by storing container images in
-          # a GitHub package registry.
-          githubToken: ${{ github.token }}
-
-          # Mount the .m2/repository
-          dockerRunArgs: |
-            --platform linux/riscv64
-            --volume "/home/runner/.m2/repository/:/root/.m2/repository"
-          # Install dependencies
-          install: |
-            apt-get update
-            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential openjdk-11-jdk
-
-          run: |
-            export MAVEN_OPTS="-Djdk.lang.Process.launchMechanism=vfork"
-            chmod +x ./mvnw
-            ./mvnw -B --show-version -ntp clean package
-
-      - name: Upload the build
-        uses: actions/upload-artifact@v3
-        with:
-          name: Linux-riscv64-Build-JDK11
-          path: /home/runner/work/Brotli4j/
-
-  Linux-riscv64-Build-JDK17:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/cache@v3
-        env:
-          cache-name: cache-m2-repository-${{ runner.os }}-jdk17-riscv64
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
-      - uses: uraimo/run-on-arch-action@v2.4.0
-        name: Run commands
-        id: runcmd
-        with:
-          arch: riscv64
-          distro: ubuntu20.04
-
-          # Not required, but speeds up builds by storing container images in
-          # a GitHub package registry.
-          githubToken: ${{ github.token }}
-
-          # Mount the .m2/repository
-          dockerRunArgs: |
-            --platform linux/riscv64
-            --volume "/home/runner/.m2/repository/:/root/.m2/repository"
-          # Install dependencies
-          install: |
-            apt-get update
-            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential openjdk-17-jdk
-
-          run: |
-            export MAVEN_OPTS="-Djdk.lang.Process.launchMechanism=vfork"
-            chmod +x ./mvnw
-            ./mvnw -B --show-version -ntp clean package
-
-  Linux-riscv64-Build-JDK21:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/cache@v3
-        env:
-          cache-name: cache-m2-repository-${{ runner.os }}-jdk21-riscv64
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
-      - uses: uraimo/run-on-arch-action@v2.4.0
-        name: Run commands
-        id: runcmd
-        with:
-          arch: riscv64
-          distro: ubuntu22.04
-
-          # Not required, but speeds up builds by storing container images in
-          # a GitHub package registry.
-          githubToken: ${{ github.token }}
-
-          # Mount the .m2/repository
-          dockerRunArgs: |
-            --platform linux/riscv64
-            --volume "/home/runner/.m2/repository/:/root/.m2/repository"
-
-          # Install dependencies
-          install: |
-            apt-get update
-            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential
-
-            curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | bash && . ~/.jabba/jabba.sh
-            jabba install 21-custom=tgz+https://api.adoptium.net/v3/binary/latest/21/ea/linux/riscv64/jdk/hotspot/normal/eclipse?project=jdk -o /jdk
-
-          run: |
-            export JAVA_HOME="/jdk"
-            chmod +x ./mvnw
-            ./mvnw -B --show-version -ntp clean package
-
-  Windows-x86_64-Build-JDK8:
+          name: Linux-${{ matrix.architecture.name }}-Build-JDK${{ matrix.java_version }}
+          path: .
+          compression-level: 9
+
+  Windows-Build:
+    strategy:
+      fail-fast: true
+      matrix:
+        architecture:
+          - name: x86_64
+            msvc_code: x64
+          - name: x86
+            msvc_code: x64_x86
+          - name: aarch64
+            msvc_code: x64_arm64
+          - name: armv7
+            msvc_code: x64_arm
+        java_version: [ 8, 11, 17, 21 ]
+
+    name: Windows-${{ matrix.architecture.name }}-Build-JDK${{ matrix.java_version }}
     runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK 8
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'corretto'
-          java-version: 8
-          architecture: x64
-      - name: Enable Developer Command Prompt
-        uses: ilammy/msvc-dev-cmd@v1.12.0
-      - name: Build with Maven
-        run: mvn -B --show-version -ntp clean package --file pom.xml
-      - name: Upload the build
-        uses: actions/upload-artifact@v3
-        with:
-          name: Windows-x86_64-Build-JDK8
-          path: D:\a\Brotli4j\
 
-
-  Windows-x86_64-Build-JDK11:
-    runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK 11
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'corretto'
-          java-version: 11
-          architecture: x64
-      - name: Enable Developer Command Prompt
-        uses: ilammy/msvc-dev-cmd@v1.12.0
-      - name: Build with Maven
-        run: mvn -B --show-version -ntp --file pom.xml clean package
+      - name: Checkout
+        uses: actions/checkout@v4
 
-  Windows-x86_64-Build-JDK17:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'corretto'
-          java-version: 17
-          architecture: x64
-      - name: Enable Developer Command Prompt
-        uses: ilammy/msvc-dev-cmd@v1.12.0
-      - name: Build with Maven
-        run: mvn -B --show-version -ntp --file pom.xml clean package
+      - name: Pre Setup JDK
+        run: |
+          if (Test-Path C:\hostedtoolcache\windows) {
+            Remove-Item -Recurse -Force -Path C:\hostedtoolcache\windows\Java_*\*
+          }
 
-  Windows-x86_64-Build-JDK21:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK 21
-        uses: actions/setup-java@v3
+      - name: Setup JDK
+        uses: actions/setup-java@v4
         with:
-          distribution: 'corretto'
-          java-version: 21
-          architecture: x64
-      - name: Enable Developer Command Prompt
-        uses: ilammy/msvc-dev-cmd@v1.12.0
-      - name: Build with Maven
-        run: mvn -B --show-version -ntp --file pom.xml clean package
+          distribution: 'temurin'
+          java-version: ${{ matrix.java_version }}
+          architecture: 'x64'
+          check-latest: true
 
-  Windows-ARM-Build-JDK11:
-    runs-on: self-hosted
+      - name: Enable compiler
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.architecture.msvc_code }}
+
+      - name: Build
+        run: |
+          ./mvnw -B -V -ntp -P "windows-${{ matrix.architecture.name }}" "-Dmaven.test.skip=true" clean package
+
+      - name: Upload build
+        uses: actions/upload-artifact@v4
+        with:
+          name: Windows-${{ matrix.architecture.name }}-Build-JDK${{ matrix.java_version }}
+          path: .
+          compression-level: 9
+
+  OSX-Build:
+    strategy:
+      fail-fast: true
+      matrix:
+        architecture:
+          - name: x86_64
+          - name: aarch64
+        java_version: [ 8, 11, 17, 21 ]
+
+    name: OSX-${{ matrix.architecture.name }}-Build-JDK${{ matrix.java_version }}
+    runs-on: macos-latest
+
     steps:
-      - uses: actions/checkout@v3
-      - name: Enable Developer Command Prompt
-        uses: ilammy/msvc-dev-cmd@v1.12.0
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Pre Setup JDK
+        run: |
+          sudo rm -rf /Users/runner/hostedtoolcache/Java_*/*
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
         with:
-          arch: arm64
-      - name: Build with Maven
-        run: .\mvnw -B --show-version -ntp --file pom.xml clean package
-      - name: Upload the build
-        uses: actions/upload-artifact@v3
+          distribution: 'temurin'
+          java-version: ${{ matrix.java_version }}
+          architecture: 'x64'
+          check-latest: true
+
+      - name: Build
+        run: |
+          chmod +x ./mvnw ./mvnw.cmd
+          ./mvnw -B -V -ntp -P "osx-${{ matrix.architecture.name }}" "-Dmaven.test.skip=true" clean package
+
+      - name: Upload build
+        uses: actions/upload-artifact@v4
         with:
-          name: Windows-ARM-Build-JDK8
-          path: C:\Users\HyperXPro\Desktop\actions-runner\_work\Brotli4j\
+          name: OSX-${{ matrix.architecture.name }}-Build-JDK${{ matrix.java_version }}
+          path: .
+          compression-level: 9
+
+  Complete-Build:
+    strategy:
+      fail-fast: true
+      matrix:
+        java_version: [ 8, 11, 17, 21 ]
+
+    needs: [ Linux-Build, Windows-Build, OSX-Build, Linux-Test-Docker, Linux-Test-QEMU, Windows-Test, OSX-Test ]
+    if: ${{ always() && !cancelled() }}
+
+    name: Complete-Build-JDK${{ matrix.java_version }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Pre Setup JDK
+        run: |
+          sudo rm -rf /opt/hostedtoolcache/Java_*/*
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ matrix.java_version }}
+          architecture: 'x64'
+          check-latest: true
+
+      - name: Download intermediate builds
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "*-JDK${{ matrix.java_version }}"
+          path: builds/
+          merge-multiple: false
+
+      - name: Merge intermediate builds
+        run: |
+          chmod +x docker/merge-builds.sh
+          docker/merge-builds.sh
+
+      - name: Setup Build
+        run: |
+          docker build \
+              --platform linux/amd64 \
+              --build-arg "DOCKER_IMAGE=amd64/ubuntu:18.04" \
+              --tag linux-buildimage:complete \
+              docker/completebuild/
+
+      - name: Build
+        run: |
+          chmod +x ./mvnw ./mvnw.cmd
+          docker run \
+              --platform linux/amd64 \
+              --volume "$PWD:/data" \
+              --volume "$JAVA_HOME:/opt/java" \
+              linux-buildimage:complete \
+                  ./mvnw -B -V -ntp -P "release" "-Dmaven.test.skip=true" package
+
+      - name: Remove intermediate builds
+        if: ${{ !(inputs.keep_intermediate_builds == true) }}
+        continue-on-error: true
+        uses: geekyeggo/delete-artifact@v5
+        with:
+          name: '*-JDK${{ matrix.java_version }}'
+
+      - name: Upload build
+        uses: actions/upload-artifact@v4
+        with:
+          name: Complete-Build-JDK${{ matrix.java_version }}
+          path: .
+          compression-level: 9
+
+  Linux-Test-Docker:
+    strategy:
+      fail-fast: true
+      matrix:
+        architecture:
+          - name: x86_64
+            ubuntu_docker_arch: amd64
+            java_distro: 'temurin'
+            java_name: x64
+            docker_name: linux/amd64
+          - name: aarch64
+            ubuntu_docker_arch: arm64v8
+            java_distro: 'temurin'
+            java_name: aarch64
+            docker_name: linux/aarch64
+        ubuntu_version: [ "16.04", "18.04", "20.04", "22.04", "24.04" ]
+        java_version: [ 8, 11, 17, 21 ]
+
+    needs: [ Linux-Build ]
+    if: ${{ inputs.run_all_tests == true }}
+
+    name: Linux-${{ matrix.architecture.name }}-Test-JDK${{ matrix.java_version }}-Docker-Ubuntu_${{ matrix.ubuntu_version }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Pre Setup JDK
+        run: |
+          sudo rm -rf /opt/hostedtoolcache/Java_*/*
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: ${{ matrix.architecture.java_distro }}
+          java-version: ${{ matrix.java_version }}
+          architecture: ${{ matrix.architecture.java_name }}
+          check-latest: true
+
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: ${{ matrix.architecture.docker_name }}
+
+      - name: Download build
+        uses: actions/download-artifact@v4
+        with:
+          name: Linux-${{ matrix.architecture.name }}-Build-JDK${{ matrix.java_version }}
+          path: .
+
+      - name: Setup Test
+        run: |
+          docker build \
+              --platform ${{ matrix.architecture.docker_name }} \
+              --build-arg "DOCKER_IMAGE=${{ matrix.architecture.ubuntu_docker_arch }}/ubuntu:${{ matrix.ubuntu_version }}" \
+              --tag linux-testimage:${{ matrix.architecture.name }} \
+              docker/test/
+
+      - name: Test
+        run: |
+          chmod +x ./mvnw ./mvnw.cmd
+          docker run \
+              --platform ${{ matrix.architecture.docker_name }} \
+              --volume "$PWD:/data" \
+              --volume "$JAVA_HOME:/opt/java" \
+              linux-testimage:${{ matrix.architecture.name }} \
+                  ./mvnw -B -V -ntp -P "release" test
+
+  Linux-Test-QEMU:
+    strategy:
+      fail-fast: true
+      matrix:
+        architecture:
+          - name: x86_64
+            runs_on: ubuntu-24.04
+            java_distro: 'temurin'
+            java_name: x64
+            linux_name: amd64
+            is_ports: false
+            qemu_package_name: x86
+            qemu_name: x86_64
+          - name: x86
+            runs_on: ubuntu-22.04
+            java_distro: 'liberica'
+            java_name: x86
+            linux_name: i386
+            is_ports: false
+            qemu_package_name: x86
+            qemu_name: i386
+          - name: aarch64
+            runs_on: ubuntu-24.04
+            java_distro: 'temurin'
+            java_name: aarch64
+            linux_name: arm64
+            is_ports: true
+            qemu_package_name: arm
+            qemu_name: aarch64
+          - name: armv7
+            runs_on: ubuntu-24.04
+            java_distro: 'temurin'
+            java_name: arm
+            linux_name: armhf
+            is_ports: true
+            qemu_package_name: arm
+            qemu_name: armhf
+          - name: ppc64le
+            runs_on: ubuntu-24.04
+            java_distro: 'temurin'
+            java_name: ppc64le
+            linux_name: ppc64el
+            is_ports: true
+            qemu_package_name: ppc
+            qemu_name: ppc64le
+          - name: riscv64
+            runs_on: ubuntu-24.04
+            java_distro: 'temurin'
+            java_name: riscv64
+            linux_name: riscv64
+            is_ports: true
+            qemu_package_name: misc
+            qemu_name: riscv64
+          - name: s390x
+            runs_on: ubuntu-24.04
+            java_distro: 'temurin'
+            java_name: s390x
+            linux_name: s390x
+            is_ports: true
+            qemu_package_name: misc
+            qemu_name: s390x
+        java_version: [ 8, 11, 17, 21 ]
+
+        exclude:
+          - architecture:
+              name: armv7
+              java_distro: 'temurin'
+            java_version: 17
+          - architecture:
+              name: armv7
+              java_distro: 'temurin'
+            java_version: 21
+          - architecture:
+              name: s390x
+              java_distro: 'temurin'
+            java_version: 8
+          - architecture:
+              name: riscv64
+              java_distro: 'temurin'
+            java_version: 8
+          - architecture:
+              name: riscv64
+              java_distro: 'temurin'
+            java_version: 11
+
+    needs: [ Linux-Build ]
+
+    name: Linux-${{ matrix.architecture.name }}-Test-JDK${{ matrix.java_version }}-QEMU
+    runs-on: ${{ matrix.architecture.runs_on }}
+
+    steps:
+      - name: Pre Setup JDK
+        run: |
+          sudo rm -rf /opt/hostedtoolcache/Java_*/*
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: ${{ matrix.architecture.java_distro }}
+          java-version: ${{ matrix.java_version }}
+          architecture: ${{ matrix.architecture.java_name }}
+          check-latest: true
+
+      - name: Download build
+        uses: actions/download-artifact@v4
+        with:
+          name: Linux-${{ matrix.architecture.name }}-Build-JDK${{ matrix.java_version }}
+          path: .
+
+      - name: Setup QEMU
+        run: |
+          chmod +x docker/install-qemu.sh
+          docker/install-qemu.sh "${{ matrix.architecture.linux_name }}" "${{ matrix.architecture.is_ports }}" "${{ matrix.architecture.qemu_package_name }}"
+
+      - name: Test
+        run: |
+          chmod +x ./mvnw ./mvnw.cmd
+          qemu-${{ matrix.architecture.qemu_name }} /opt/bash -c "./mvnw -B -V -ntp -P \"release\" test"
+
+  Windows-Test:
+    strategy:
+      fail-fast: true
+      matrix:
+        architecture:
+          - name: x86_64
+            runs_on: windows-2022
+            java_distro: 'temurin'
+            java_name: x64
+          - name: x86
+            runs_on: windows-2022
+            java_distro: 'temurin'
+            java_name: x86
+          - name: aarch64
+            runs_on: self-hosted
+            java_distro: 'liberica'
+            java_name: aarch64
+        java_version: [ 8, 11, 17, 21 ]
+
+        exclude:
+          - architecture:
+              name: x86
+              java_distro: 'temurin'
+            java_version: 21
+          - architecture:
+              name: aarch64
+              java_distro: 'liberica'
+            java_version: 8
+
+    needs: [ Windows-Build ]
+
+    name: Windows-${{ matrix.architecture.name }}-Test-JDK${{ matrix.java_version }}
+    runs-on: ${{ matrix.architecture.runs_on }}
+
+    steps:
+      - name: Pre Setup JDK
+        run: |
+          if (Test-Path "C:\hostedtoolcache\windows") {
+            Remove-Item -Recurse -Force -Path C:\hostedtoolcache\windows\Java_*\*
+          }
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: ${{ matrix.architecture.java_distro }}
+          java-version: ${{ matrix.java_version }}
+          architecture: ${{ matrix.architecture.java_name }}
+          check-latest: true
+
+      - name: Download build
+        uses: actions/download-artifact@v4
+        with:
+          name: Windows-${{ matrix.architecture.name }}-Build-JDK${{ matrix.java_version }}
+          path: .
+
+      - name: Test
+        run: |
+          ./mvnw -B -V -ntp -P "release" test
+
+  OSX-Test:
+    strategy:
+      fail-fast: true
+      matrix:
+        architecture:
+          - name: x86_64
+            runs_on: macos-14
+            java_distro: 'temurin'
+            java_name: x64
+          - name: aarch64
+            runs_on: macos-14
+            java_distro: 'liberica'
+            java_name: aarch64
+        java_version: [ 8, 11, 17, 21 ]
+
+    needs: [ OSX-Build ]
+
+    name: OSX-${{ matrix.architecture.name }}-Test-JDK${{ matrix.java_version }}
+    runs-on: ${{ matrix.architecture.runs_on }}
+
+    steps:
+      - name: Pre Setup JDK
+        run: |
+          sudo rm -rf /Users/runner/hostedtoolcache/Java_*/*
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: ${{ matrix.architecture.java_distro }}
+          java-version: ${{ matrix.java_version }}
+          architecture: ${{ matrix.architecture.java_name }}
+          check-latest: true
+
+      - name: Download build
+        uses: actions/download-artifact@v4
+        with:
+          name: OSX-${{ matrix.architecture.name }}-Build-JDK${{ matrix.java_version }}
+          path: .
+
+      - name: Test
+        run: |
+          chmod +x ./mvnw ./mvnw.cmd
+          ./mvnw -B -V -ntp -P "release" test

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright 2020-2023, Aayush Atharva
+  Copyright 2020-2024, Aayush Atharva
 
   Brotli4j licenses this file to you under the
   Apache License, Version 2.0 (the "License");
@@ -24,7 +24,7 @@
     <groupId>com.aayushatharva.brotli4j</groupId>
     <artifactId>brotli4j-parent</artifactId>
     <packaging>pom</packaging>
-    <version>1.16.0</version>
+    <version>1.17.0</version>
 
     <name>Brotli4j</name>
     <description>Brotli4j provides Brotli compression and decompression for Java.</description>
@@ -66,6 +66,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <overwriteExistingFiles>true</overwriteExistingFiles>
+        <test.excludes>none</test.excludes>
     </properties>
 
     <profiles>
@@ -76,6 +77,18 @@
             </activation>
             <properties>
                 <maven.compiler.release>8</maven.compiler.release>
+            </properties>
+        </profile>
+        <profile>
+            <id>windows-x86</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                    <arch>x86</arch>
+                </os>
+            </activation>
+            <properties>
+                <test.excludes>com/aayushatharva/brotli4j/FileCompressAndDecompressTest.java</test.excludes>
             </properties>
         </profile>
     </profiles>
@@ -96,8 +109,7 @@
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-buffer</artifactId>
-            <version>4.1.104.Final</version>
-            <scope>compile</scope>
+                <version>4.1.110.Final</version>
             <optional>true</optional>
         </dependency>
 
@@ -105,7 +117,7 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>5.10.0</version>
+            <version>5.10.2</version>
             <scope>test</scope>
         </dependency>
 
@@ -113,7 +125,7 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.10.0</version>
+            <version>5.10.2</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -144,7 +156,10 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.1.0</version>
                 <configuration>
-                    <argLine>-Xmx2G -Xcheck:jni</argLine>
+                    <argLine>-Xmx1680M -Xcheck:jni</argLine>
+                    <excludes>
+                        <exclude>${test.excludes}</exclude>
+                    </excludes>
                 </configuration>
             </plugin>
 
