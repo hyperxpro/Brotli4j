@@ -96,7 +96,7 @@
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-buffer</artifactId>
-            <version>4.1.104.Final</version>
+            <version>4.1.111.Final</version>
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>
@@ -105,7 +105,7 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>5.10.0</version>
+            <version>5.10.3</version>
             <scope>test</scope>
         </dependency>
 
@@ -113,7 +113,7 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.10.0</version>
+            <version>5.10.3</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
