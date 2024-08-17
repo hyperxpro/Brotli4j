@@ -109,7 +109,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         env:
           cache-name: cache-m2-repository-${{ runner.os }}-jdk8-aarch64
         with:
@@ -157,7 +157,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         env:
           cache-name: cache-m2-repository-${{ runner.os }}-jdk11-aarch64
         with:
@@ -198,7 +198,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         env:
           cache-name: cache-m2-repository-${{ runner.os }}-jdk17-aarch64
         with:
@@ -240,7 +240,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         env:
           cache-name: cache-m2-repository-${{ runner.os }}-jdk21-aarch64
         with:
@@ -282,7 +282,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         env:
           cache-name: cache-m2-repository-${{ runner.os }}-jdk8-arm7
         with:
@@ -329,7 +329,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         env:
           cache-name: cache-m2-repository-${{ runner.os }}-jdk11-armv7
         with:
@@ -370,7 +370,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         env:
           cache-name: cache-m2-repository-${{ runner.os }}-jdk11-armv7
         with:
@@ -414,7 +414,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         env:
           cache-name: cache-m2-repository-${{ runner.os }}-jdk8-s390x
         with:
@@ -457,7 +457,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         env:
           cache-name: cache-m2-repository-${{ runner.os }}-jdk8-s390x
         with:
@@ -494,7 +494,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         env:
           cache-name: cache-m2-repository-${{ runner.os }}-jdk8-ppc64le
         with:
@@ -535,7 +535,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         env:
           cache-name: cache-m2-repository-${{ runner.os }}-jdk11-ppc64le
         with:
@@ -570,7 +570,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         env:
           cache-name: cache-m2-repository-${{ runner.os }}-jdk11-riscv64
         with:
@@ -614,7 +614,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         env:
           cache-name: cache-m2-repository-${{ runner.os }}-jdk17-riscv64
         with:
@@ -651,7 +651,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         env:
           cache-name: cache-m2-repository-${{ runner.os }}-jdk21-riscv64
         with:
