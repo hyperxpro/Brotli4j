@@ -118,7 +118,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pr-${{ env.cache-name }}-
             ${{ runner.os }}-pr-
-      - uses: uraimo/run-on-arch-action@v2.4.0
+      - uses: uraimo/run-on-arch-action@v2.7.2
         name: Run commands
         id: runcmd
         with:
@@ -165,7 +165,7 @@ jobs:
           key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
-      - uses: uraimo/run-on-arch-action@v2.4.0
+      - uses: uraimo/run-on-arch-action@v2.7.2
         name: Run commands
         id: runcmd
         with:
@@ -206,7 +206,7 @@ jobs:
           key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
-      - uses: uraimo/run-on-arch-action@v2.4.0
+      - uses: uraimo/run-on-arch-action@v2.7.2
         name: Run commands
         id: runcmd
         with:
@@ -248,7 +248,7 @@ jobs:
           key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
-      - uses: uraimo/run-on-arch-action@v2.4.0
+      - uses: uraimo/run-on-arch-action@v2.7.2
         name: Run commands
         id: runcmd
         with:
@@ -290,7 +290,7 @@ jobs:
           key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
-      - uses: uraimo/run-on-arch-action@v2.4.0
+      - uses: uraimo/run-on-arch-action@v2.7.2
         name: Run commands
         id: runcmd
         with:
@@ -337,7 +337,7 @@ jobs:
           key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
-      - uses: uraimo/run-on-arch-action@v2.4.0
+      - uses: uraimo/run-on-arch-action@v2.7.2
         name: Run commands
         id: runcmd
         with:
@@ -378,7 +378,7 @@ jobs:
           key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
-      - uses: uraimo/run-on-arch-action@v2.4.0
+      - uses: uraimo/run-on-arch-action@v2.7.2
         name: Run commands
         id: runcmd
         with:
@@ -422,7 +422,7 @@ jobs:
           key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
-      - uses: uraimo/run-on-arch-action@v2.4.0
+      - uses: uraimo/run-on-arch-action@v2.7.2
         name: Run commands
         id: runcmd
         with:
@@ -465,7 +465,7 @@ jobs:
           key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
-      - uses: uraimo/run-on-arch-action@v2.4.0
+      - uses: uraimo/run-on-arch-action@v2.7.2
         name: Run commands
         id: runcmd
         with:
@@ -502,7 +502,7 @@ jobs:
           key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
-      - uses: uraimo/run-on-arch-action@v2.3.0
+      - uses: uraimo/run-on-arch-action@v2.7.2
         name: Run commands
         id: runcmd
         with:
@@ -543,7 +543,7 @@ jobs:
           key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
-      - uses: uraimo/run-on-arch-action@v2.3.0
+      - uses: uraimo/run-on-arch-action@v2.7.2
         name: Run commands
         id: runcmd
         with:
@@ -579,7 +579,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
 
-      - uses: uraimo/run-on-arch-action@v2.4.0
+      - uses: uraimo/run-on-arch-action@v2.7.2
         name: Run commands
         id: runcmd
         with:
@@ -622,7 +622,7 @@ jobs:
           key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
-      - uses: uraimo/run-on-arch-action@v2.4.0
+      - uses: uraimo/run-on-arch-action@v2.7.2
         name: Run commands
         id: runcmd
         with:
@@ -659,7 +659,7 @@ jobs:
           key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
-      - uses: uraimo/run-on-arch-action@v2.4.0
+      - uses: uraimo/run-on-arch-action@v2.7.2
         name: Run commands
         id: runcmd
         with:
