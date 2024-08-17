@@ -77,7 +77,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: build centos6
-        run: docker compose -f docker/docker compose.yml run build
+        run: docker compose -f docker/docker-compose.yml run build
       - name: Upload the build
         uses: actions/upload-artifact@v3
         with:
