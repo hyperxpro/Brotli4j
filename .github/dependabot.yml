@@ -5,8 +5,13 @@
 
 version: 2
 updates:
-  - package-ecosystem: "maven" # See documentation for possible values
+  - package-ecosystem: "maven"
     directories:
       - "/"
     schedule:
-      interval: "weekly"
+      interval: "daily"
+  - package-ecosystem: "github-actions"
+    directories:
+      - "/"
+    schedule:
+      interval: "daily"
