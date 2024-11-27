@@ -92,7 +92,7 @@ class EncoderTest {
 
         // Create gc pressure to trigger potential collection of dictionary data
         ArrayList<Integer> hashes = new ArrayList<>();
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 1_000_000; i++) {
             String obj = String.valueOf(Math.random());
             hashes.add(obj.hashCode());
         }
