@@ -265,10 +265,34 @@ public class Encoder {
         public Parameters() {
         }
 
-        private Parameters(Parameters other) {
-            this.quality = other.quality;
-            this.lgwin = other.lgwin;
-            this.mode = other.mode;
+        /**
+         * @param quality compression quality, or -1 for default
+         * @return this instance
+         */
+        public static Parameters create(int quality) {
+            return create(quality, -1);
+        }
+
+        /**
+         * @param quality compression quality, or -1 for default
+         * @param lgwin log2(LZ window size), or -1 for default
+         * @return this instance
+         */
+        public static Parameters create(int quality, int lgwin) {
+            return create(quality, lgwin, null);
+        }
+
+        /**
+         * @param quality compression quality, or -1 for default
+         * @param lgwin log2(LZ window size), or -1 for default
+         * @param mode compression mode, or {@code null} for default
+         * @return this instance
+         */
+        public static Parameters create(int quality, int lgwin, Mode mode) {
+            return new Parameters()
+                    .setQuality(quality)
+                    .setWindow(lgwin)
+                    .setMode(mode);
         }
 
         /**
