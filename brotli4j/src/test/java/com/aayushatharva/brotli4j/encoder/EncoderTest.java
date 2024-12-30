@@ -47,7 +47,7 @@ class EncoderTest {
 
     @Test
     void compressWithQuality() throws IOException {
-        assertArrayEquals(compressedData, Encoder.compress("Meow".getBytes(), new Encoder.Parameters().setQuality(6)));
+        assertArrayEquals(compressedData, Encoder.compress("Meow".getBytes(), Encoder.Parameters.create(6)));
     }
 
     @Test
