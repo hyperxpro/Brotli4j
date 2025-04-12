@@ -32,7 +32,7 @@ For maven, the natives will
 <dependency>
     <groupId>com.aayushatharva.brotli4j</groupId>
     <artifactId>brotli4j</artifactId>
-    <version>1.17.0</version>
+    <version>1.18.0</version>
 </dependency>
 ```
 
@@ -48,7 +48,7 @@ import org.gradle.nativeplatform.platform.internal.Architectures
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 import org.gradle.nativeplatform.operatingsystem.OperatingSystem
 
-val brotliVersion = "1.17.0"
+val brotliVersion = "1.18.0"
 val operatingSystem: OperatingSystem = DefaultNativePlatform.getCurrentOperatingSystem()
 
 repositories {
@@ -100,7 +100,7 @@ dependencies {
 import org.gradle.nativeplatform.platform.internal.Architectures
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 
-def brotliVersion = "1.17.0"
+def brotliVersion = "1.18.0"
 def operatingSystem = DefaultNativePlatform.getCurrentOperatingSystem()
 def currentArchitecture = DefaultNativePlatform.getCurrentArchitecture()
 
@@ -176,7 +176,7 @@ public class Example {
         FileInputStream inFile = new FileInputStream(filePath);
         FileOutputStream outFile = new FileOutputStream(filePath + ".br");
 
-        Encoder.Parameters params = new Encoder.Parameters().setQuality(4);
+        Encoder.Parameters params = new Encoder.Parameters.create(4);
 
         BrotliOutputStream brotliOutputStream = new BrotliOutputStream(outFile, params);
 

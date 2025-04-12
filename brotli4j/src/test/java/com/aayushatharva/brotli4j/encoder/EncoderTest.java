@@ -17,13 +17,16 @@
 package com.aayushatharva.brotli4j.encoder;
 
 import com.aayushatharva.brotli4j.Brotli4jLoader;
+import com.aayushatharva.brotli4j.common.BrotliCommon;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -44,7 +47,7 @@ class EncoderTest {
 
     @Test
     void compressWithQuality() throws IOException {
-        assertArrayEquals(compressedData, Encoder.compress("Meow".getBytes(), new Encoder.Parameters().setQuality(6)));
+        assertArrayEquals(compressedData, Encoder.compress("Meow".getBytes(), Encoder.Parameters.create(6)));
     }
 
     @Test
@@ -76,5 +79,33 @@ class EncoderTest {
         assertEquals(Encoder.Mode.FONT, Encoder.Mode.of(Encoder.Mode.FONT.ordinal()));
         assertEquals(Encoder.Mode.TEXT, Encoder.Mode.of(Encoder.Mode.TEXT.ordinal()));
         assertEquals(Encoder.Mode.GENERIC, Encoder.Mode.of(Encoder.Mode.GENERIC.ordinal()));
+    }
+
+
+    @Test
+    void ensureDictionaryDataRemainsAfterGC() throws IOException, InterruptedException {
+        // We hard code the compressed data, since the dictionary could also be collected just before our first compression
+        final byte[] expectedCompression = new byte[]{27, 43, 0, -8, 37, 0, -62, -104, -40, -63, 0};
+        final String dictionaryData = "This is some data to be used as a dictionary";
+        final byte[] rawBytes = dictionaryData.getBytes(); // Use dictionary also as data to keep it small
+        final PreparedDictionary dic = Encoder.prepareDictionary(BrotliCommon.makeNative(dictionaryData.getBytes()), 0);
+
+        // Create gc pressure to trigger potential collection of dictionary data
+        ArrayList<Integer> hashes = new ArrayList<>();
+        for (int i = 0; i < 1_000_000; i++) {
+            String obj = String.valueOf(Math.random());
+            hashes.add(obj.hashCode());
+        }
+        hashes = null;
+        System.gc();
+
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+             BrotliOutputStream brotliOutputStream = new BrotliOutputStream(byteArrayOutputStream)) {
+            brotliOutputStream.attachDictionary(dic);
+            brotliOutputStream.write(rawBytes);
+            brotliOutputStream.close();
+            byteArrayOutputStream.close();
+            assertArrayEquals(expectedCompression, byteArrayOutputStream.toByteArray());  // Otherwise the GC already cleared the data
+        }
     }
 }

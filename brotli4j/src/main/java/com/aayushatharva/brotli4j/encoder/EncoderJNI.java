@@ -36,6 +36,7 @@ public class EncoderJNI {
 
         private PreparedDictionaryImpl(ByteBuffer data, ByteBuffer rawData) {
             this.data = data;
+            this.rawData = rawData;
         }
 
         @Override
