@@ -755,17 +755,26 @@ jobs:
         run: mvn -B --show-version -ntp --file pom.xml clean package
 
   Windows-ARM-Build-JDK11:
-    runs-on: self-hosted
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install ARM64 MSVC Toolchain
+        run: |
+          choco install visualstudio2022buildtools --package-parameters "--add Microsoft.VisualStudio.Component.VC.ATL.ARM64 --add Microsoft.VisualStudio.Component.VC.Tools.ARM64 --add Microsoft.VisualStudio.Component.VC.CMake.Project --includeRecommended --includeOptional --passive --locale en-US"
       - name: Enable Developer Command Prompt
         uses: ilammy/msvc-dev-cmd@v1.13.0
+      - name: Set up JDK 11
+        uses: actions/setup-java@v4
         with:
-          arch: arm64
-      - name: Build with Maven
-        run: .\mvnw -B --show-version -ntp --file pom.xml clean package
+          distribution: 'corretto'
+          java-version: 11
+          architecture: x64
+      - name: Build with Maven for ARM64
+        run: |
+          set "Platform=ARM64"
+          mvn -B --show-version -ntp --file pom.xml clean package
       - name: Upload the build
         uses: actions/upload-artifact@v4
         with:
-          name: Windows-ARM-Build-JDK8
-          path: C:\Users\HyperXPro\Desktop\actions-runner\_work\Brotli4j\
+          name: Windows-ARM-Build-JDK11
+          path: D:\a\Brotli4j\
