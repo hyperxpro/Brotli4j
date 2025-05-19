@@ -770,6 +770,13 @@ jobs:
         run: |
           set "Platform=ARM64"
           mvn -B --show-version -ntp --file pom.xml clean package
+      - name: Verify DLL Architecture
+        run: |
+          for /r %%f in (*.dll) do (
+            echo Checking architecture for %%f
+            dumpbin /headers "%%f" | findstr /C:"machine (ARM64)" || echo Not ARM64: %%f
+          )
+        shell: cmd
       - name: Upload the build
         uses: actions/upload-artifact@v4
         with:
