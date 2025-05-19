@@ -769,10 +769,10 @@ jobs:
       - name: Build with Maven for ARM64
         run: |
           set "Platform=ARM64"
-          mvn -B --show-version -ntp --file pom.xml clean package
+          mvn -B --show-version -ntp --file pom.xml clean package -Pwindows-aarch64
       - name: Verify DLL Architecture
         run: |
-          for /r %%f in (*.dll) do (
+          for /r natives\windows-aarch64\target\classes\lib\windows-aarch64 %%f in (*.dll) do (
             echo Checking architecture for %%f
             dumpbin /headers "%%f" | findstr /C:"machine (ARM64)" || echo Not ARM64: %%f
           )
