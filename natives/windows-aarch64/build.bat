@@ -22,7 +22,11 @@ if not exist "%TARGET_CLASSES_PATH%" mkdir "%TARGET_CLASSES_PATH%"
 
 :PREPARE_MAKEFILES
 cd "%~dp0target"
-cmake -DCMAKE_BUILD_TYPE=RELEASE -A ARM64 -G "NMake Makefiles" ..\..\..\ || goto ERROR
+REM Set up ARM64 environment if not already set by the workflow
+if "%VSCMD_ARG_TGT_ARCH%"=="" (
+  call "%VSINSTALLDIR%\VC\Auxiliary\Build\vcvarsall.bat" arm64 || goto ERROR
+)
+cmake -DCMAKE_BUILD_TYPE=RELEASE -G "NMake Makefiles" ..\..\.. || goto ERROR
 
 :MAKE_ALL
 cd "%~dp0target"
