@@ -22,7 +22,7 @@ if not exist "%TARGET_CLASSES_PATH%" mkdir "%TARGET_CLASSES_PATH%"
 
 :PREPARE_MAKEFILES
 cd "%~dp0target"
-cmake -DCMAKE_BUILD_TYPE=RELEASE -G "NMake Makefiles" ..\..\..\ || goto ERROR
+cmake -DCMAKE_BUILD_TYPE=RELEASE -A ARM64 -G "NMake Makefiles" ..\..\..\ || goto ERROR
 
 :MAKE_ALL
 cd "%~dp0target"
