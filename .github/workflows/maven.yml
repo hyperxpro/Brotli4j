@@ -771,6 +771,7 @@ jobs:
           set "Platform=ARM64"
           mvn -B --show-version -ntp --file pom.xml clean package -Pwindows-aarch64
       - name: Verify DLL Architecture
+        if: always()
         run: |
           for /r natives\windows-aarch64\target\classes\lib\windows-aarch64 %%f in (*.dll) do (
             echo Checking architecture for %%f
