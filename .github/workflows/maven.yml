@@ -778,7 +778,7 @@ jobs:
       - name: Build with Maven for ARM64
         run: |
           set "Platform=ARM64"
-          mvn -B --show-version -ntp --file pom.xml clean package -Pwindows-aarch64 -skipTests
+          mvn -B --show-version -ntp --file pom.xml clean package -Pwindows-aarch64 -DskipTests
       - name: Verify DLL Architecture
         run: |
           dumpbin /headers "natives\windows-aarch64\target\classes\lib\windows-aarch64\brotli.dll" | findstr /C:"machine (ARM64)" || exit /b 1
