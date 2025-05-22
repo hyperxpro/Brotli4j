@@ -761,9 +761,7 @@ jobs:
       - name: Install ARM64 MSVC Build Tools
         run: |
           choco install visualstudio2022buildtools --no-progress --yes --limit-output
-          "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vs_installer.exe" modify --installPath "C:\Program Files\Microsoft Visual Studio\2022\BuildTools" --add Microsoft.VisualStudio.Component.VC.ATL.ARM64 Microsoft.VisualStudio.Component.VC.Tools.ARM64 Microsoft.VisualStudio.Component.VC.140.ARM64 Microsoft.VisualStudio.Component.Windows11SDK.22621 --quiet --norestart
         shell: pwsh
-        continue-on-error: true
         # Installs ARM64 MSVC toolchain and Windows 11 SDK
       - name: Enable Developer Command Prompt
         uses: ilammy/msvc-dev-cmd@v1.13.0
