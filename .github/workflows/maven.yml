@@ -810,7 +810,7 @@ jobs:
           gpg-passphrase: ${{ secrets.GPG_PASSPHRASE }}
       - name: Deploy to Maven Central
         run: |
-          cd release-bundle
+          cd release-bundle/Windows-x86_64-Build-JDK8
           mvn deploy -ntp -B -Dmaven.main.skip -DskipTests -Dexec.skip \
             -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }} \
             -Dossrh.username=${{ secrets.OSSRH_USERNAME }} \
