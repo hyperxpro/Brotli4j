@@ -791,14 +791,7 @@ jobs:
 
   Release-to-Maven:
     needs:
-      - Linux-x86_64-Build-JDK8
-      - Linux-Aarch64-Build-JDK8
-      - Linux-ArmV7-Build-JDK8
-      - Linux-s390x-Build-JDK8
-      - Linux-ppc64le-Build-JDK8
-      - Linux-riscv64-Build-JDK11
-      - Linux-riscv64-Build-JDK17
-      - Linux-riscv64-Build-JDK21
+      - Windows-x86_64-Build-JDK8
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
@@ -807,10 +800,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: release-bundle
-      - name: Extract all artifacts
-        run: |
-          mkdir -p release-all
-          find release-bundle -type f -name '*.zip' -exec unzip -o {} -d release-all \;
       - name: Set up JDK 8 for deploy
         uses: actions/setup-java@v4
         with:
@@ -821,7 +810,7 @@ jobs:
           gpg-passphrase: ${{ secrets.GPG_PASSPHRASE }}
       - name: Deploy to Maven Central
         run: |
-          cd release-all
+          cd release-bundle
           mvn deploy -ntp -B -Dmaven.main.skip -DskipTests -Dexec.skip \
             -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }} \
             -Dossrh.username=${{ secrets.OSSRH_USERNAME }} \
