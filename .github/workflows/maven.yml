@@ -788,3 +788,46 @@ jobs:
         with:
           name: Windows-ARM-Build-JDK8
           path: D:\a\Brotli4j\
+
+  Release-to-Maven:
+    needs:
+      - Linux-x86_64-Build-JDK8
+      - Linux-Aarch64-Build-JDK8
+      - Linux-ArmV7-Build-JDK8
+      - Linux-s390x-Build-JDK8
+      - Linux-ppc64le-Build-JDK8
+      - Linux-riscv64-Build-JDK11
+      - Linux-riscv64-Build-JDK17
+      - Linux-riscv64-Build-JDK21
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-bundle
+      - name: Extract all artifacts
+        run: |
+          mkdir -p release-all
+          find release-bundle -type f -name '*.zip' -exec unzip -o {} -d release-all \;
+      - name: Set up JDK 8 for deploy
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: 8
+          architecture: x64
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+          gpg-passphrase: ${{ secrets.GPG_PASSPHRASE }}
+      - name: Deploy to Maven Central
+        run: |
+          cd release-all
+          mvn deploy -ntp -B -Dmaven.main.skip -DskipTests -Dexec.skip \
+            -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }} \
+            -Dossrh.username=${{ secrets.OSSRH_USERNAME }} \
+            -Dossrh.password=${{ secrets.OSSRH_PASSWORD }}
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
