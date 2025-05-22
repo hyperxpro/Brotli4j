@@ -9,7 +9,7 @@ Brotli4j provides Brotli compression and decompression for Java.
 | Module                        | Architecture |                       Tested On |
 |:------------------------------|:------------:|--------------------------------:|
 | Windows (Windows Server 2022) |     x64      | JDK 1.8, JDK 11, JDK 17, JDK 21 |
-| Windows 11                    |     Aarch64  | JDK 11                          |
+| Windows 11                    |     Aarch64  | JDK 8                           |
 | Linux (CentOS 6)              |     x64      | JDK 1.8, JDK 11, JDK 17, JDK 21 |
 | Linux (Ubuntu 18.04)          |   Aarch64    | JDK 1.8, JDK 11, JDK 17, JDK 21 |
 | Linux (Ubuntu 18.04)          |    ARMv7     |         JDK 1.8, JDK 11, JDK 17 |
