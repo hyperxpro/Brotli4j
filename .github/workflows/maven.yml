@@ -851,11 +851,3 @@ jobs:
         run: |
           cd release-bundle/merged
           mvn deploy -ntp -B -Dmaven.main.skip -DskipTests -Dexec.skip
-      - name: List files in merged artifact directory
-        if: always()
-        run: |
-          ls -l release-bundle/merged
-      - name: List files recursively in merged artifact directory
-        if: always()
-        run: |
-          ls -lR release-bundle/merged
