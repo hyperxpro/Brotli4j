@@ -792,6 +792,7 @@ jobs:
   Release-to-Maven:
     needs:
       - Windows-x86_64-Build-JDK8
+      - MacOS-x86_64-Build-JDK8
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
@@ -800,16 +801,19 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: release-bundle
+      - name: Merge all build artifacts into one directory
+        run: |
+          mkdir -p release-bundle/merged
+          cp -rn release-bundle/Windows-x86_64-Build-JDK8/Brotli4j/* release-bundle/merged/
+          cp -rn release-bundle/MacOS-x86_64-Build-JDK8/Brotli4j/* release-bundle/merged/
       - name: Set up JDK 8 for deploy
         uses: actions/setup-java@v4
         with:
           distribution: 'corretto'
           java-version: 8
           architecture: x64
-
       - name: Remove old Maven Settings
         run: rm -f /home/runner/.m2/settings.xml
-
       - name: Maven Settings
         uses: s4u/maven-settings-action@v3.1.0
         with:
@@ -819,22 +823,20 @@ jobs:
               "username": "${{ secrets.OSSRH_USERNAME }}",
               "password": "${{ secrets.OSSRH_PASSWORD }}"
             }]
-
       - name: Import GPG
         uses: crazy-max/ghaction-import-gpg@v6.3.0
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.GPG_PASSPHRASE }}
-
       - name: Deploy to Maven Central
         run: |
-          cd release-bundle/Windows-x86_64-Build-JDK8/Brotli4j
+          cd release-bundle/merged
           mvn deploy -ntp -B -Dmaven.main.skip -DskipTests -Dexec.skip
-      - name: List files in artifact directory
+      - name: List files in merged artifact directory
         if: always()
         run: |
-          ls -l release-bundle/Windows-x86_64-Build-JDK8
-      - name: List files recursively in artifact directory
-        if: always() 
+          ls -l release-bundle/merged
+      - name: List files recursively in merged artifact directory
+        if: always()
         run: |
-          ls -lR release-bundle/Windows-x86_64-Build-JDK8
+          ls -lR release-bundle/merged
