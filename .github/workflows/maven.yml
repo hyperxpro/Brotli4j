@@ -791,8 +791,15 @@ jobs:
 
   Release-to-Maven:
     needs:
-      - Windows-x86_64-Build-JDK8
+      - Linux-Aarch64-Build-JDK8
+      - Linux-ArmV7-Build-JDK8
+      - Linux-ppc64le-Build-JDK8
+      - Linux-riscv64-Build-JDK11
+      - Linux-s390x-Build-JDK8
+      - Linux-x86_64-Build-JDK8
       - MacOS-x86_64-Build-JDK8
+      - Windows-ARM-Build-JDK8
+      - Windows-x86_64-Build-JDK8
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
@@ -804,8 +811,15 @@ jobs:
       - name: Merge all build artifacts into one directory
         run: |
           mkdir -p release-bundle/merged
-          cp -rn release-bundle/Windows-x86_64-Build-JDK8/Brotli4j/* release-bundle/merged/
-          cp -rn release-bundle/MacOS-x86_64-Build-JDK8/Brotli4j/* release-bundle/merged/
+          cp -rn release-bundle/Linux-Aarch64-Build-JDK8/Brotli4j/* release-bundle/merged/ || true
+          cp -rn release-bundle/Linux-ArmV7-Build-JDK8/Brotli4j/* release-bundle/merged/ || true
+          cp -rn release-bundle/Linux-ppc64le-Build-JDK8/Brotli4j/* release-bundle/merged/ || true
+          cp -rn release-bundle/Linux-riscv64-Build-JDK11/Brotli4j/* release-bundle/merged/ || true
+          cp -rn release-bundle/Linux-s390x-Build-JDK8/Brotli4j/* release-bundle/merged/ || true
+          cp -rn release-bundle/Linux-x86_64-Build-JDK8/Brotli4j/* release-bundle/merged/ || true
+          cp -rn release-bundle/MacOS-x86_64-Build-JDK8/Brotli4j/* release-bundle/merged/ || true
+          cp -rn release-bundle/Windows-ARM-Build-JDK8/Brotli4j/* release-bundle/merged/ || true
+          cp -rn release-bundle/Windows-x86_64-Build-JDK8/Brotli4j/* release-bundle/merged/ || true
       - name: Set up JDK 8 for deploy
         uses: actions/setup-java@v4
         with:
