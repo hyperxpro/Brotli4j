@@ -825,5 +825,6 @@ jobs:
         run: |
           ls -l release-bundle/Windows-x86_64-Build-JDK8
       - name: List files recursively in artifact directory
+        if: always() 
         run: |
           ls -lR release-bundle/Windows-x86_64-Build-JDK8
