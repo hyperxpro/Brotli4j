@@ -820,3 +820,7 @@ jobs:
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+      - name: List files in artifact directory
+        if: always()
+        run: |
+          ls -l release-bundle/Windows-x86_64-Build-JDK8
