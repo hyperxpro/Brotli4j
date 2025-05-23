@@ -1,4 +1,4 @@
-name: Java CI with Maven
+name: Brotli4j CI/CD and Release
 
 on:
   push:
@@ -11,6 +11,11 @@ on:
         description: 'Github Actions'
         required: true
         default: 'Github Actions'
+      do_release:
+        description: 'Release to Maven Central (checkbox)'
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -800,7 +805,7 @@ jobs:
       - MacOS-x86_64-Build-JDK8
       - Windows-ARM-Build-JDK8
       - Windows-x86_64-Build-JDK8
-    if: github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch' && inputs.do_release == true
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
