@@ -81,7 +81,7 @@ public class BrotliOutputStream extends OutputStream {
             throw new IOException("write after close");
         }
         while (!encoder.encode(EncoderJNI.Operation.PROCESS)) {
-            // Busy-wait loop.
+            Thread.yield();
         }
         encoder.inputBuffer.put((byte) b);
     }
@@ -98,9 +98,13 @@ public class BrotliOutputStream extends OutputStream {
         }
         while (len > 0) {
             if (!encoder.encode(EncoderJNI.Operation.PROCESS)) {
+                Thread.yield();
                 continue;
             }
-            int limit = Math.min(len, encoder.inputBuffer.remaining());
+            int limit;
+            while ((limit = Math.min(len, encoder.inputBuffer.remaining())) == 0) {
+                Thread.yield();
+            }
             encoder.inputBuffer.put(b, off, limit);
             off += limit;
             len -= limit;

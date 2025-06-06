@@ -82,6 +82,7 @@ public class BrotliInputStream extends InputStream {
             if (decoded != 0) {
                 break;
             }
+            Thread.yield();
         }
 
         if (decoded == -1) {
@@ -105,7 +106,10 @@ public class BrotliInputStream extends InputStream {
         }
         int result = 0;
         while (len > 0) {
-            int limit = Math.min(len, decoder.buffer.remaining());
+            int limit;
+            while ((limit = Math.min(len, decoder.buffer.remaining())) == 0) {
+                Thread.yield();
+            }
             decoder.buffer.get(b, off, limit);
             off += limit;
             len -= limit;
