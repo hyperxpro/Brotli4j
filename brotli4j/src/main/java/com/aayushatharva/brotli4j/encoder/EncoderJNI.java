@@ -9,6 +9,8 @@ import com.aayushatharva.brotli4j.common.annotations.Upstream;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * JNI wrapper for brotli encoder.
@@ -75,6 +77,7 @@ public class EncoderJNI {
     }
 
     public static class Wrapper {
+        private static final Logger logger = Logger.getLogger(Wrapper.class.getName());
         protected final long[] context = new long[5];
         private final ByteBuffer inputBuffer;
         private boolean fresh = true;
@@ -174,7 +177,8 @@ public class EncoderJNI {
         @Override
         protected void finalize() throws Throwable {
             if (context[0] != 0) {
-                /* TODO(eustas): log resource leak? */
+                logger.log(Level.WARNING, "Brotli encoder not properly destroyed. Native resources may leak. " +
+                        "Call destroy() method explicitly to avoid this warning.");
                 destroy();
             }
             super.finalize();

@@ -9,6 +9,8 @@ import com.aayushatharva.brotli4j.common.annotations.Upstream;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * JNI wrapper for brotli decoder.
@@ -34,6 +36,7 @@ public class DecoderJNI {
     }
 
     public static class Wrapper {
+        private static final Logger logger = Logger.getLogger(Wrapper.class.getName());
         private final long[] context = new long[3];
         private final ByteBuffer inputBuffer;
         private Status lastStatus = Status.NEEDS_MORE_INPUT;
@@ -132,7 +135,8 @@ public class DecoderJNI {
         @Override
         protected void finalize() throws Throwable {
             if (context[0] != 0) {
-                /* TODO: log resource leak? */
+                logger.log(Level.WARNING, "Brotli decoder not properly destroyed. Native resources may leak. " +
+                        "Call destroy() method explicitly to avoid this warning.");
                 destroy();
             }
             super.finalize();
