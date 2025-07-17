@@ -415,6 +415,12 @@ jobs:
             ls -al $JAVA_HOME/include
             ls -al $JAVA_HOME/include/linux
           run: |
+            export JAVA_HOME=/usr/lib/jvm/temurin-17-jdk-armhf
+            export PATH="$JAVA_HOME/bin:$PATH"
+            export JAVA_INCLUDE_PATH="$JAVA_HOME/include"
+            export JAVA_INCLUDE_PATH2="$JAVA_HOME/include/linux"
+            export JAVA_AWT_LIBRARY="$JAVA_HOME/lib/arm"
+            export JAVA_JVM_LIBRARY="$JAVA_HOME/lib/arm/server"
             export MAVEN_OPTS="-Djdk.lang.Process.launchMechanism=vfork"
             chmod +x ./mvnw
             ./mvnw -B --show-version -ntp clean package
