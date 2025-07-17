@@ -500,8 +500,13 @@ jobs:
           install: |
             apt-get update
             apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential openjdk-11-jdk
-
           run: |
+            export JAVA_HOME="/usr/lib/jvm/java-11-openjdk-s390x"
+            export PATH="$JAVA_HOME/bin:$PATH"
+            export JAVA_INCLUDE_PATH="$JAVA_HOME/include"
+            export JAVA_INCLUDE_PATH2="$JAVA_HOME/include/linux"
+            export JAVA_AWT_LIBRARY="$JAVA_HOME/lib"
+            export JAVA_JVM_LIBRARY="$JAVA_HOME/lib/server"
             chmod +x ./mvnw
             ./mvnw -B --show-version -ntp clean package
 
@@ -536,8 +541,13 @@ jobs:
           install: |
             apt-get update
             apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential openjdk-8-jdk
-          
           run: |
+            export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-ppc64el"
+            export PATH="$JAVA_HOME/bin:$PATH"
+            export JAVA_INCLUDE_PATH="$JAVA_HOME/include"
+            export JAVA_INCLUDE_PATH2="$JAVA_HOME/include/linux"
+            export JAVA_AWT_LIBRARY="$JAVA_HOME/lib"
+            export JAVA_JVM_LIBRARY="$JAVA_HOME/lib/server"
             chmod +x ./mvnw
             ./mvnw -B -ntp clean package
       - name: Upload the build
@@ -578,6 +588,12 @@ jobs:
             apt-get update
             apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential openjdk-11-jdk
           run: |
+            export JAVA_HOME="/usr/lib/jvm/java-11-openjdk-ppc64el"
+            export PATH="$JAVA_HOME/bin:$PATH"
+            export JAVA_INCLUDE_PATH="$JAVA_HOME/include"
+            export JAVA_INCLUDE_PATH2="$JAVA_HOME/include/linux"
+            export JAVA_AWT_LIBRARY="$JAVA_HOME/lib"
+            export JAVA_JVM_LIBRARY="$JAVA_HOME/lib/server"
             chmod +x ./mvnw
             ./mvnw -B -ntp clean package          
 
