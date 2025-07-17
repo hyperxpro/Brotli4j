@@ -38,99 +38,442 @@ For maven, the natives will
 
 ### Gradle
 
-For gradle, we have to write some logic to import native automatically.
-Of course, you can add native(s) as dependency manually also.
+For gradle, some additional configuration must be added in order to allow gradle to resolve the correct native artifacts automatically,
+based on your architecture.  
+Do note that when creating a [distribution zip/tar](https://docs.gradle.org/current/userguide/distribution_plugin.html),
+this will cause the distribution to only have the natives for the architecture it was compiled on.
+In order to have it include all natives, some additional configuration would be necessary.
+(For example, creating a custom configuration which has the `all` operating system & architecture, similar to what is done for shadow)
+
+This also supports [shadow](https://gradleup.com/shadow/), so that the shaded jar will contain the natives for *all* architectures.
+
+There are two ways it can be added:
+
+1. Project-wide configuration.  
+   For this, you must add the rule class as well as the global rule usage & global attributes to the `settings.gradle.kts`/`settings.gradle` file.
+   This rule will apply to *all* subprojects, and is best suited for working with multiple gradle subprojects.
+2. Subproject-specific configuration.  
+   For this, you must add the rule class as well as the rule usage & attributes to the `build.gradle.kts`/`build.gradle` file.
+   This rule will only apply to the project it is added to and will not be applied to other projects.
+   This is useful when, for example, you only have a single gradle subproject.
+
+As of gradle 8.14.3, both of these methods work.
+But they should also work for any version of gradle since 8.0.
+They have not been tested on versions lower than that and may or may not work.
+
+Note that this method requires the use of some internal gradle apis, which may get break at some point in the future.
+If it does, please open an issue.
+However, the apis seem to be somewhat stable, and if it does break then in the past it's just because they were moved to a different package.
+
+To add the dependency, use:
+
+```kotlin
+dependencies {
+    implementation("com.aayushatharva.brotli4j:brotli4j:1.18.0")
+    runtimeOnly("com.aayushatharva.brotli4j:natives:1.18.0")
+}
+```
 
 #### Kotlin DSL
 
+<details>
+<summary><b>Project-Wide Configuration</b></summary>
+
+To configure the rule to be used project-wide, in addition to the below `Brotli4JRule` class,
+this must also be added to the `settings.gradle.kts` file:
+
 ```kotlin
-import org.gradle.nativeplatform.platform.internal.Architectures
-import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
-import org.gradle.nativeplatform.operatingsystem.OperatingSystem
+import org.gradle.nativeplatform.internal.DefaultTargetMachineFactory
 
-val brotliVersion = "1.18.0"
-val operatingSystem: OperatingSystem = DefaultNativePlatform.getCurrentOperatingSystem()
+gradle.beforeProject {
+    val host = DefaultTargetMachineFactory(objects).host()
 
-repositories {
-    mavenCentral()
+    // This tells gradle that we want an artifact with the correct OperatingSystemFamily and MachineArchitecture
+    // Gradle will then attempt to find the artifact with the best matching value, or if one cannot be found,
+    // fall back to the default (i.e. in the case of any dependency other than brotli4j)
+    configurations.configureEach {
+        // if the configuration is being published, don't set the attributes
+        if (isCanBeConsumed)
+            return@configureEach
+
+        attributes {
+            if (OperatingSystemFamily.OPERATING_SYSTEM_ATTRIBUTE !in keySet())
+                attribute(OperatingSystemFamily.OPERATING_SYSTEM_ATTRIBUTE, host.operatingSystemFamily)
+            if (MachineArchitecture.ARCHITECTURE_ATTRIBUTE !in keySet())
+                attribute(MachineArchitecture.ARCHITECTURE_ATTRIBUTE, host.architecture)
+        }
+    }
+
+    // can be removed if not using shadow plugin
+    pluginManager.withPlugin("com.gradleup.shadow") {
+        val runtimeClasspath by configurations.getting
+
+        configurations.register("shaded") {
+            extendsFrom(runtimeClasspath)
+
+            isCanBeConsumed = false
+            isCanBeResolved = true
+            isCanBeDeclared = true
+
+            attributes {
+                attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_RUNTIME))
+                attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category.LIBRARY))
+                attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements.JAR))
+
+                attribute(OperatingSystemFamily.OPERATING_SYSTEM_ATTRIBUTE, objects.named("all"))
+                attribute(MachineArchitecture.ARCHITECTURE_ATTRIBUTE, objects.named("all"))
+            }
+        }
+    }
+}
+
+dependencyResolutionManagement {
+    components {
+        withModule<Brotli4JRule>("com.aayushatharva.brotli4j:natives")
+    }
+}
+```
+
+If you are using the shadow gradle plugin, then in your `build.gradle.kts` include:
+
+```kotlin
+dependencies {
+    shaded("com.aayushatharva.brotli4j:natives:1.18.0")
+}
+
+tasks {
+    shadowJar.configure {
+        // shadow 8.x
+        configurations = listOf(project.configurations.shaded).map { it.get() }
+        // shadow 9.x
+        configurations.add(project.configurations.shaded)
+    }
+}
+```
+
+</details>
+
+<details>
+<summary><b>Subproject-Specific Configuration</b></summary>
+
+To configure the rule to be used in a specific subproject, in addition to the below `Brotli4JRule` class,
+this must also be added to the `build.gradle.kts` file:
+
+```kotlin
+import org.gradle.nativeplatform.internal.DefaultTargetMachineFactory
+
+val host = DefaultTargetMachineFactory(objects).host()
+
+// This tells gradle that we want an artifact with the correct OperatingSystemFamily and MachineArchitecture
+// Gradle will then attempt to find the artifact with the best matching value, or if one cannot be found,
+// fall back to the default (i.e. in the case of any dependency other than brotli4j)
+configurations.configureEach {
+    // if the configuration is being published, don't set the attributes
+    if (isCanBeConsumed)
+        return@configureEach
+
+    attributes {
+        if (OperatingSystemFamily.OPERATING_SYSTEM_ATTRIBUTE !in keySet())
+            attributes.attribute(OperatingSystemFamily.OPERATING_SYSTEM_ATTRIBUTE, host.operatingSystemFamily)
+        if (MachineArchitecture.ARCHITECTURE_ATTRIBUTE !in keySet())
+            attributes.attribute(MachineArchitecture.ARCHITECTURE_ATTRIBUTE, host.architecture)
+    }
 }
 
 dependencies {
-    implementation("com.aayushatharva.brotli4j:brotli4j:$brotliVersion")
-    runtimeOnly(
-        "com.aayushatharva.brotli4j:native-" +
-                if (operatingSystem.isWindows) {
-                    if (DefaultNativePlatform.getCurrentArchitecture().isArm()) {
-                        "windows-aarch64"
-                    } else {
-                        "windows-x86_64"
-                    }
-                } else if (operatingSystem.isMacOsX) {
-                    if (DefaultNativePlatform.getCurrentArchitecture().isArm()) {
-                        "osx-aarch64"
-                    } else {
-                        "osx-x86_64"
-                    }
-                } else if (operatingSystem.isLinux) {
-                    if (Architectures.ARM_V7.isAlias(DefaultNativePlatform.getCurrentArchitecture().name)) {
-                        "linux-armv7"
-                    } else if (Architectures.AARCH64.isAlias(DefaultNativePlatform.getCurrentArchitecture().name)) {
-                        "linux-aarch64"
-                    } else if (Architectures.X86_64.isAlias(DefaultNativePlatform.getCurrentArchitecture().name)) {
-                        "linux-x86_64"
-                    } else if (Architectures.S390X.isAlias(DefaultNativePlatform.getCurrentArchitecture().name)) {
-                        "linux-s390x"
-                    } else if (Architectures.RISCV_64.isAlias(DefaultNativePlatform.getCurrentArchitecture().name)) {
-                        "linux-riscv64"
-                    } else if (Architectures.PPC64LE.isAlias(DefaultNativePlatform.getCurrentArchitecture().name)) {
-                        "linux-ppc64le"
-                    } else {
-                        throw IllegalStateException("Unsupported architecture: ${DefaultNativePlatform.getCurrentArchitecture().name}")
-                    }
-                } else {
-                    throw IllegalStateException("Unsupported operating system: $operatingSystem")
-                } + ":$brotliVersion"
+    components {
+        withModule<Brotli4JRule>("com.aayushatharva.brotli4j:natives")
+    }
+}
+```
+
+If you are using the shadow gradle plugin, then in your `build.gradle.kts` include:
+
+```kotlin
+val shaded by configurations.registering {
+    extendsFrom(configurations.runtimeClasspath)
+
+    isCanBeConsumed = false
+    isCanBeResolved = true
+    isCanBeDeclared = true
+
+    attributes {
+        attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_RUNTIME))
+        attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category.LIBRARY))
+        attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements.JAR))
+
+        attribute(OperatingSystemFamily.OPERATING_SYSTEM_ATTRIBUTE, objects.named("all"))
+        attribute(MachineArchitecture.ARCHITECTURE_ATTRIBUTE, objects.named("all"))
+    }
+}
+
+dependencies {
+    shaded("com.aayushatharva.brotli4j:natives:1.18.0")
+}
+
+tasks {
+    shadowJar.configure {
+        // shadow 8.x
+        configurations = listOf(shaded).map { it.get() }
+        // shadow 9.x
+        configurations.add(shaded)
+    }
+}
+```
+
+</details>
+
+```kotlin
+@CacheableRule
+abstract class Brotli4JRule : ComponentMetadataRule {
+    data class NativeVariant(val os: String, val arch: String, val classifier: String) {
+        fun dependency(version: String) = "com.aayushatharva.brotli4j:native-${classifier}:${version}"
+    }
+
+    private val nativeVariants = listOf(
+        NativeVariant(OperatingSystemFamily.WINDOWS, "aarch64", "windows-aarch64"),
+        NativeVariant(OperatingSystemFamily.WINDOWS, "x86-64", "windows-x86_64"),
+        NativeVariant(OperatingSystemFamily.MACOS, "x86-64", "osx-x86_64"),
+        NativeVariant(OperatingSystemFamily.MACOS, "aarch64", "osx-aarch64"),
+        NativeVariant(OperatingSystemFamily.LINUX, "x86-64", "linux-x86_64"),
+        NativeVariant(OperatingSystemFamily.LINUX, "aarch64", "linux-aarch64"),
+        NativeVariant(OperatingSystemFamily.LINUX, "arm-v7", "linux-armv7"),
+        NativeVariant(OperatingSystemFamily.LINUX, "s390x", "linux-s390x"),
+        NativeVariant(OperatingSystemFamily.LINUX, "riscv64", "linux-riscv64"),
+        NativeVariant(OperatingSystemFamily.LINUX, "ppc64le", "linux-ppc64le"),
     )
+
+    @get:Inject
+    abstract val objects: ObjectFactory
+
+    override fun execute(context: ComponentMetadataContext) {
+        listOf("compile", "runtime").forEach { base -> addVariant(context, base) }
+    }
+
+    private fun addVariant(context: ComponentMetadataContext, base: String) {
+        val version = context.details.id.version
+
+        nativeVariants.forEach { variant ->
+            context.details.addVariant("${variant.classifier}-${base}", base) {
+                attributes {
+                    attributes.attribute(OperatingSystemFamily.OPERATING_SYSTEM_ATTRIBUTE, objects.named(variant.os))
+                    attributes.attribute(MachineArchitecture.ARCHITECTURE_ATTRIBUTE, objects.named(variant.arch))
+                }
+
+                withDependencies {
+                    add(variant.dependency(version))
+                }
+            }
+        }
+
+        context.details.addVariant("all-${base}", base) {
+            attributes {
+                attributes.attribute(OperatingSystemFamily.OPERATING_SYSTEM_ATTRIBUTE, objects.named("all"))
+                attributes.attribute(MachineArchitecture.ARCHITECTURE_ATTRIBUTE, objects.named("all"))
+            }
+
+            withDependencies {
+                nativeVariants.forEach { variant ->
+                    add(variant.dependency(version))
+                }
+            }
+        }
+    }
 }
 ```
 
 #### Groovy
 
+<details>
+<summary><b>Project-Wide Configuration</b></summary>
+
+To configure the rule to be used project-wide, in addition to the below `Brotli4JRule` class,
+this must also be added to the `settings.gradle` file:
+
 ```groovy
-import org.gradle.nativeplatform.platform.internal.Architectures
-import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
+gradle.beforeProject {
+    def host = new DefaultTargetMachineFactory(objects).host()
 
-def brotliVersion = "1.18.0"
-def operatingSystem = DefaultNativePlatform.getCurrentOperatingSystem()
-def currentArchitecture = DefaultNativePlatform.getCurrentArchitecture()
+    // This tells gradle that we want an artifact with the correct OperatingSystemFamily and MachineArchitecture
+    // Gradle will then attempt to find the artifact with the best matching value, or if one cannot be found,
+    // fall back to the default (i.e. in the case of any dependency other than brotli4j)
+    configurations.configureEach {
+        // if the configuration is being published, don't set the attributes
+        if (canBeConsumed)
+            return
 
-repositories {
-    mavenCentral()
+        attributes {
+            if (OperatingSystemFamily.OPERATING_SYSTEM_ATTRIBUTE !in keySet())
+                attribute(OperatingSystemFamily.OPERATING_SYSTEM_ATTRIBUTE, host.operatingSystemFamily)
+            if (MachineArchitecture.ARCHITECTURE_ATTRIBUTE !in keySet())
+                attribute(MachineArchitecture.ARCHITECTURE_ATTRIBUTE, host.architecture)
+        }
+    }
+
+    // can be removed if not using shadow plugin
+    pluginManager.withPlugin("com.gradleup.shadow") {
+        configurations.register("shaded") {
+            extendsFrom(configurations.runtimeClasspath)
+
+            canBeConsumed = false
+            canBeResolved = true
+            canBeDeclared = true
+
+            attributes {
+                attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage, Usage.JAVA_RUNTIME))
+                attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category, Category.LIBRARY))
+                attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements, LibraryElements.JAR))
+
+                attribute(OperatingSystemFamily.OPERATING_SYSTEM_ATTRIBUTE, objects.named(OperatingSystemFamily, "all"))
+                attribute(MachineArchitecture.ARCHITECTURE_ATTRIBUTE, objects.named(MachineArchitecture, "all"))
+            }
+        }
+    }
+}
+
+dependencyResolutionManagement {
+    components {
+        withModule("com.aayushatharva.brotli4j:natives", Brotli4JRule)
+    }
+}
+```
+
+If you are using the shadow gradle plugin, then in your `build.gradle` include:
+
+```kotlin
+dependencies {
+    shaded("com.aayushatharva.brotli4j:natives:1.18.0")
+}
+
+tasks {
+    shadowJar.configure {
+        configurations = [project.configurations.shaded]
+    }
+}
+```
+
+</details>
+
+<details>
+<summary><b>Subproject-Specific Configuration</b></summary>
+
+To configure the rule to be used in a specific subproject, in addition to the below `Brotli4JRule` class,
+this must also be added to the `build.gradle` file:
+
+```groovy
+def host = new DefaultTargetMachineFactory(objects).host()
+
+// This tells gradle that we want an artifact with the correct OperatingSystemFamily and MachineArchitecture
+// Gradle will then attempt to find the artifact with the best matching value, or if one cannot be found,
+// fall back to the default (i.e. in the case of any dependency other than brotli4j)
+configurations.configureEach {
+    // if the configuration is being published, don't set the attributes
+    if (canBeConsumed)
+        return
+
+    def isShadow = name.containsIgnoreCase("shadow")
+    attributes {
+        if (OperatingSystemFamily.OPERATING_SYSTEM_ATTRIBUTE !in keySet())
+            attributes.attribute(OperatingSystemFamily.OPERATING_SYSTEM_ATTRIBUTE, host.operatingSystemFamily)
+        if (MachineArchitecture.ARCHITECTURE_ATTRIBUTE !in keySet())
+            attributes.attribute(MachineArchitecture.ARCHITECTURE_ATTRIBUTE, host.architecture)
+    }
 }
 
 dependencies {
-    implementation "com.aayushatharva.brotli4j:brotli4j:$brotliVersion"
-    runtimeOnly("""com.aayushatharva.brotli4j:native-${
-        if (operatingSystem.isWindows())
-            if (currentArchitecture.isX86_64()) "windows-x86_64"
-            else if (currentArchitecture.isArm()) "windows-aarch64"
-            else
-                throw new IllegalStateException("Unsupported architecture: ${currentArchitecture.getName()}");
-        else if (operatingSystem.isMacOsX())
-            if (currentArchitecture.isArm()) "osx-aarch64"
-            else "osx-x86_64"
-        else if (operatingSystem.isLinux())
-            if (currentArchitecture.isAARCH64()) "linux-aarch64"
-            else if (currentArchitecture.isX86_64()) "linux-x86_64"
-            else if (currentArchitecture.isARM_V7()) "linux-armv7"
-            else if (currentArchitecture.isPPC64LE()) "linux-ppc64le"
-            else if (currentArchitecture.isS390X()) "linux-s390x"
-            else if (currentArchitecture.isRISCV64()) "linux-riscv64"
-            else
-                throw new IllegalStateException("Unsupported architecture: ${currentArchitecture.getName()}");
-        else
-            throw new IllegalStateException("Unsupported operating system: $operatingSystem");
-    }:$brotliVersion""")
+    components {
+        withModule("com.aayushatharva.brotli4j:natives", Brotli4JRule)
+    }
+}
+```
+
+If you are using the shadow gradle plugin, then in your `build.gradle` include:
+
+```kotlin
+configurations.register("shaded") {
+    extendsFrom(configurations.runtimeClasspath)
+
+    canBeConsumed = false
+    canBeResolved = true
+    canBeDeclared = true
+
+    attributes {
+        attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage, Usage.JAVA_RUNTIME))
+        attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category, Category.LIBRARY))
+        attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements, LibraryElements.JAR))
+
+        attribute(OperatingSystemFamily.OPERATING_SYSTEM_ATTRIBUTE, objects.named(OperatingSystemFamily, "all"))
+        attribute(MachineArchitecture.ARCHITECTURE_ATTRIBUTE, objects.named(MachineArchitecture, "all"))
+    }
+}
+
+dependencies {
+    shaded("com.aayushatharva.brotli4j:natives:1.18.0")
+}
+
+tasks {
+    shadowJar.configure {
+        configurations = [project.configurations.shaded]
+    }
+}
+```
+
+</details>
+
+```groovy
+@CacheableRule
+abstract class Brotli4JRule implements ComponentMetadataRule {
+    @Inject
+    abstract ObjectFactory getObjects()
+
+    void execute(ComponentMetadataContext context) {
+        for (base in ["compile", "runtime"]) {
+            addVariant(context, base)
+        }
+    }
+
+    void addVariant(ComponentMetadataContext context, String base) {
+        def nativeVariants = [
+            [ os: OperatingSystemFamily.WINDOWS, arch: "aarch64", classifier: "windows-aarch64" ],
+            [ os: OperatingSystemFamily.WINDOWS, arch: "x86-64",  classifier: "windows-x86_64"  ],
+            [ os: OperatingSystemFamily.MACOS,   arch: "x86-64",  classifier: "osx-x86_64"      ],
+            [ os: OperatingSystemFamily.MACOS,   arch: "aarch64", classifier: "osx-aarch64"     ],
+            [ os: OperatingSystemFamily.LINUX,   arch: "x86-64",  classifier: "linux-x86_64"    ],
+            [ os: OperatingSystemFamily.LINUX,   arch: "aarch64", classifier: "linux-aarch64"   ],
+            [ os: OperatingSystemFamily.LINUX,   arch: "arm-v7",  classifier: "linux-armv7"     ],
+            [ os: OperatingSystemFamily.LINUX,   arch: "s390x",   classifier: "linux-s390x"     ],
+            [ os: OperatingSystemFamily.LINUX,   arch: "riscv64", classifier: "linux-riscv64"   ],
+            [ os: OperatingSystemFamily.LINUX,   arch: "ppc64le", classifier: "linux-ppc64le"   ],
+        ]
+
+        def version = context.details.id.version
+
+        nativeVariants.forEach { variant ->
+            context.details.addVariant("${variant.classifier}-${base}", base) {
+                attributes {
+                    attributes.attribute(OperatingSystemFamily.OPERATING_SYSTEM_ATTRIBUTE, objects.named(OperatingSystemFamily, variant.os))
+                    attributes.attribute(MachineArchitecture.ARCHITECTURE_ATTRIBUTE, objects.named(MachineArchitecture, variant.arch))
+                }
+
+                withDependencies {
+                    add("com.aayushatharva.brotli4j:native-${variant.classifier}:${version}")
+                }
+            }
+        }
+
+        context.details.addVariant("all-${base}", base) {
+            attributes {
+                attributes.attribute(OperatingSystemFamily.OPERATING_SYSTEM_ATTRIBUTE, objects.named(OperatingSystemFamily, "all"))
+                attributes.attribute(MachineArchitecture.ARCHITECTURE_ATTRIBUTE, objects.named(MachineArchitecture, "all"))
+            }
+
+            withDependencies {
+                nativeVariants.forEach { variant ->
+                    add("com.aayushatharva.brotli4j:native-${variant.classifier}:${version}")
+                }
+            }
+        }
+    }
 }
 ```
 
