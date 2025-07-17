@@ -405,13 +405,15 @@ jobs:
           install: |
             apt-get update
             apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential apt-transport-https wget
-            
             mkdir -p /etc/apt/keyrings
             wget -O - https://packages.adoptium.net/artifactory/api/gpg/key/public | tee /etc/apt/keyrings/adoptium.asc
             echo "deb [signed-by=/etc/apt/keyrings/adoptium.asc] https://packages.adoptium.net/artifactory/deb $(awk -F= '/^VERSION_CODENAME/{print$2}' /etc/os-release) main" | tee /etc/apt/sources.list.d/adoptium.list
-
             apt-get update
-            apt install temurin-17-jdk -y
+            apt-get install -y temurin-17-jdk
+            export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))
+            export PATH=$JAVA_HOME/bin:$PATH
+            ls -al $JAVA_HOME/include
+            ls -al $JAVA_HOME/include/linux
           run: |
             export MAVEN_OPTS="-Djdk.lang.Process.launchMechanism=vfork"
             chmod +x ./mvnw
