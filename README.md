@@ -46,10 +46,9 @@ Of course, you can add native(s) as dependency manually also.
 ```kotlin
 import org.gradle.nativeplatform.platform.internal.Architectures
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
-import org.gradle.nativeplatform.operatingsystem.OperatingSystem
 
 val brotliVersion = "1.18.0"
-val operatingSystem: OperatingSystem = DefaultNativePlatform.getCurrentOperatingSystem()
+val operatingSystem = DefaultNativePlatform.getCurrentOperatingSystem()
 
 repositories {
     mavenCentral()
@@ -60,13 +59,13 @@ dependencies {
     runtimeOnly(
         "com.aayushatharva.brotli4j:native-" +
                 if (operatingSystem.isWindows) {
-                    if (DefaultNativePlatform.getCurrentArchitecture().isArm()) {
+                    if (DefaultNativePlatform.getCurrentArchitecture().isArm64()) {
                         "windows-aarch64"
                     } else {
                         "windows-x86_64"
                     }
                 } else if (operatingSystem.isMacOsX) {
-                    if (DefaultNativePlatform.getCurrentArchitecture().isArm()) {
+                    if (DefaultNativePlatform.getCurrentArchitecture().isArm64()) {
                         "osx-aarch64"
                     } else {
                         "osx-x86_64"
@@ -78,11 +77,11 @@ dependencies {
                         "linux-aarch64"
                     } else if (Architectures.X86_64.isAlias(DefaultNativePlatform.getCurrentArchitecture().name)) {
                         "linux-x86_64"
-                    } else if (Architectures.S390X.isAlias(DefaultNativePlatform.getCurrentArchitecture().name)) {
+                    } else if (DefaultNativePlatform.getCurrentArchitecture().name.contains("s390x")) {
                         "linux-s390x"
-                    } else if (Architectures.RISCV_64.isAlias(DefaultNativePlatform.getCurrentArchitecture().name)) {
+                    } else if (DefaultNativePlatform.getCurrentArchitecture().name.contains("riscv64")) {
                         "linux-riscv64"
-                    } else if (Architectures.PPC64LE.isAlias(DefaultNativePlatform.getCurrentArchitecture().name)) {
+                    } else if (DefaultNativePlatform.getCurrentArchitecture().name.contains("ppc64le")) {
                         "linux-ppc64le"
                     } else {
                         throw IllegalStateException("Unsupported architecture: ${DefaultNativePlatform.getCurrentArchitecture().name}")
@@ -112,20 +111,20 @@ dependencies {
     implementation "com.aayushatharva.brotli4j:brotli4j:$brotliVersion"
     runtimeOnly("""com.aayushatharva.brotli4j:native-${
         if (operatingSystem.isWindows())
-            if (currentArchitecture.isX86_64()) "windows-x86_64"
-            else if (currentArchitecture.isArm()) "windows-aarch64"
+            if (currentArchitecture.isAmd64()) "windows-x86_64"
+            else if (currentArchitecture.isArm64()) "windows-aarch64"
             else
                 throw new IllegalStateException("Unsupported architecture: ${currentArchitecture.getName()}");
         else if (operatingSystem.isMacOsX())
-            if (currentArchitecture.isArm()) "osx-aarch64"
+            if (currentArchitecture.isArm64()) "osx-aarch64"
             else "osx-x86_64"
         else if (operatingSystem.isLinux())
-            if (currentArchitecture.isAARCH64()) "linux-aarch64"
-            else if (currentArchitecture.isX86_64()) "linux-x86_64"
-            else if (currentArchitecture.isARM_V7()) "linux-armv7"
-            else if (currentArchitecture.isPPC64LE()) "linux-ppc64le"
-            else if (currentArchitecture.isS390X()) "linux-s390x"
-            else if (currentArchitecture.isRISCV64()) "linux-riscv64"
+            if (Architectures.AARCH64.isAlias(currentArchitecture.getName())) "linux-aarch64"
+            else if (Architectures.X86_64.isAlias(currentArchitecture.getName())) "linux-x86_64"
+            else if (Architectures.ARM_V7.isAlias(currentArchitecture.getName())) "linux-armv7"
+            else if (currentArchitecture.getName().contains("ppc64le")) "linux-ppc64le"
+            else if (currentArchitecture.getName().contains("s390x")) "linux-s390x"
+            else if (currentArchitecture.getName().contains("riscv64")) "linux-riscv64"
             else
                 throw new IllegalStateException("Unsupported architecture: ${currentArchitecture.getName()}");
         else
