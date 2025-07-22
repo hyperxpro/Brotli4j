@@ -176,7 +176,7 @@ public class Example {
         FileInputStream inFile = new FileInputStream(filePath);
         FileOutputStream outFile = new FileOutputStream(filePath + ".br");
 
-        Encoder.Parameters params = new Encoder.Parameters.create(4);
+        Encoder.Parameters params = Encoder.Parameters.create(4);
 
         BrotliOutputStream brotliOutputStream = new BrotliOutputStream(outFile, params);
 
