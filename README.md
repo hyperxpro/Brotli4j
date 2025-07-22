@@ -9,7 +9,7 @@ Brotli4j provides Brotli compression and decompression for Java.
 | Module                        | Architecture |                       Tested On |
 |:------------------------------|:------------:|--------------------------------:|
 | Windows (Windows Server 2022) |     x64      | JDK 1.8, JDK 11, JDK 17, JDK 21 |
-| Windows 11                    |     Aarch64  | JDK 8                           |
+| Windows 11                    |   Aarch64    |                           JDK 8 |
 | Linux (CentOS 6)              |     x64      | JDK 1.8, JDK 11, JDK 17, JDK 21 |
 | Linux (Ubuntu 18.04)          |   Aarch64    | JDK 1.8, JDK 11, JDK 17, JDK 21 |
 | Linux (Ubuntu 18.04)          |    ARMv7     |         JDK 1.8, JDK 11, JDK 17 |
@@ -19,7 +19,9 @@ Brotli4j provides Brotli compression and decompression for Java.
 | macOS (Catalina)              |     x64      | JDK 1.8, JDK 11, JDK 17, JDK 21 |
 | macOS (Catalina)              |   Aarch64    | JDK 1.8, JDK 11, JDK 17, JDK 21 |
 
-#### *Install [Microsoft Visual C++ Redistributable](https://learn.microsoft.com/en-US/cpp/windows/latest-supported-vc-redist?view=msvc-170) before running this library on Windows
+> [!IMPORTANT]
+> Install [Microsoft Visual C++ Redistributable](https://learn.microsoft.com/en-US/cpp/windows/latest-supported-vc-redist?view=msvc-170) before running this
+> library on Windows
 
 ## Download
 
@@ -39,13 +41,14 @@ For maven, the natives will
 ### Gradle
 
 For gradle, some additional configuration must be added in order to allow gradle to resolve the correct native artifacts automatically,
-based on your architecture.  
-Do note that when creating a [distribution zip/tar](https://docs.gradle.org/current/userguide/distribution_plugin.html),
-this will cause the distribution to only have the natives for the architecture it was compiled on.
-In order to have it include all natives, some additional configuration would be necessary.
-(For example, creating a custom configuration which has the `all` operating system & architecture, similar to what is done for shadow)
-
+based on your architecture.
 This also supports [shadow](https://gradleup.com/shadow/), so that the shaded jar will contain the natives for *all* architectures.
+
+> [!NOTE]
+> Do note that when creating a [distribution zip/tar](https://docs.gradle.org/current/userguide/distribution_plugin.html),
+> this will cause the distribution to only have the natives for the architecture it was compiled on.
+> In order to have it include all natives, some additional configuration would be necessary.
+> (For example, creating a custom configuration which has the `all` operating system & architecture, similar to what is done for shadow)
 
 There are two ways it can be added:
 
@@ -74,10 +77,14 @@ dependencies {
 }
 ```
 
-#### Kotlin DSL
+> [!IMPORTANT]
+> Don't forget to also include the dependency metadata rule. You can see how to include the appropriate rule below based on which DSL you're using.
 
 <details>
-<summary><b>Project-Wide Configuration</b></summary>
+<summary><h4>Gradle Kotlin DSL</h4></summary>
+
+<details>
+<summary>Project-Wide Configuration</summary>
 
 To configure the rule to be used project-wide, in addition to the below `Brotli4JRule` class,
 this must also be added to the `settings.gradle.kts` file:
@@ -154,7 +161,7 @@ tasks {
 </details>
 
 <details>
-<summary><b>Subproject-Specific Configuration</b></summary>
+<summary>Subproject-Specific Configuration</summary>
 
 To configure the rule to be used in a specific subproject, in addition to the below `Brotli4JRule` class,
 this must also be added to the `build.gradle.kts` file:
@@ -282,10 +289,13 @@ abstract class Brotli4JRule : ComponentMetadataRule {
 }
 ```
 
-#### Groovy
+</details>
 
 <details>
-<summary><b>Project-Wide Configuration</b></summary>
+<summary><h4>Gradle Groovy DSL</h4></summary>
+
+<details>
+<summary>Project-Wide Configuration</summary>
 
 To configure the rule to be used project-wide, in addition to the below `Brotli4JRule` class,
 this must also be added to the `settings.gradle` file:
@@ -355,7 +365,7 @@ tasks {
 </details>
 
 <details>
-<summary><b>Subproject-Specific Configuration</b></summary>
+<summary>Subproject-Specific Configuration</summary>
 
 To configure the rule to be used in a specific subproject, in addition to the below `Brotli4JRule` class,
 this must also be added to the `build.gradle` file:
@@ -476,14 +486,19 @@ abstract class Brotli4JRule implements ComponentMetadataRule {
     }
 }
 ```
+</details>
 
 ## Usage
 
 ### Loading native library:
 
-Call `Brotli4jLoader.ensureAvailability()` in your application once before using Brotli4j. This will load
-Brotli4j native library automatically using automatic dependency resolution.
-However, its possible to load native library manually from custom path by specifying System Property `"brotli4j.library.path"`.
+
+> [!WARNING]
+> Call `Brotli4jLoader.ensureAvailability()` in your application once before using Brotli4j. This will load
+> Brotli4j native library automatically using automatic dependency resolution.
+
+> [!TIP]
+> However, its possible to load native library manually from custom path by specifying System Property `"brotli4j.library.path"`.
 
 ### Direct API
 
@@ -564,14 +579,15 @@ public class Example {
 
 ### Additional Notes
 
-* Windows-AArch64: Brotli4j is compiled with JDK 11 with JDK 8 as target because JDK 8 Windows Aarch64 builds are not available at the moment.
-However, it should not cause any problem on running it on JDK 8 or plus.
-__________________________________________________________________
+> [!NOTE]
+> Windows-AArch64: Brotli4j is compiled with JDK 11 with JDK 8 as target because JDK 8 Windows Aarch64 builds are not available at the moment.
+> However, it should not cause any problem on running it on JDK 8 or plus.
 
-* RISC-V64: This platform is only supported by JDK 11+ (i.e. JDK 11, JDK 17, JDK 21, atm.). However, Since Brotli4j was always compiled
-with JDK 8, we're cross-compiling RISC-V64 native module bytecode with JDK 8. This should not break existing application using
-Broti4j. However, you should use JDK 11+ for using Brotli4j on RISC-V64 platform.
-__________________________________________________________________
+> [!IMPORTANT]
+> RISC-V64: This platform is only supported by JDK 11+ (i.e. JDK 11, JDK 17, JDK 21, atm.).
+> However, Since Brotli4j was always compiled with JDK 8, we're cross-compiling RISC-V64 native module bytecode with JDK 8.
+> This should not break existing application using Broti4j.
+> However, you should use JDK 11+ for using Brotli4j on RISC-V64 platform.
 
 ## Projects that use Brotli4j
 
