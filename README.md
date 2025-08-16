@@ -34,7 +34,7 @@ For maven, the natives will
 <dependency>
     <groupId>com.aayushatharva.brotli4j</groupId>
     <artifactId>brotli4j</artifactId>
-    <version>1.18.0</version>
+    <version>1.19.0</version>
 </dependency>
 ```
 
@@ -72,8 +72,8 @@ To add the dependency, use:
 
 ```kotlin
 dependencies {
-    implementation("com.aayushatharva.brotli4j:brotli4j:1.18.0")
-    runtimeOnly("com.aayushatharva.brotli4j:natives:1.18.0")
+    implementation("com.aayushatharva.brotli4j:brotli4j:1.19.0")
+    runtimeOnly("com.aayushatharva.brotli4j:natives:1.19.0")
 }
 ```
 
@@ -145,7 +145,7 @@ If you are using the shadow gradle plugin, then in your `build.gradle.kts` inclu
 
 ```kotlin
 dependencies {
-    shaded("com.aayushatharva.brotli4j:natives:1.18.0")
+    shaded("com.aayushatharva.brotli4j:natives:1.19.0")
 }
 
 tasks {
@@ -215,7 +215,7 @@ val shaded by configurations.registering {
 }
 
 dependencies {
-    shaded("com.aayushatharva.brotli4j:natives:1.18.0")
+    shaded("com.aayushatharva.brotli4j:natives:1.19.0")
 }
 
 tasks {
@@ -352,7 +352,7 @@ If you are using the shadow gradle plugin, then in your `build.gradle` include:
 
 ```kotlin
 dependencies {
-    shaded("com.aayushatharva.brotli4j:natives:1.18.0")
+    shaded("com.aayushatharva.brotli4j:natives:1.19.0")
 }
 
 tasks {
@@ -418,7 +418,7 @@ configurations.register("shaded") {
 }
 
 dependencies {
-    shaded("com.aayushatharva.brotli4j:natives:1.18.0")
+    shaded("com.aayushatharva.brotli4j:natives:1.19.0")
 }
 
 tasks {

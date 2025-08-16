@@ -22,11 +22,12 @@
     <parent>
         <artifactId>natives</artifactId>
         <groupId>com.aayushatharva.brotli4j</groupId>
-        <version>1.18.0</version>
+        <version>1.19.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>native-osx-aarch64</artifactId>
+    <name>Brotli4j</name>
     <packaging>jar</packaging>
 
     <properties>
