@@ -26,6 +26,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>natives</artifactId>
+    <name>Brotli4j</name>
     <packaging>pom</packaging>
     <modules>
         <module>linux-x86_64</module>

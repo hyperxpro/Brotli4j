@@ -10,6 +10,7 @@
     </parent>
 
     <artifactId>service</artifactId>
+    <name>Brotli4j</name>
     <packaging>jar</packaging>
 
     <properties>
