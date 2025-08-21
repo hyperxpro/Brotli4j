@@ -22,7 +22,7 @@
     <parent>
         <artifactId>brotli4j-parent</artifactId>
         <groupId>com.aayushatharva.brotli4j</groupId>
-        <version>1.19.0</version>
+        <version>1.20.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
