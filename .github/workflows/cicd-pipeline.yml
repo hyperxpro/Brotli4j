@@ -840,16 +840,21 @@ jobs:
           path: release-bundle
       - name: Merge all build artifacts into one directory
         run: |
-          mkdir -p release-bundle/merged
-          cp -rn release-bundle/Linux-Aarch64-Build-JDK8/Brotli4j/* release-bundle/merged/ || true
-          cp -rn release-bundle/Linux-ArmV7-Build-JDK8/Brotli4j/* release-bundle/merged/ || true
-          cp -rn release-bundle/Linux-ppc64le-Build-JDK8/Brotli4j/* release-bundle/merged/ || true
-          cp -rn release-bundle/Linux-riscv64-Build-JDK11/Brotli4j/* release-bundle/merged/ || true
-          cp -rn release-bundle/Linux-s390x-Build-JDK8/Brotli4j/* release-bundle/merged/ || true
-          cp -rn release-bundle/Linux-x86_64-Build-JDK8/Brotli4j/* release-bundle/merged/ || true
-          cp -rn release-bundle/MacOS-x86_64-Build-JDK8/Brotli4j/* release-bundle/merged/ || true
-          cp -rn release-bundle/Windows-ARM-Build-JDK8/Brotli4j/* release-bundle/merged/ || true
-          cp -rn release-bundle/Windows-x86_64-Build-JDK8/Brotli4j/* release-bundle/merged/ || true
+          mv release-bundle/Linux-x86_64-Build-JDK8/Brotli4j/natives/linux-x86_64/target/ natives/linux-x86_64/target
+          mv release-bundle/Linux-Aarch64-Build-JDK8/Brotli4j/natives/linux-aarch64/target/ natives/linux-aarch64/target
+          mv release-bundle/Linux-ArmV7-Build-JDK8/Brotli4j/natives/linux-armv7/target/ natives/linux-armv7/target
+          mv release-bundle/Linux-ppc64le-Build-JDK8/Brotli4j/natives/linux-ppc64le/target/ natives/linux-ppc64le/target
+          mv release-bundle/Linux-riscv64-Build-JDK11/Brotli4j/natives/linux-riscv64/target/ natives/linux-riscv64/target
+          mv release-bundle/Linux-s390x-Build-JDK8/Brotli4j/natives/linux-s390x/target/ natives/linux-s390x/target
+          mv release-bundle/Windows-ARM-Build-JDK8/Brotli4j/natives/windows-aarch64/target/ natives/windows-aarch64/target
+          mv release-bundle/Windows-x86_64-Build-JDK8/Brotli4j/natives/windows-x86_64/target/ natives/windows-x86_64/target
+          
+          # Both MacOS builds are done on x86_64 using cross-compilation, so we need to copy both.
+          mkdir natives/osx-x86_64/target
+          cp -r release-bundle/MacOS-x86_64-Build-JDK8/Brotli4j/natives/osx-x86_64/target/ natives/osx-x86_64/target
+          
+          mkdir natives/osx-aarch64/target
+          cp -r release-bundle/MacOS-x86_64-Build-JDK8/Brotli4j/natives/osx-aarch64/target/ natives/osx-aarch64/target
       - name: Set up JDK 8 for deploy
         uses: actions/setup-java@v4
         with:
@@ -874,5 +879,4 @@ jobs:
           passphrase: ${{ secrets.GPG_PASSPHRASE }}
       - name: Deploy to Maven Central
         run: |
-          cd release-bundle/merged
-          mvn deploy -ntp -B -Dmaven.main.skip -DskipTests -Dexec.skip
+          mvn deploy -ntp -B -DskipTests -Dexec.skip
