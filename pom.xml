@@ -96,7 +96,7 @@
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-buffer</artifactId>
-            <version>4.2.3.Final</version>
+            <version>4.2.4.Final</version>
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>
@@ -165,7 +165,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.11.2</version>
+                <version>3.11.3</version>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
@@ -189,7 +189,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
-                <version>3.2.7</version>
+                <version>3.2.8</version>
                 <executions>
                     <execution>
                         <id>sign-artifacts</id>
