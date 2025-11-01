@@ -35,7 +35,7 @@ jobs:
       - name: Build with Maven
         run: mvn -B --show-version -ntp clean package --file pom.xml
       - name: Upload the build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: MacOS-x86_64-Build-JDK8
           path: /Users/runner/work/Brotli4j/
@@ -86,7 +86,7 @@ jobs:
       - name: build centos6
         run: docker compose -f docker/docker-compose.yml run build
       - name: Upload the build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: Linux-x86_64-Build-JDK8
           path: /home/runner/work/Brotli4j/
@@ -155,7 +155,7 @@ jobs:
             ./mvnw -B --show-version -ntp clean package
 
       - name: Upload the build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: Linux-Aarch64-Build-JDK8
           path: /home/runner/work/Brotli4j/
@@ -327,7 +327,7 @@ jobs:
             ./mvnw -B --show-version -ntp clean package
 
       - name: Upload the build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: Linux-ArmV7-Build-JDK8
           path: /home/runner/work/Brotli4j/
@@ -459,7 +459,7 @@ jobs:
             ./mvnw -B --show-version -ntp clean package
 
       - name: Upload the build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: Linux-s390x-Build-JDK8
           path: /home/runner/work/Brotli4j/
@@ -547,7 +547,7 @@ jobs:
             chmod +x ./mvnw
             ./mvnw -B -ntp clean package
       - name: Upload the build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: Linux-ppc64le-Build-JDK8
           path: /home/runner/work/Brotli4j/
@@ -632,7 +632,7 @@ jobs:
             ./mvnw -B --show-version -ntp clean package
 
       - name: Upload the build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: Linux-riscv64-Build-JDK11
           path: /home/runner/work/Brotli4j/
@@ -735,7 +735,7 @@ jobs:
       - name: Build with Maven
         run: mvn -B --show-version -ntp clean package --file pom.xml
       - name: Upload the build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: Windows-x86_64-Build-JDK8
           path: D:\a\Brotli4j\
@@ -814,7 +814,7 @@ jobs:
           dumpbin /headers "natives\windows-aarch64\target\classes\lib\windows-aarch64\brotli.dll" | findstr /C:"machine (ARM64)" || exit /b 1
         shell: cmd
       - name: Upload the build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: Windows-ARM-Build-JDK8
           path: D:\a\Brotli4j\
@@ -835,7 +835,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Download all build artifacts
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           path: release-bundle
       - name: Merge all build artifacts into one directory
