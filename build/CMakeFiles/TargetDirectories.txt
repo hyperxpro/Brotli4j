@@ -1,0 +1,3 @@
+/workspaces/Brotli4j/build/CMakeFiles/brotli.dir
+/workspaces/Brotli4j/build/CMakeFiles/edit_cache.dir
+/workspaces/Brotli4j/build/CMakeFiles/rebuild_cache.dir
