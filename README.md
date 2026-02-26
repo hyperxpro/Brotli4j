@@ -603,6 +603,7 @@ public class Example {
 - [Apache NiFi](https://github.com/apache/nifi)
 - [quarkus](https://github.com/quarkusio/quarkus)
 - [sbt-web-brotli](https://github.com/dwickern/sbt-web-brotli)
+- [hardwood](https://github.com/hardwood-hq/hardwood)
 
 ## Sponsors
 
