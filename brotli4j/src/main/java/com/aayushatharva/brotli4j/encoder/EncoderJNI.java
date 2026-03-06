@@ -29,9 +29,8 @@ public class EncoderJNI {
         FINISH
     }
 
-    private static class PreparedDictionaryImpl implements PreparedDictionary {
+    private static class PreparedDictionaryImpl implements PreparedDictionary, AutoCloseable {
         private ByteBuffer data;
-        /** Reference to (non-copied) LZ data. */
         private ByteBuffer rawData;
 
         private PreparedDictionaryImpl(ByteBuffer data, ByteBuffer rawData) {
@@ -45,15 +44,11 @@ public class EncoderJNI {
         }
 
         @Override
-        protected void finalize() throws Throwable {
-            try {
-                ByteBuffer data = this.data;
-                this.data = null;
-                this.rawData = null;
-                nativeDestroyDictionary(data);
-            } finally {
-                super.finalize();
-            }
+        public void close() {
+            ByteBuffer data = this.data;
+            this.data = null;
+            this.rawData = null;
+            nativeDestroyDictionary(data);
         }
     }
 
@@ -171,13 +166,5 @@ public class EncoderJNI {
             context[0] = 0;
         }
 
-        @Override
-        protected void finalize() throws Throwable {
-            if (context[0] != 0) {
-                /* TODO(eustas): log resource leak? */
-                destroy();
-            }
-            super.finalize();
-        }
     }
 }
