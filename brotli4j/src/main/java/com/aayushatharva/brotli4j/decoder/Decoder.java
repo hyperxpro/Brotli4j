@@ -19,7 +19,7 @@ import java.util.ArrayList;
  */
 @Upstream
 @Local
-public class Decoder {
+public class Decoder implements AutoCloseable {
     private static final ByteBuffer EMPTY_BUFFER = ByteBuffer.allocate(0);
     private final ReadableByteChannel source;
     private final DecoderJNI.Wrapper decoder;
@@ -197,8 +197,9 @@ public class Decoder {
         return limit;
     }
 
+    @Override
     @Upstream
-    void close() throws IOException {
+    public void close() throws IOException {
         if (closed) {
             return;
         }

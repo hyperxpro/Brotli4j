@@ -129,13 +129,5 @@ public class DecoderJNI {
             context[0] = 0;
         }
 
-        @Override
-        protected void finalize() throws Throwable {
-            if (context[0] != 0) {
-                /* TODO: log resource leak? */
-                destroy();
-            }
-            super.finalize();
-        }
     }
 }
