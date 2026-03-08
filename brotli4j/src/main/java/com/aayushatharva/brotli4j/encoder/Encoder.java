@@ -20,7 +20,7 @@ import java.util.List;
  */
 @Upstream
 @Local
-public class Encoder {
+public class Encoder implements AutoCloseable {
     private final WritableByteChannel destination;
     private final List<PreparedDictionary> dictionaries;
     private final EncoderJNI.Wrapper encoder;
@@ -205,8 +205,9 @@ public class Encoder {
         encode(EncoderJNI.Operation.FLUSH);
     }
 
+    @Override
     @Upstream
-    void close() throws IOException {
+    public void close() throws IOException {
         if (closed) {
             return;
         }
