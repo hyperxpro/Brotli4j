@@ -5,6 +5,13 @@ updates:
     schedule:
       interval: "monthly"
     open-pull-requests-limit: 1
+    ignore:
+      - dependency-name: "org.junit.jupiter:junit-jupiter-api"
+        update-types:
+          - "version-update:semver-major"
+      - dependency-name: "org.junit.jupiter:junit-jupiter-engine"
+        update-types:
+          - "version-update:semver-major"
     groups:
       dependencies:
         patterns:
