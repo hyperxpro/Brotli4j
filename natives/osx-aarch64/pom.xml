@@ -39,7 +39,7 @@
             <plugin>
                 <groupId>org.moditect</groupId>
                 <artifactId>moditect-maven-plugin</artifactId>
-                <version>1.3.0.Final</version>
+                <version>${moditect.version}</version>
                 <executions>
                     <execution>
                         <id>add-module-infos</id>
