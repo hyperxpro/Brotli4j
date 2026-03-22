@@ -39,7 +39,7 @@
             <plugin>
                 <groupId>org.moditect</groupId>
                 <artifactId>moditect-maven-plugin</artifactId>
-                <version>1.0.0.RC2</version>
+                <version>${moditect.version}</version>
                 <executions>
                     <execution>
                         <id>add-module-infos</id>
@@ -85,7 +85,7 @@
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>exec-maven-plugin</artifactId>
-                        <version>3.5.1</version>
+                        <version>3.6.3</version>
                         <executions>
                             <execution>
                                 <id>build-native</id>
