@@ -631,6 +631,9 @@ jobs:
             chmod +x ./mvnw
             ./mvnw -B --show-version -ntp clean package
 
+      - name: Fix file permissions
+        run: sudo chmod -R a+r /home/runner/work/Brotli4j/
+
       - name: Upload the build
         uses: actions/upload-artifact@v7
         with:
