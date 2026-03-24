@@ -876,7 +876,7 @@ jobs:
               "password": "${{ secrets.OSSRH_PASSWORD }}"
             }]
       - name: Import GPG
-        uses: crazy-max/ghaction-import-gpg@v6.3.0
+        uses: crazy-max/ghaction-import-gpg@v7.0.0
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.GPG_PASSPHRASE }}
