@@ -69,8 +69,8 @@
 
         <!-- JDK-sensitive versions: defaults target the lowest supported JDK (8).
              Profiles below override these for higher JDKs. -->
-        <moditect.version>1.0.0.RC2</moditect.version>
-        <junit.version>5.14.1</junit.version>
+        <moditect.version>1.0.0.Final</moditect.version>
+        <junit.version>5.14.3</junit.version>
     </properties>
 
     <profiles>
