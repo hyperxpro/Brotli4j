@@ -160,7 +160,7 @@
             <activation>
                 <os>
                     <family>Mac</family>
-                    <arch>x86_64</arch>
+                    <arch>aarch64</arch>
                 </os>
             </activation>
             <modules>
@@ -173,7 +173,7 @@
             <activation>
                 <os>
                     <family>Mac</family>
-                    <arch>x86_64</arch> <!-- Run this on x86_64, so we can cross-compile for aarch64-->
+                    <arch>aarch64</arch> <!-- Cross-compile for aarch64 using cmake -->
                 </os>
             </activation>
             <modules>

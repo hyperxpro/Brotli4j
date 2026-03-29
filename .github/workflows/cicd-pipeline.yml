@@ -23,7 +23,7 @@ permissions:
 jobs:
 
   MacOS-x86_64-Build-JDK8:
-    runs-on: macos-latest
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v6
       - name: Set up JDK 8
@@ -31,7 +31,6 @@ jobs:
         with:
           distribution: 'corretto'
           java-version: 8
-          architecture: x64
       - name: Build with Maven
         run: mvn -B --show-version -ntp clean package --file pom.xml
       - name: Upload the build
@@ -41,7 +40,7 @@ jobs:
           path: /Users/runner/work/Brotli4j/
 
   MacOS-x86_64-Build-JDK11:
-    runs-on: macos-latest
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v6
       - name: Set up JDK 11
@@ -49,12 +48,11 @@ jobs:
         with:
           distribution: 'corretto'
           java-version: 11
-          architecture: x64
       - name: Build with Maven
         run: mvn -B --show-version -ntp --file pom.xml clean package
 
   MacOS-x86_64-Build-JDK17:
-    runs-on: macos-latest
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v6
       - name: Set up JDK 17
@@ -62,12 +60,11 @@ jobs:
         with:
           distribution: 'corretto'
           java-version: 17
-          architecture: x64
       - name: Build with Maven
         run: mvn -B --show-version -ntp --file pom.xml clean package
 
   MacOS-x86_64-Build-JDK21:
-    runs-on: macos-latest
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v6
       - name: Set up JDK 21
@@ -75,7 +72,6 @@ jobs:
         with:
           distribution: 'corretto'
           java-version: 21
-          architecture: x64
       - name: Build with Maven
         run: mvn -B --show-version -ntp --file pom.xml clean package
 
@@ -822,7 +818,7 @@ jobs:
           name: Windows-ARM-Build-JDK8
           path: D:\a\Brotli4j\
 
-  Release-to-Maven:
+  Validate-Native-Binaries:
     needs:
       - Linux-Aarch64-Build-JDK8
       - Linux-ArmV7-Build-JDK8
@@ -833,6 +829,19 @@ jobs:
       - MacOS-x86_64-Build-JDK8
       - Windows-ARM-Build-JDK8
       - Windows-x86_64-Build-JDK8
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v8
+        with:
+          path: release-bundle
+      - name: Validate native binaries
+        run: bash .github/scripts/validate-native-binaries.sh --bundle release-bundle
+
+  Release-to-Maven:
+    needs:
+      - Validate-Native-Binaries
     if: github.event_name == 'workflow_dispatch' && inputs.do_release == true
     runs-on: ubuntu-latest
     steps:
@@ -841,23 +850,8 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           path: release-bundle
-      - name: Merge all build artifacts into one directory
-        run: |
-          mv release-bundle/Linux-x86_64-Build-JDK8/Brotli4j/natives/linux-x86_64/target/ natives/linux-x86_64/target
-          mv release-bundle/Linux-Aarch64-Build-JDK8/Brotli4j/natives/linux-aarch64/target/ natives/linux-aarch64/target
-          mv release-bundle/Linux-ArmV7-Build-JDK8/Brotli4j/natives/linux-armv7/target/ natives/linux-armv7/target
-          mv release-bundle/Linux-ppc64le-Build-JDK8/Brotli4j/natives/linux-ppc64le/target/ natives/linux-ppc64le/target
-          mv release-bundle/Linux-riscv64-Build-JDK11/Brotli4j/natives/linux-riscv64/target/ natives/linux-riscv64/target
-          mv release-bundle/Linux-s390x-Build-JDK8/Brotli4j/natives/linux-s390x/target/ natives/linux-s390x/target
-          mv release-bundle/Windows-ARM-Build-JDK8/Brotli4j/natives/windows-aarch64/target/ natives/windows-aarch64/target
-          mv release-bundle/Windows-x86_64-Build-JDK8/Brotli4j/natives/windows-x86_64/target/ natives/windows-x86_64/target
-          
-          # Both MacOS builds are done on x86_64 using cross-compilation, so we need to copy both.
-          mkdir natives/osx-x86_64/target
-          cp -r release-bundle/MacOS-x86_64-Build-JDK8/Brotli4j/natives/osx-x86_64/target/ natives/osx-x86_64/target
-          
-          mkdir natives/osx-aarch64/target
-          cp -r release-bundle/MacOS-x86_64-Build-JDK8/Brotli4j/natives/osx-aarch64/target/ natives/osx-aarch64/target
+      - name: Merge and validate native binaries
+        run: bash .github/scripts/validate-native-binaries.sh --bundle release-bundle
       - name: Set up JDK 8 for deploy
         uses: actions/setup-java@v5
         with:
