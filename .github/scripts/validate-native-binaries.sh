@@ -106,7 +106,21 @@ detect_pe() {
         pei-x86-64)  echo "x86_64:64" ;;
         pei-aarch64) echo "arm64:64" ;;
         pei-i386)    echo "x86:32" ;;
-        *)           echo "unknown:unknown" ;;
+        *)
+            # objdump may not support PE Aarch64; read Machine from PE header.
+            # DOS header byte 60: 4-byte LE offset to PE signature.
+            # PE signature + 4: Machine (2-byte LE).
+            #   0x8664 = AMD64, 0xAA64 = ARM64, 0x014C = i386
+            local pe_offset machine
+            pe_offset=$(od -An -t u4 -j 60 -N 4 "$f" 2>/dev/null | tr -d ' \n') || { echo "unknown:unknown"; return; }
+            machine=$(od -An -t x2 -j $((pe_offset + 4)) -N 2 "$f" 2>/dev/null | tr -d ' \n') || { echo "unknown:unknown"; return; }
+            case "$machine" in
+                8664) echo "x86_64:64" ;;
+                aa64) echo "arm64:64" ;;
+                014c) echo "x86:32" ;;
+                *)    echo "unknown:unknown" ;;
+            esac
+            ;;
     esac
 }
 
