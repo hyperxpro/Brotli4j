@@ -56,6 +56,22 @@ Java_com_aayushatharva_brotli4j_decoder_DecoderJNI_nativePull(
     JNIEnv* env, jobject /*jobj*/, jlongArray ctx);
 
 /**
+ * Pull decompressed data from decoder, capped to at most max_bytes per call.
+ *
+ * When max_bytes <= 0, behaves identically to nativePull (no cap).
+ *
+ * @param ctx {in_cookie, out_status} tuple
+ * @param max_bytes maximum number of bytes to return in this pull; <= 0 means
+ *                  no cap
+ * @returns direct ByteBuffer (size <= max_bytes when max_bytes > 0); all the
+ *          produced data MUST be consumed before any further invocation; null
+ *          in case of error
+ */
+JNIEXPORT jobject JNICALL
+Java_com_aayushatharva_brotli4j_decoder_DecoderJNI_nativePullBounded(
+    JNIEnv* env, jobject /*jobj*/, jlongArray ctx, jint max_bytes);
+
+/**
  * Releases all used resources.
  *
  * @param ctx {in_cookie} tuple

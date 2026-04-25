@@ -66,8 +66,25 @@ public final class Decoders {
      */
     @Local
     public static DirectDecompress decompress(ByteBuf compressed, ByteBuf decompressed) throws IOException {
+        return decompress(compressed, decompressed, 0);
+    }
+
+    /**
+     * Decodes the given data buffer, failing if decompressed output would
+     * exceed {@code maxOutputSize} bytes. Use to mitigate decompression bombs.
+     *
+     * @param compressed    {@link ByteBuf} source
+     * @param decompressed  {@link ByteBuf} destination
+     * @param maxOutputSize cap on total decompressed bytes; {@code 0} for no cap
+     * @return {@link DirectDecompress} instance
+     * @throws IOException If output exceeds {@code maxOutputSize}
+     */
+    @Local
+    public static DirectDecompress decompress(ByteBuf compressed, ByteBuf decompressed, int maxOutputSize)
+            throws IOException {
         int compressedBytes = compressed.readableBytes();
         DecoderJNI.Wrapper decoder = new DecoderJNI.Wrapper(compressedBytes);
+        int totalOutputSize = 0;
         try {
             decoder.getInputBuffer().put(compressed.nioBuffer());
             decoder.push(compressedBytes);
@@ -78,8 +95,15 @@ public final class Decoders {
                         break;
 
                     case NEEDS_MORE_OUTPUT:
-                        ByteBuffer buffer = decoder.pull();
+                        ByteBuffer buffer = maxOutputSize > 0
+                                ? decoder.pull(Math.max(1, maxOutputSize - totalOutputSize))
+                                : decoder.pull();
+                        totalOutputSize += buffer.remaining();
                         decompressed.writeBytes(buffer);
+                        if (maxOutputSize > 0 && totalOutputSize >= maxOutputSize
+                                && decoder.getStatus() == DecoderJNI.Status.NEEDS_MORE_OUTPUT) {
+                            throw new IOException("decompressed size exceeds maximum size " + maxOutputSize);
+                        }
                         break;
 
                     case NEEDS_MORE_INPUT:

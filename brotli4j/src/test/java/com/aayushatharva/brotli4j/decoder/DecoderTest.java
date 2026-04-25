@@ -17,14 +17,20 @@
 package com.aayushatharva.brotli4j.decoder;
 
 import com.aayushatharva.brotli4j.Brotli4jLoader;
+import com.aayushatharva.brotli4j.encoder.Encoder;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DecoderTest {
 
@@ -50,5 +56,95 @@ class DecoderTest {
         DirectDecompress directDecompress = Decoders.decompress(src, dst);
         assertEquals(DecoderJNI.Status.DONE, directDecompress.getResultStatus());
         assertEquals("Meow", new String(directDecompress.getDecompressedData()));
+    }
+
+    @Test
+    void boundedPullCapsEachChunk() throws IOException {
+        byte[] original = new byte[64 * 1024];
+        Arrays.fill(original, (byte) 'a');
+        byte[] compressed = Encoder.compress(original);
+
+        int cap = 4096;
+        DecoderJNI.Wrapper decoder = new DecoderJNI.Wrapper(compressed.length);
+        byte[] result = new byte[original.length];
+        int produced = 0;
+        try {
+            decoder.getInputBuffer().put(compressed);
+            decoder.push(compressed.length);
+            while (decoder.getStatus() != DecoderJNI.Status.DONE) {
+                switch (decoder.getStatus()) {
+                    case OK:
+                        decoder.push(0);
+                        break;
+                    case NEEDS_MORE_OUTPUT:
+                        ByteBuffer chunk = decoder.pull(cap);
+                        assertTrue(chunk.remaining() <= cap,
+                                "pull(int) returned " + chunk.remaining() + " > cap " + cap);
+                        int n = chunk.remaining();
+                        chunk.get(result, produced, n);
+                        produced += n;
+                        break;
+                    default:
+                        throw new IOException("unexpected status " + decoder.getStatus());
+                }
+            }
+        } finally {
+            decoder.destroy();
+        }
+        assertEquals(original.length, produced);
+        assertArrayEquals(original, result);
+    }
+
+    @Test
+    void wrapperConstructorAppliesStickyCap() throws IOException {
+        byte[] original = new byte[64 * 1024];
+        Arrays.fill(original, (byte) 'b');
+        byte[] compressed = Encoder.compress(original);
+
+        int cap = 8192;
+        DecoderJNI.Wrapper decoder = new DecoderJNI.Wrapper(compressed.length, cap);
+        try {
+            decoder.getInputBuffer().put(compressed);
+            decoder.push(compressed.length);
+            while (decoder.getStatus() != DecoderJNI.Status.DONE) {
+                switch (decoder.getStatus()) {
+                    case OK:
+                        decoder.push(0);
+                        break;
+                    case NEEDS_MORE_OUTPUT:
+                        ByteBuffer chunk = decoder.pull();
+                        assertTrue(chunk.remaining() <= cap,
+                                "sticky cap not applied: chunk=" + chunk.remaining());
+                        break;
+                    default:
+                        throw new IOException("unexpected status " + decoder.getStatus());
+                }
+            }
+        } finally {
+            decoder.destroy();
+        }
+    }
+
+    @Test
+    void decompressRejectsOutputExceedingMax() throws IOException {
+        byte[] original = new byte[64 * 1024];
+        Arrays.fill(original, (byte) 'c');
+        byte[] compressed = Encoder.compress(original);
+
+        IOException ex = assertThrows(IOException.class,
+                () -> Decoder.decompress(compressed, 1024));
+        assertTrue(ex.getMessage().contains("maximum size"),
+                "unexpected message: " + ex.getMessage());
+    }
+
+    @Test
+    void decompressWithMaxOutputAllowsExactFit() throws IOException {
+        byte[] original = new byte[8 * 1024];
+        Arrays.fill(original, (byte) 'd');
+        byte[] compressed = Encoder.compress(original);
+
+        DirectDecompress result = Decoder.decompress(compressed, original.length);
+        assertEquals(DecoderJNI.Status.DONE, result.getResultStatus());
+        assertArrayEquals(original, result.getDecompressedData());
     }
 }

@@ -5,6 +5,7 @@
 */
 package com.aayushatharva.brotli4j.decoder;
 
+import com.aayushatharva.brotli4j.common.annotations.Local;
 import com.aayushatharva.brotli4j.common.annotations.Upstream;
 
 import java.io.IOException;
@@ -21,6 +22,8 @@ public class DecoderJNI {
 
     private static native ByteBuffer nativePull(long[] context);
 
+    private static native ByteBuffer nativePullBounded(long[] context, int maxBytes);
+
     private static native void nativeDestroy(long[] context);
 
     private static native boolean nativeAttachDictionary(long[] context, ByteBuffer dictionary);
@@ -36,10 +39,31 @@ public class DecoderJNI {
     public static class Wrapper {
         private final long[] context = new long[3];
         private final ByteBuffer inputBuffer;
+        private final int maxOutputChunkSize;
         private Status lastStatus = Status.NEEDS_MORE_INPUT;
         private boolean fresh = true;
 
         public Wrapper(int inputBufferSize) throws IOException {
+            this(inputBufferSize, 0);
+        }
+
+        /**
+         * Creates a Wrapper that caps every {@link #pull()} to at most
+         * {@code maxOutputChunkSize} bytes. A zero-or-negative value disables
+         * the cap (equivalent to the single-argument constructor).
+         *
+         * <p>Use this to bound peak memory when streaming potentially-malicious
+         * compressed input: each pull returns a {@link ByteBuffer} whose
+         * {@code remaining()} is at most {@code maxOutputChunkSize}, with
+         * remaining decoded output served by subsequent pulls.
+         *
+         * @param inputBufferSize     size of the decoder's input buffer
+         * @param maxOutputChunkSize  per-pull output cap in bytes; {@code 0} for no cap
+         * @throws IOException if native decoder initialization fails
+         */
+        @Local
+        public Wrapper(int inputBufferSize, int maxOutputChunkSize) throws IOException {
+            this.maxOutputChunkSize = Math.max(maxOutputChunkSize, 0);
             this.context[1] = inputBufferSize;
             this.inputBuffer = nativeCreate(this.context);
             if (this.context[0] == 0) {
@@ -113,7 +137,34 @@ public class DecoderJNI {
                 throw new IllegalStateException("pulling output from decoder in " + lastStatus + " state");
             }
             fresh = false;
-            ByteBuffer result = nativePull(context);
+            ByteBuffer result = (maxOutputChunkSize > 0)
+                    ? nativePullBounded(context, maxOutputChunkSize)
+                    : nativePull(context);
+            parseStatus();
+            return result;
+        }
+
+        /**
+         * Pulls decompressed output, returning at most {@code maxBytes} bytes.
+         * Use this to bound a single allocation when handling untrusted input;
+         * any remaining decoded output is served by subsequent pulls.
+         *
+         * @param maxBytes positive upper bound on the returned buffer size
+         * @return direct {@link ByteBuffer} with {@code remaining() <= maxBytes}
+         */
+        @Local
+        public ByteBuffer pull(int maxBytes) {
+            if (maxBytes <= 0) {
+                throw new IllegalArgumentException("maxBytes must be positive");
+            }
+            if (context[0] == 0) {
+                throw new IllegalStateException("brotli decoder is already destroyed");
+            }
+            if (lastStatus != Status.NEEDS_MORE_OUTPUT && !hasOutput()) {
+                throw new IllegalStateException("pulling output from decoder in " + lastStatus + " state");
+            }
+            fresh = false;
+            ByteBuffer result = nativePullBounded(context, maxBytes);
             parseStatus();
             return result;
         }

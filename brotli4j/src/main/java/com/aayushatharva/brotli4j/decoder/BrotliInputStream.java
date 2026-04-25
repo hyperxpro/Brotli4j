@@ -5,6 +5,7 @@
 */
 package com.aayushatharva.brotli4j.decoder;
 
+import com.aayushatharva.brotli4j.common.annotations.Local;
 import com.aayushatharva.brotli4j.common.annotations.Upstream;
 
 import java.io.IOException;
@@ -33,7 +34,21 @@ public class BrotliInputStream extends InputStream {
      */
     public BrotliInputStream(InputStream source, int bufferSize)
             throws IOException {
-        this.decoder = new Decoder(Channels.newChannel(source), bufferSize);
+        this(source, bufferSize, 0);
+    }
+
+    /**
+     * Creates a BrotliInputStream with a per-pull output cap.
+     *
+     * @param source             underlying source
+     * @param bufferSize         intermediate buffer size
+     * @param maxOutputChunkSize per-pull output cap in bytes; {@code 0} for no cap
+     * @throws IOException If any failure during initialization
+     */
+    @Local
+    public BrotliInputStream(InputStream source, int bufferSize, int maxOutputChunkSize)
+            throws IOException {
+        this.decoder = new Decoder(Channels.newChannel(source), bufferSize, maxOutputChunkSize);
     }
 
     /**

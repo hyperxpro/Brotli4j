@@ -50,6 +50,20 @@ public final class DirectDecompress {
     }
 
     /**
+     * Initiate direct decompression of data, failing if the decompressed
+     * output would exceed {@code maxOutputSize} bytes. Use to mitigate
+     * decompression bombs.
+     *
+     * @param compressedData Compressed data as Byte Array
+     * @param maxOutputSize  cap on total decompressed bytes; {@code 0} for no cap
+     * @return {@link DirectDecompress} Instance
+     * @throws IOException If output exceeds {@code maxOutputSize}, or other decoding error
+     */
+    public static DirectDecompress decompress(byte[] compressedData, int maxOutputSize) throws IOException {
+        return Decoder.decompress(compressedData, maxOutputSize);
+    }
+
+    /**
      * Get the result of decompression.
      *
      * @return {@link DecoderJNI.Status}
