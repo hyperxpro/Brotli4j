@@ -26,7 +26,7 @@ import java.lang.annotation.Target;
  * represents code which created locally and not in sync with
  * Google Brotli upstream repository.
  */
-@Target({ElementType.FIELD, ElementType.TYPE, ElementType.METHOD})
+@Target({ElementType.FIELD, ElementType.TYPE, ElementType.METHOD, ElementType.CONSTRUCTOR})
 @Retention(RetentionPolicy.SOURCE)
 public @interface Local {
 }

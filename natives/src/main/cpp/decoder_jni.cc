@@ -159,19 +159,16 @@ Java_com_aayushatharva_brotli4j_decoder_DecoderJNI_nativePush(
 }
 
 /**
- * Pull decompressed data from decoder.
+ * Pull decompressed data from decoder, optionally capped to max_bytes.
  *
- * @param ctx {in_cookie, out_status} tuple
- * @returns direct ByteBuffer; all the produced data MUST be consumed before
- *          any further invocation; null in case of error
+ * When max_bytes is 0, the underlying call returns all currently available
+ * output (up to brotli's internal default).
  */
-JNIEXPORT jobject JNICALL
-Java_com_aayushatharva_brotli4j_decoder_DecoderJNI_nativePull(
-    JNIEnv* env, jobject /*jobj*/, jlongArray ctx) {
+static jobject pullImpl(JNIEnv* env, jlongArray ctx, size_t max_bytes) {
   jlong context[3];
   env->GetLongArrayRegion(ctx, 0, 3, context);
   DecoderHandle* handle = getHandle(reinterpret_cast<void*>(context[0]));
-  size_t data_length = 0;
+  size_t data_length = max_bytes;
   const uint8_t* data = BrotliDecoderTakeOutput(handle->state, &data_length);
   bool hasMoreOutput = !!BrotliDecoderHasMoreOutput(handle->state);
   if (hasMoreOutput) {
@@ -186,6 +183,29 @@ Java_com_aayushatharva_brotli4j_decoder_DecoderJNI_nativePull(
   context[2] = hasMoreOutput ? 1 : 0;
   env->SetLongArrayRegion(ctx, 0, 3, context);
   return env->NewDirectByteBuffer(const_cast<uint8_t*>(data), data_length);
+}
+
+/**
+ * Pull decompressed data from decoder.
+ *
+ * @param ctx {in_cookie, out_status} tuple
+ * @returns direct ByteBuffer; all the produced data MUST be consumed before
+ *          any further invocation; null in case of error
+ */
+JNIEXPORT jobject JNICALL
+Java_com_aayushatharva_brotli4j_decoder_DecoderJNI_nativePull(
+    JNIEnv* env, jobject /*jobj*/, jlongArray ctx) {
+  return pullImpl(env, ctx, 0);
+}
+
+/**
+ * Pull decompressed data from decoder, capped to at most max_bytes per call.
+ */
+JNIEXPORT jobject JNICALL
+Java_com_aayushatharva_brotli4j_decoder_DecoderJNI_nativePullBounded(
+    JNIEnv* env, jobject /*jobj*/, jlongArray ctx, jint max_bytes) {
+  size_t cap = (max_bytes > 0) ? static_cast<size_t>(max_bytes) : 0;
+  return pullImpl(env, ctx, cap);
 }
 
 /**

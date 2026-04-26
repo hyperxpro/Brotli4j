@@ -22,6 +22,9 @@ static const JNINativeMethod kDecoderMethods[] = {
     {"nativePull", "([J)Ljava/nio/ByteBuffer;",
      reinterpret_cast<void*>(
          Java_com_aayushatharva_brotli4j_decoder_DecoderJNI_nativePull)},
+    {"nativePullBounded", "([JI)Ljava/nio/ByteBuffer;",
+     reinterpret_cast<void*>(
+         Java_com_aayushatharva_brotli4j_decoder_DecoderJNI_nativePullBounded)},
     {"nativeDestroy", "([J)V",
      reinterpret_cast<void*>(
          Java_com_aayushatharva_brotli4j_decoder_DecoderJNI_nativeDestroy)},

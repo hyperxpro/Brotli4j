@@ -36,6 +36,20 @@ public class Decoder implements AutoCloseable {
      */
     public Decoder(ReadableByteChannel source, int inputBufferSize)
             throws IOException {
+        this(source, inputBufferSize, 0);
+    }
+
+    /**
+     * Creates a Decoder wrapper with a per-pull output cap.
+     *
+     * @param source             underlying source
+     * @param inputBufferSize    read buffer size
+     * @param maxOutputChunkSize per-pull output cap in bytes; {@code 0} for no cap
+     * @throws IOException If any failure during initialization
+     */
+    @Local
+    public Decoder(ReadableByteChannel source, int inputBufferSize, int maxOutputChunkSize)
+            throws IOException {
         if (inputBufferSize <= 0) {
             throw new IllegalArgumentException("buffer size must be positive");
         }
@@ -43,7 +57,7 @@ public class Decoder implements AutoCloseable {
             throw new NullPointerException("source can not be null");
         }
         this.source = source;
-        this.decoder = new DecoderJNI.Wrapper(inputBufferSize);
+        this.decoder = new DecoderJNI.Wrapper(inputBufferSize, maxOutputChunkSize);
     }
 
     /**
@@ -55,6 +69,20 @@ public class Decoder implements AutoCloseable {
      */
     @Local
     public static DirectDecompress decompress(byte[] data) throws IOException {
+        return decompress(data, 0);
+    }
+
+    /**
+     * Decodes the given data buffer, failing if decompressed output would
+     * exceed {@code maxOutputSize} bytes. Use to mitigate decompression bombs.
+     *
+     * @param data          byte array of data to be decoded
+     * @param maxOutputSize cap on total decompressed bytes; {@code 0} for no cap
+     * @return {@link DirectDecompress} instance
+     * @throws IOException If an error occurs during decoding, or output exceeds {@code maxOutputSize}
+     */
+    @Local
+    public static DirectDecompress decompress(byte[] data, int maxOutputSize) throws IOException {
         DecoderJNI.Wrapper decoder = new DecoderJNI.Wrapper(data.length);
         ArrayList<byte[]> output = new ArrayList<>();
         int totalOutputSize = 0;
@@ -68,11 +96,17 @@ public class Decoder implements AutoCloseable {
                         break;
 
                     case NEEDS_MORE_OUTPUT:
-                        ByteBuffer buffer = decoder.pull();
+                        ByteBuffer buffer = maxOutputSize > 0
+                                ? decoder.pull(Math.max(1, maxOutputSize - totalOutputSize))
+                                : decoder.pull();
                         byte[] chunk = new byte[buffer.remaining()];
                         buffer.get(chunk);
                         output.add(chunk);
                         totalOutputSize += chunk.length;
+                        if (maxOutputSize > 0 && totalOutputSize >= maxOutputSize
+                                && decoder.getStatus() == DecoderJNI.Status.NEEDS_MORE_OUTPUT) {
+                            throw new IOException("decompressed size exceeds maximum size " + maxOutputSize);
+                        }
                         break;
 
                     case NEEDS_MORE_INPUT:
@@ -235,6 +269,72 @@ public class Decoder implements AutoCloseable {
                         // Give decoder a chance to process the remaining of the buffered byte.
                         decoder.push(0);
                         // If decoder still needs input, this means that stream is truncated.
+                        if (decoder.getStatus() == DecoderJNI.Status.NEEDS_MORE_INPUT) {
+                            throw new IOException("corrupted input");
+                        }
+                        break;
+
+                    default:
+                        throw new IOException("corrupted input");
+                }
+            }
+        } finally {
+            decoder.destroy();
+        }
+        if (output.size() == 1) {
+            return output.get(0);
+        }
+        byte[] result = new byte[totalOutputSize];
+        int resultOffset = 0;
+        for (byte[] chunk : output) {
+            System.arraycopy(chunk, 0, result, resultOffset, chunk.length);
+            resultOffset += chunk.length;
+        }
+        return result;
+    }
+
+    /**
+     * Decodes the given data buffer starting at offset till length, failing
+     * if decompressed output would exceed {@code maxOutputSize} bytes. Use to
+     * mitigate decompression bombs.
+     *
+     * @param data          source byte array
+     * @param offset        offset within {@code data}
+     * @param length        compressed length
+     * @param maxOutputSize cap on total decompressed bytes; {@code 0} for no cap
+     * @return decompressed bytes
+     * @throws IOException if input is corrupted, or output exceeds {@code maxOutputSize}
+     */
+    @Local
+    public static byte[] decompress(byte[] data, int offset, int length, int maxOutputSize) throws IOException {
+        DecoderJNI.Wrapper decoder = new DecoderJNI.Wrapper(length);
+        ArrayList<byte[]> output = new ArrayList<>();
+        int totalOutputSize = 0;
+        try {
+            decoder.getInputBuffer().put(data, offset, length);
+            decoder.push(length);
+            while (decoder.getStatus() != DecoderJNI.Status.DONE) {
+                switch (decoder.getStatus()) {
+                    case OK:
+                        decoder.push(0);
+                        break;
+
+                    case NEEDS_MORE_OUTPUT:
+                        ByteBuffer buffer = maxOutputSize > 0
+                                ? decoder.pull(Math.max(1, maxOutputSize - totalOutputSize))
+                                : decoder.pull();
+                        byte[] chunk = new byte[buffer.remaining()];
+                        buffer.get(chunk);
+                        output.add(chunk);
+                        totalOutputSize += chunk.length;
+                        if (maxOutputSize > 0 && totalOutputSize >= maxOutputSize
+                                && decoder.getStatus() == DecoderJNI.Status.NEEDS_MORE_OUTPUT) {
+                            throw new IOException("decompressed size exceeds maximum size " + maxOutputSize);
+                        }
+                        break;
+
+                    case NEEDS_MORE_INPUT:
+                        decoder.push(0);
                         if (decoder.getStatus() == DecoderJNI.Status.NEEDS_MORE_INPUT) {
                             throw new IOException("corrupted input");
                         }
