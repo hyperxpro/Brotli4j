@@ -1,0 +1,81 @@
+name: Build CI Docker Images
+
+# Manual-trigger only. Building 18 images (many under QEMU emulation)
+# is expensive — never auto-run on push or PR.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: build-ci-images-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE: ghcr.io/${{ github.repository_owner }}/brotli4j-ci
+
+jobs:
+  build:
+    name: ${{ matrix.arch }}-${{ matrix.os }}-jdk${{ matrix.jdk }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { arch: x86_64,  os: centos6,    jdk: 8,  platform: linux/amd64,    dir: docker-ci/x86_64/centos6-jdk8 }
+          - { arch: x86_64,  os: centos6,    jdk: 11, platform: linux/amd64,    dir: docker-ci/x86_64/centos6-jdk11 }
+          - { arch: x86_64,  os: centos6,    jdk: 17, platform: linux/amd64,    dir: docker-ci/x86_64/centos6-jdk17 }
+          - { arch: x86_64,  os: centos6,    jdk: 21, platform: linux/amd64,    dir: docker-ci/x86_64/centos6-jdk21 }
+          - { arch: aarch64, os: centos7,    jdk: 8,  platform: linux/arm64/v8, dir: docker-ci/aarch64/centos7-jdk8 }
+          - { arch: aarch64, os: centos7,    jdk: 11, platform: linux/arm64/v8, dir: docker-ci/aarch64/centos7-jdk11 }
+          - { arch: aarch64, os: centos7,    jdk: 17, platform: linux/arm64/v8, dir: docker-ci/aarch64/centos7-jdk17 }
+          - { arch: aarch64, os: centos7,    jdk: 21, platform: linux/arm64/v8, dir: docker-ci/aarch64/centos7-jdk21 }
+          - { arch: armv7,   os: debian11,   jdk: 8,  platform: linux/arm/v7,   dir: docker-ci/armv7/debian11-jdk8 }
+          - { arch: armv7,   os: debian11,   jdk: 11, platform: linux/arm/v7,   dir: docker-ci/armv7/debian11-jdk11 }
+          - { arch: armv7,   os: debian11,   jdk: 17, platform: linux/arm/v7,   dir: docker-ci/armv7/debian11-jdk17 }
+          - { arch: s390x,   os: ubuntu2004, jdk: 8,  platform: linux/s390x,    dir: docker-ci/s390x/ubuntu2004-jdk8 }
+          - { arch: s390x,   os: ubuntu2004, jdk: 11, platform: linux/s390x,    dir: docker-ci/s390x/ubuntu2004-jdk11 }
+          - { arch: ppc64le, os: ubuntu2004, jdk: 8,  platform: linux/ppc64le,  dir: docker-ci/ppc64le/ubuntu2004-jdk8 }
+          - { arch: ppc64le, os: ubuntu2004, jdk: 11, platform: linux/ppc64le,  dir: docker-ci/ppc64le/ubuntu2004-jdk11 }
+          - { arch: riscv64, os: ubuntu2004, jdk: 11, platform: linux/riscv64,  dir: docker-ci/riscv64/ubuntu2004-jdk11 }
+          - { arch: riscv64, os: ubuntu2004, jdk: 17, platform: linux/riscv64,  dir: docker-ci/riscv64/ubuntu2004-jdk17 }
+          - { arch: riscv64, os: ubuntu2204, jdk: 21, platform: linux/riscv64,  dir: docker-ci/riscv64/ubuntu2204-jdk21 }
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Compute short SHA
+        id: sha
+        run: echo "value=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+
+      - name: Set up QEMU
+        if: matrix.platform != 'linux/amd64'
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ${{ matrix.dir }}/Dockerfile
+          platforms: ${{ matrix.platform }}
+          push: true
+          provenance: false
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+          tags: |
+            ${{ env.IMAGE }}:${{ matrix.arch }}-${{ matrix.os }}-jdk${{ matrix.jdk }}
+            ${{ env.IMAGE }}:${{ matrix.arch }}-${{ matrix.os }}-jdk${{ matrix.jdk }}-sha-${{ steps.sha.outputs.value }}
+          cache-from: type=gha,scope=${{ matrix.arch }}-${{ matrix.os }}-jdk${{ matrix.jdk }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.arch }}-${{ matrix.os }}-jdk${{ matrix.jdk }}
