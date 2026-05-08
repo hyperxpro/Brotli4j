@@ -175,7 +175,7 @@ jobs:
         with:
           arch: none
           distro: none
-          base_image: --platform=linux/arm64/v8 ghcr.io/hyperxpro/brotli4j:aarch64-centos7-jdk8
+          base_image: --platform=linux/arm64/v8 ghcr.io/hyperxpro/brotli4j:aarch64-ubuntu1804-jdk8
 
           dockerRunArgs: |
             --volume "/home/runner/.m2/repository/:/root/.m2/repository"
@@ -215,7 +215,7 @@ jobs:
         with:
           arch: none
           distro: none
-          base_image: --platform=linux/arm64/v8 ghcr.io/hyperxpro/brotli4j:aarch64-centos7-jdk11
+          base_image: --platform=linux/arm64/v8 ghcr.io/hyperxpro/brotli4j:aarch64-ubuntu1804-jdk11
 
           dockerRunArgs: |
             --volume "/home/runner/.m2/repository/:/root/.m2/repository"
@@ -249,7 +249,7 @@ jobs:
         with:
           arch: none
           distro: none
-          base_image: --platform=linux/arm64/v8 ghcr.io/hyperxpro/brotli4j:aarch64-centos7-jdk17
+          base_image: --platform=linux/arm64/v8 ghcr.io/hyperxpro/brotli4j:aarch64-ubuntu1804-jdk17
 
           dockerRunArgs: |
             --volume "/home/runner/.m2/repository/:/root/.m2/repository"
@@ -284,7 +284,7 @@ jobs:
         with:
           arch: none
           distro: none
-          base_image: --platform=linux/arm64/v8 ghcr.io/hyperxpro/brotli4j:aarch64-centos7-jdk21
+          base_image: --platform=linux/arm64/v8 ghcr.io/hyperxpro/brotli4j:aarch64-ubuntu2004-jdk21
 
           dockerRunArgs: |
             --volume "/home/runner/.m2/repository/:/root/.m2/repository"
@@ -319,7 +319,7 @@ jobs:
         with:
           arch: none
           distro: none
-          base_image: --platform=linux/arm/v7 ghcr.io/hyperxpro/brotli4j:armv7-debian11-jdk8
+          base_image: --platform=linux/arm/v7 ghcr.io/hyperxpro/brotli4j:armv7-ubuntu1804-jdk8
 
           dockerRunArgs: |
             --volume "/home/runner/.m2/repository/:/root/.m2/repository"
@@ -359,7 +359,7 @@ jobs:
         with:
           arch: none
           distro: none
-          base_image: --platform=linux/arm/v7 ghcr.io/hyperxpro/brotli4j:armv7-debian11-jdk11
+          base_image: --platform=linux/arm/v7 ghcr.io/hyperxpro/brotli4j:armv7-ubuntu1804-jdk11
 
           dockerRunArgs: |
             --volume "/home/runner/.m2/repository/:/root/.m2/repository"
@@ -393,7 +393,7 @@ jobs:
         with:
           arch: none
           distro: none
-          base_image: --platform=linux/arm/v7 ghcr.io/hyperxpro/brotli4j:armv7-debian11-jdk17
+          base_image: --platform=linux/arm/v7 ghcr.io/hyperxpro/brotli4j:armv7-ubuntu1804-jdk17
 
           dockerRunArgs: |
             --volume "/home/runner/.m2/repository/:/root/.m2/repository"

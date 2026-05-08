@@ -33,13 +33,13 @@ jobs:
           - { arch: x86_64,  os: centos6,    jdk: 11, platform: linux/amd64,    dir: docker-ci/x86_64/centos6-jdk11 }
           - { arch: x86_64,  os: centos6,    jdk: 17, platform: linux/amd64,    dir: docker-ci/x86_64/centos6-jdk17 }
           - { arch: x86_64,  os: centos6,    jdk: 21, platform: linux/amd64,    dir: docker-ci/x86_64/centos6-jdk21 }
-          - { arch: aarch64, os: centos7,    jdk: 8,  platform: linux/arm64/v8, dir: docker-ci/aarch64/centos7-jdk8 }
-          - { arch: aarch64, os: centos7,    jdk: 11, platform: linux/arm64/v8, dir: docker-ci/aarch64/centos7-jdk11 }
-          - { arch: aarch64, os: centos7,    jdk: 17, platform: linux/arm64/v8, dir: docker-ci/aarch64/centos7-jdk17 }
-          - { arch: aarch64, os: centos7,    jdk: 21, platform: linux/arm64/v8, dir: docker-ci/aarch64/centos7-jdk21 }
-          - { arch: armv7,   os: debian11,   jdk: 8,  platform: linux/arm/v7,   dir: docker-ci/armv7/debian11-jdk8 }
-          - { arch: armv7,   os: debian11,   jdk: 11, platform: linux/arm/v7,   dir: docker-ci/armv7/debian11-jdk11 }
-          - { arch: armv7,   os: debian11,   jdk: 17, platform: linux/arm/v7,   dir: docker-ci/armv7/debian11-jdk17 }
+          - { arch: aarch64, os: ubuntu1804, jdk: 8,  platform: linux/arm64/v8, dir: docker-ci/aarch64/ubuntu1804-jdk8 }
+          - { arch: aarch64, os: ubuntu1804, jdk: 11, platform: linux/arm64/v8, dir: docker-ci/aarch64/ubuntu1804-jdk11 }
+          - { arch: aarch64, os: ubuntu1804, jdk: 17, platform: linux/arm64/v8, dir: docker-ci/aarch64/ubuntu1804-jdk17 }
+          - { arch: aarch64, os: ubuntu2004, jdk: 21, platform: linux/arm64/v8, dir: docker-ci/aarch64/ubuntu2004-jdk21 }
+          - { arch: armv7,   os: ubuntu1804, jdk: 8,  platform: linux/arm/v7,   dir: docker-ci/armv7/ubuntu1804-jdk8 }
+          - { arch: armv7,   os: ubuntu1804, jdk: 11, platform: linux/arm/v7,   dir: docker-ci/armv7/ubuntu1804-jdk11 }
+          - { arch: armv7,   os: ubuntu1804, jdk: 17, platform: linux/arm/v7,   dir: docker-ci/armv7/ubuntu1804-jdk17 }
           - { arch: s390x,   os: ubuntu2004, jdk: 8,  platform: linux/s390x,    dir: docker-ci/s390x/ubuntu2004-jdk8 }
           - { arch: s390x,   os: ubuntu2004, jdk: 11, platform: linux/s390x,    dir: docker-ci/s390x/ubuntu2004-jdk11 }
           - { arch: ppc64le, os: ubuntu2004, jdk: 8,  platform: linux/ppc64le,  dir: docker-ci/ppc64le/ubuntu2004-jdk8 }
