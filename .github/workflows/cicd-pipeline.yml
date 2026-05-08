@@ -79,8 +79,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - name: build centos6
-        run: docker compose -f docker/docker-compose.yml run build
+      - name: Build in prebuilt CentOS 6 container
+        run: |
+          IMAGE=ghcr.io/hyperxpro/brotli4j-ci:x86_64-centos6-jdk8
+          docker pull "$IMAGE"
+          docker run --rm \
+            -v "${{ github.workspace }}:/code" \
+            -v "${HOME}/.m2:/root/.m2" \
+            -w /code \
+            "$IMAGE" \
+            mvn -B --show-version -ntp clean package --file pom.xml
       - name: Upload the build
         uses: actions/upload-artifact@v7
         with:
@@ -91,22 +99,46 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - name: build centos6
-        run: docker compose -f docker/docker-compose11.yml run build
+      - name: Build in prebuilt CentOS 6 container
+        run: |
+          IMAGE=ghcr.io/hyperxpro/brotli4j-ci:x86_64-centos6-jdk11
+          docker pull "$IMAGE"
+          docker run --rm \
+            -v "${{ github.workspace }}:/code" \
+            -v "${HOME}/.m2:/root/.m2" \
+            -w /code \
+            "$IMAGE" \
+            mvn -B --show-version -ntp clean package --file pom.xml
 
   Linux-x86_64-Build-JDK17:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - name: build centos6
-        run: docker compose -f docker/docker-compose17.yml run build
+      - name: Build in prebuilt CentOS 6 container
+        run: |
+          IMAGE=ghcr.io/hyperxpro/brotli4j-ci:x86_64-centos6-jdk17
+          docker pull "$IMAGE"
+          docker run --rm \
+            -v "${{ github.workspace }}:/code" \
+            -v "${HOME}/.m2:/root/.m2" \
+            -w /code \
+            "$IMAGE" \
+            mvn -B --show-version -ntp clean package --file pom.xml
 
   Linux-x86_64-Build-JDK21:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - name: build centos6
-        run: docker compose -f docker/docker-compose21.yml run build
+      - name: Build in prebuilt CentOS 6 container
+        run: |
+          IMAGE=ghcr.io/hyperxpro/brotli4j-ci:x86_64-centos6-jdk21
+          docker pull "$IMAGE"
+          docker run --rm \
+            -v "${{ github.workspace }}:/code" \
+            -v "${HOME}/.m2:/root/.m2" \
+            -w /code \
+            "$IMAGE" \
+            mvn -B --show-version -ntp clean package --file pom.xml
 
   Linux-Aarch64-Build-JDK8:
     runs-on: ubuntu-latest
@@ -121,32 +153,19 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pr-${{ env.cache-name }}-
             ${{ runner.os }}-pr-
+      - uses: docker/setup-qemu-action@v3
       - uses: uraimo/run-on-arch-action@v3.1.0
         name: Run commands
         id: runcmd
         with:
-          arch: aarch64
-          distro: ubuntu18.04
-          
-          # Not required, but speeds up builds by storing container images in
-          # a GitHub package registry.
-          githubToken: ${{ github.token }}
+          arch: none
+          distro: none
+          base_image: --platform=linux/arm64/v8 ghcr.io/hyperxpro/brotli4j-ci:aarch64-centos7-jdk8
 
-          # Mount the .m2/repository
           dockerRunArgs: |
-            --platform linux/arm64
             --volume "/home/runner/.m2/repository/:/root/.m2/repository"
 
-          # Install dependencies
-          install: |
-            apt-get update
-            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential
-
-            curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | bash && . ~/.jabba/jabba.sh
-            jabba install 1.8.0-custom=tgz+https://corretto.aws/downloads/resources/8.352.08.1/amazon-corretto-8.352.08.1-linux-aarch64.tar.gz -o /jdk
-          
           run: |
-            export JAVA_HOME="/jdk"
             chmod +x ./mvnw
             ./mvnw -B --show-version -ntp clean package
 
@@ -168,32 +187,19 @@ jobs:
           key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
+      - uses: docker/setup-qemu-action@v3
       - uses: uraimo/run-on-arch-action@v3.1.0
         name: Run commands
         id: runcmd
         with:
-          arch: aarch64
-          distro: ubuntu18.04
+          arch: none
+          distro: none
+          base_image: --platform=linux/arm64/v8 ghcr.io/hyperxpro/brotli4j-ci:aarch64-centos7-jdk11
 
-          # Not required, but speeds up builds by storing container images in
-          # a GitHub package registry.
-          githubToken: ${{ github.token }}
-
-          # Mount the .m2/repository
           dockerRunArgs: |
-            --platform linux/arm64
             --volume "/home/runner/.m2/repository/:/root/.m2/repository"
 
-          # Install dependencies
-          install: |
-            apt-get update
-            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential
-
-            curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | bash && . ~/.jabba/jabba.sh
-            jabba install 11.0.0-custom=tgz+https://corretto.aws/downloads/resources/11.0.17.8.1/amazon-corretto-11.0.17.8.1-linux-aarch64.tar.gz -o /jdk
-          
           run: |
-            export JAVA_HOME="/jdk"
             chmod +x ./mvnw
             ./mvnw -B --show-version -ntp clean package
 
@@ -209,33 +215,20 @@ jobs:
           key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
+      - uses: docker/setup-qemu-action@v3
       - uses: uraimo/run-on-arch-action@v3.1.0
         name: Run commands
         id: runcmd
         with:
-          arch: aarch64
-          distro: ubuntu18.04
+          arch: none
+          distro: none
+          base_image: --platform=linux/arm64/v8 ghcr.io/hyperxpro/brotli4j-ci:aarch64-centos7-jdk17
 
-          # Not required, but speeds up builds by storing container images in
-          # a GitHub package registry.
-          githubToken: ${{ github.token }}
-
-          # Mount the .m2/repository
           dockerRunArgs: |
-            --platform linux/arm64
             --volume "/home/runner/.m2/repository/:/root/.m2/repository"
 
-          # Install dependencies
-          install: |
-            apt-get update
-            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential
-
-            curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | bash && . ~/.jabba/jabba.sh
-            jabba install 17.0.0-custom=tgz+https://corretto.aws/downloads/resources/17.0.5.8.1/amazon-corretto-17.0.5.8.1-linux-aarch64.tar.gz -o /jdk
-          
           run: |
             export MAVEN_OPTS="-Djdk.lang.Process.launchMechanism=vfork"
-            export JAVA_HOME="/jdk"
             chmod +x ./mvnw
             ./mvnw -B --show-version -ntp clean package
 
@@ -251,33 +244,20 @@ jobs:
           key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
+      - uses: docker/setup-qemu-action@v3
       - uses: uraimo/run-on-arch-action@v3.1.0
         name: Run commands
         id: runcmd
         with:
-          arch: aarch64
-          distro: ubuntu20.04
+          arch: none
+          distro: none
+          base_image: --platform=linux/arm64/v8 ghcr.io/hyperxpro/brotli4j-ci:aarch64-centos7-jdk21
 
-          # Not required, but speeds up builds by storing container images in
-          # a GitHub package registry.
-          githubToken: ${{ github.token }}
-
-          # Mount the .m2/repository
           dockerRunArgs: |
-            --platform linux/arm64
             --volume "/home/runner/.m2/repository/:/root/.m2/repository"
-
-          # Install dependencies
-          install: |
-            apt-get update
-            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential
-            
-            curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | bash && . ~/.jabba/jabba.sh
-            jabba install 21.0.1-custom=tgz+https://corretto.aws/downloads/resources/21.0.1.12.1/amazon-corretto-21.0.1.12.1-linux-aarch64.tar.gz -o /jdk
 
           run: |
             export MAVEN_OPTS="-Djdk.lang.Process.launchMechanism=vfork"
-            export JAVA_HOME="/jdk"
             chmod +x ./mvnw
             ./mvnw -B --show-version -ntp clean package
 
@@ -293,32 +273,19 @@ jobs:
           key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
+      - uses: docker/setup-qemu-action@v3
       - uses: uraimo/run-on-arch-action@v3.1.0
         name: Run commands
         id: runcmd
         with:
-          arch: armv7
-          distro: ubuntu18.04
+          arch: none
+          distro: none
+          base_image: --platform=linux/arm/v7 ghcr.io/hyperxpro/brotli4j-ci:armv7-debian11-jdk8
 
-          # Not required, but speeds up builds by storing container images in
-          # a GitHub package registry.
-          githubToken: ${{ github.token }}
-
-          # Mount the .m2/repository
           dockerRunArgs: |
-            --platform linux/arm/v7
             --volume "/home/runner/.m2/repository/:/root/.m2/repository"
 
-          # Install dependencies
-          install: |
-            apt-get update
-            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential
-
-            curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | bash && . ~/.jabba/jabba.sh
-            jabba install 1.8.0-custom=tgz+https://cdn.azul.com/zulu-embedded/bin/zulu8.66.0.15-ca-jdk8.0.352-linux_aarch32hf.tar.gz -o /jdk
-          
           run: |
-            export JAVA_HOME="/jdk"
             chmod +x ./mvnw
             ./mvnw -B --show-version -ntp clean package
 
@@ -340,32 +307,19 @@ jobs:
           key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
+      - uses: docker/setup-qemu-action@v3
       - uses: uraimo/run-on-arch-action@v3.1.0
         name: Run commands
         id: runcmd
         with:
-          arch: armv7
-          distro: ubuntu18.04
+          arch: none
+          distro: none
+          base_image: --platform=linux/arm/v7 ghcr.io/hyperxpro/brotli4j-ci:armv7-debian11-jdk11
 
-          # Not required, but speeds up builds by storing container images in
-          # a GitHub package registry.
-          githubToken: ${{ github.token }}
-
-          # Mount the .m2/repository
           dockerRunArgs: |
-            --platform linux/arm/v7
             --volume "/home/runner/.m2/repository/:/root/.m2/repository"
 
-          # Install dependencies
-          install: |
-            apt-get update
-            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential
-
-            curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | bash && . ~/.jabba/jabba.sh
-            jabba install 11.0.0-custom=tgz+https://cdn.azul.com/zulu-embedded/bin/zulu11.60.19-ca-jdk11.0.17-linux_aarch32hf.tar.gz -o /jdk
-
           run: |
-            export JAVA_HOME="/jdk"
             chmod +x ./mvnw
             ./mvnw -B --show-version -ntp clean package
 
@@ -381,38 +335,19 @@ jobs:
           key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
+      - uses: docker/setup-qemu-action@v3
       - uses: uraimo/run-on-arch-action@v3.1.0
         name: Run commands
         id: runcmd
         with:
-          arch: armv7
-          distro: ubuntu18.04
+          arch: none
+          distro: none
+          base_image: --platform=linux/arm/v7 ghcr.io/hyperxpro/brotli4j-ci:armv7-debian11-jdk17
 
-          # Not required, but speeds up builds by storing container images in
-          # a GitHub package registry.
-          githubToken: ${{ github.token }}
-
-          # Mount the .m2/repository
           dockerRunArgs: |
-            --platform linux/arm/v7
             --volume "/home/runner/.m2/repository/:/root/.m2/repository"
 
-          # Install dependencies
-          install: |
-            apt-get update
-            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential apt-transport-https wget
-            mkdir -p /etc/apt/keyrings
-            wget -O - https://packages.adoptium.net/artifactory/api/gpg/key/public | tee /etc/apt/keyrings/adoptium.asc
-            echo "deb [signed-by=/etc/apt/keyrings/adoptium.asc] https://packages.adoptium.net/artifactory/deb $(awk -F= '/^VERSION_CODENAME/{print$2}' /etc/os-release) main" | tee /etc/apt/sources.list.d/adoptium.list
-            apt-get update
-            apt-get install -y temurin-17-jdk
           run: |
-            export JAVA_HOME=/usr/lib/jvm/temurin-17-jdk-armhf
-            export PATH="$JAVA_HOME/bin:$PATH"
-            export JAVA_INCLUDE_PATH="$JAVA_HOME/include"
-            export JAVA_INCLUDE_PATH2="$JAVA_HOME/include/linux"
-            export JAVA_AWT_LIBRARY="$JAVA_HOME/lib/arm"
-            export JAVA_JVM_LIBRARY="$JAVA_HOME/lib/arm/server"
             export MAVEN_OPTS="-Djdk.lang.Process.launchMechanism=vfork"
             chmod +x ./mvnw
             ./mvnw -B --show-version -ntp clean package
@@ -429,27 +364,18 @@ jobs:
           key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
+      - uses: docker/setup-qemu-action@v3
       - uses: uraimo/run-on-arch-action@v3.1.0
         name: Run commands
         id: runcmd
         with:
-          arch: s390x
-          distro: ubuntu18.04
+          arch: none
+          distro: none
+          base_image: --platform=linux/s390x ghcr.io/hyperxpro/brotli4j-ci:s390x-ubuntu2004-jdk8
 
-          # Not required, but speeds up builds by storing container images in
-          # a GitHub package registry.
-          githubToken: ${{ github.token }}
-
-          # Mount the .m2/repository
           dockerRunArgs: |
-            --platform linux/s390x
             --volume "/home/runner/.m2/repository/:/root/.m2/repository"
 
-          # Install dependencies
-          install: |
-            apt-get update
-            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential openjdk-8-jdk
-          
           run: |
             chmod +x ./mvnw
             ./mvnw -B --show-version -ntp clean package
@@ -472,33 +398,19 @@ jobs:
           key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
+      - uses: docker/setup-qemu-action@v3
       - uses: uraimo/run-on-arch-action@v3.1.0
         name: Run commands
         id: runcmd
         with:
-          arch: s390x
-          distro: ubuntu18.04
+          arch: none
+          distro: none
+          base_image: --platform=linux/s390x ghcr.io/hyperxpro/brotli4j-ci:s390x-ubuntu2004-jdk11
 
-          # Not required, but speeds up builds by storing container images in
-          # a GitHub package registry.
-          githubToken: ${{ github.token }}
-
-          # Mount the .m2/repository
           dockerRunArgs: |
-            --platform linux/s390x
             --volume "/home/runner/.m2/repository/:/root/.m2/repository"
 
-          # Install dependencies
-          install: |
-            apt-get update
-            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential openjdk-11-jdk
           run: |
-            export JAVA_HOME="/usr/lib/jvm/java-11-openjdk-s390x"
-            export PATH="$JAVA_HOME/bin:$PATH"
-            export JAVA_INCLUDE_PATH="$JAVA_HOME/include"
-            export JAVA_INCLUDE_PATH2="$JAVA_HOME/include/linux"
-            export JAVA_AWT_LIBRARY="$JAVA_HOME/lib"
-            export JAVA_JVM_LIBRARY="$JAVA_HOME/lib/server"
             chmod +x ./mvnw
             ./mvnw -B --show-version -ntp clean package
 
@@ -514,32 +426,19 @@ jobs:
           key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
+      - uses: docker/setup-qemu-action@v3
       - uses: uraimo/run-on-arch-action@v3.1.0
         name: Run commands
         id: runcmd
         with:
-          arch: ppc64le
-          distro: ubuntu18.04
+          arch: none
+          distro: none
+          base_image: --platform=linux/ppc64le ghcr.io/hyperxpro/brotli4j-ci:ppc64le-ubuntu2004-jdk8
 
-          # Not required, but speeds up builds by storing container images in
-          # a GitHub package registry.
-          githubToken: ${{ github.token }}
-
-          # Mount the .m2/repository
           dockerRunArgs: |
-            --platform linux/ppc64le
             --volume "/home/runner/.m2/repository/:/root/.m2/repository"
-          # Install dependencies
-          install: |
-            apt-get update
-            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential openjdk-8-jdk
+
           run: |
-            export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-ppc64el"
-            export PATH="$JAVA_HOME/bin:$PATH"
-            export JAVA_INCLUDE_PATH="$JAVA_HOME/include"
-            export JAVA_INCLUDE_PATH2="$JAVA_HOME/include/linux"
-            export JAVA_AWT_LIBRARY="$JAVA_HOME/lib"
-            export JAVA_JVM_LIBRARY="$JAVA_HOME/lib/server"
             chmod +x ./mvnw
             ./mvnw -B -ntp clean package
       - name: Upload the build
@@ -560,34 +459,21 @@ jobs:
           key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
+      - uses: docker/setup-qemu-action@v3
       - uses: uraimo/run-on-arch-action@v3.1.0
         name: Run commands
         id: runcmd
         with:
-          arch: ppc64le
-          distro: ubuntu18.04
+          arch: none
+          distro: none
+          base_image: --platform=linux/ppc64le ghcr.io/hyperxpro/brotli4j-ci:ppc64le-ubuntu2004-jdk11
 
-          # Not required, but speeds up builds by storing container images in
-          # a GitHub package registry.
-          githubToken: ${{ github.token }}
-
-          # Mount the .m2/repository
           dockerRunArgs: |
-            --platform linux/ppc64le
             --volume "/home/runner/.m2/repository/:/root/.m2/repository"
-          # Install dependencies
-          install: |
-            apt-get update
-            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential openjdk-11-jdk
+
           run: |
-            export JAVA_HOME="/usr/lib/jvm/java-11-openjdk-ppc64el"
-            export PATH="$JAVA_HOME/bin:$PATH"
-            export JAVA_INCLUDE_PATH="$JAVA_HOME/include"
-            export JAVA_INCLUDE_PATH2="$JAVA_HOME/include/linux"
-            export JAVA_AWT_LIBRARY="$JAVA_HOME/lib"
-            export JAVA_JVM_LIBRARY="$JAVA_HOME/lib/server"
             chmod +x ./mvnw
-            ./mvnw -B -ntp clean package          
+            ./mvnw -B -ntp clean package
 
   Linux-riscv64-Build-JDK11:
     runs-on: ubuntu-latest
@@ -602,25 +488,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
 
+      - uses: docker/setup-qemu-action@v3
       - uses: uraimo/run-on-arch-action@v3.1.0
         name: Run commands
         id: runcmd
         with:
-          arch: riscv64
-          distro: ubuntu20.04
+          arch: none
+          distro: none
+          base_image: --platform=linux/riscv64 ghcr.io/hyperxpro/brotli4j-ci:riscv64-ubuntu2004-jdk11
 
-          # Not required, but speeds up builds by storing container images in
-          # a GitHub package registry.
-          githubToken: ${{ github.token }}
-
-          # Mount the .m2/repository
           dockerRunArgs: |
-            --platform linux/riscv64
             --volume "/home/runner/.m2/repository/:/root/.m2/repository"
-          # Install dependencies
-          install: |
-            apt-get update
-            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential openjdk-11-jdk
 
           run: |
             export MAVEN_OPTS="-Djdk.lang.Process.launchMechanism=vfork"
@@ -648,32 +526,19 @@ jobs:
           key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
+      - uses: docker/setup-qemu-action@v3
       - uses: uraimo/run-on-arch-action@v3.1.0
         name: Run commands
         id: runcmd
         with:
-          arch: riscv64
-          distro: ubuntu20.04
+          arch: none
+          distro: none
+          base_image: --platform=linux/riscv64 ghcr.io/hyperxpro/brotli4j-ci:riscv64-ubuntu2004-jdk17
 
-          # Not required, but speeds up builds by storing container images in
-          # a GitHub package registry.
-          githubToken: ${{ github.token }}
-
-          # Mount the .m2/repository
           dockerRunArgs: |
-            --platform linux/riscv64
             --volume "/home/runner/.m2/repository/:/root/.m2/repository"
-          # Install dependencies
-          install: |
-            apt-get update
-            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential openjdk-17-jdk
+
           run: |
-            export JAVA_HOME="/usr/lib/jvm/java-17-openjdk-riscv64"
-            export PATH="$JAVA_HOME/bin:$PATH"
-            export JAVA_INCLUDE_PATH="$JAVA_HOME/include"
-            export JAVA_INCLUDE_PATH2="$JAVA_HOME/include/linux"
-            export JAVA_AWT_LIBRARY="$JAVA_HOME/lib"
-            export JAVA_JVM_LIBRARY="$JAVA_HOME/lib/server"
             export MAVEN_OPTS="-Djdk.lang.Process.launchMechanism=vfork"
             chmod +x ./mvnw
             ./mvnw -B --show-version -ntp clean package
@@ -690,32 +555,19 @@ jobs:
           key: ${{ runner.os }}-pr-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-pr-${{ matrix.arch }}-pr-${{ env.cache-name }}-pr-
+      - uses: docker/setup-qemu-action@v3
       - uses: uraimo/run-on-arch-action@v3.1.0
         name: Run commands
         id: runcmd
         with:
-          arch: riscv64
-          distro: ubuntu22.04
+          arch: none
+          distro: none
+          base_image: --platform=linux/riscv64 ghcr.io/hyperxpro/brotli4j-ci:riscv64-ubuntu2204-jdk21
 
-          # Not required, but speeds up builds by storing container images in
-          # a GitHub package registry.
-          githubToken: ${{ github.token }}
-
-          # Mount the .m2/repository
           dockerRunArgs: |
-            --platform linux/riscv64
             --volume "/home/runner/.m2/repository/:/root/.m2/repository"
 
-          # Install dependencies
-          install: |
-            apt-get update
-            apt-get install -q -y curl gnupg2 autoconf automake libtool make tar git cmake build-essential
-
-            curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | bash && . ~/.jabba/jabba.sh
-            jabba install 21-custom=tgz+https://api.adoptium.net/v3/binary/latest/21/ea/linux/riscv64/jdk/hotspot/normal/eclipse?project=jdk -o /jdk
-
           run: |
-            export JAVA_HOME="/jdk"
             chmod +x ./mvnw
             ./mvnw -B --show-version -ntp clean package
 
