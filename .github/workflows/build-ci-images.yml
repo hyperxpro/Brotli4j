@@ -1,9 +1,13 @@
 name: Build CI Docker Images
 
-# Manual-trigger only. Building 18 images (many under QEMU emulation)
-# is expensive — never auto-run on push or PR.
+# Manually-triggered. Building 18 images (many under QEMU emulation) is
+# expensive, so this never runs on PR or on pushes to main. The push
+# trigger is scoped to the dedicated docker-ci-images branch only —
+# pushing there is itself the explicit "rebuild now" signal.
 on:
   workflow_dispatch:
+  push:
+    branches: [docker-ci-images]
 
 permissions:
   contents: read
