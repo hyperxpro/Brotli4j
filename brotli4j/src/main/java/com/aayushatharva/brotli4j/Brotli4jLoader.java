@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2020-2025, Aayush Atharva
+ *    Copyright (c) 2020-2026, Aayush Atharva
  *
  *    Brotli4j licenses this file to you under the
  *    Apache License, Version 2.0 (the "License");
@@ -20,6 +20,7 @@ import com.aayushatharva.brotli4j.common.annotations.Local;
 import com.aayushatharva.brotli4j.service.BrotliNativeProvider;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -53,7 +54,7 @@ public class Brotli4jLoader {
                     String platform = getPlatform();
                     String libPath = "/lib/" + platform + '/' + nativeLibName;
 
-                    File tempDir = new File(System.getProperty("java.io.tmpdir"), "com_aayushatharva_brotli4j_" + System.nanoTime());
+                    File tempDir = new File(resolveWorkdir(), "com_aayushatharva_brotli4j_" + System.nanoTime());
                     tempDir.mkdir();
                     tempDir.deleteOnExit();
 
@@ -113,6 +114,31 @@ public class Brotli4jLoader {
 
     public static Throwable getUnavailabilityCause() {
         return UNAVAILABILITY_CAUSE;
+    }
+
+    /**
+     * Resolves the directory used to extract the bundled native library.
+     *
+     * <p>If the {@code com.aayushatharva.brotli4j.native.workdir} system property is set,
+     * it is used as the extraction directory (created if it does not exist). Otherwise
+     * falls back to {@code java.io.tmpdir}. A custom workdir is useful when
+     * {@code java.io.tmpdir} is mounted {@code noexec}.
+     */
+    // Package-private for tests.
+    static File resolveWorkdir() throws IOException {
+        String workdir = System.getProperty("com.aayushatharva.brotli4j.native.workdir");
+        if (workdir != null) {
+            File dir = new File(workdir);
+            if (!dir.exists() && !dir.mkdirs()) {
+                throw new IOException("Custom native workdir mkdirs failed: " + workdir);
+            }
+            try {
+                return dir.getAbsoluteFile();
+            } catch (Exception ignored) {
+                return dir;
+            }
+        }
+        return new File(System.getProperty("java.io.tmpdir"));
     }
 
     private static String getPlatform() {
