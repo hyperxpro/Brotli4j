@@ -30,70 +30,17 @@
     <packaging>pom</packaging>
 
     <name>Brotli4j/All</name>
-    <description>Builds all Brotli4j artifacts</description>
+    <description>Deprecated alias of brotli4j-bom. Builds all Brotli4j artifacts.</description>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>com.aayushatharva.brotli4j</groupId>
-                <artifactId>brotli4j</artifactId>
+                <artifactId>brotli4j-bom</artifactId>
                 <version>${project.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
-	    <dependency>
-                <groupId>com.aayushatharva.brotli4j</groupId>
-                <artifactId>service</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.aayushatharva.brotli4j</groupId>
-                <artifactId>native-linux-aarch64</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.aayushatharva.brotli4j</groupId>
-                <artifactId>native-linux-armv7</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.aayushatharva.brotli4j</groupId>
-                <artifactId>native-linux-x86_64</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.aayushatharva.brotli4j</groupId>
-                <artifactId>native-linux-s390x</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.aayushatharva.brotli4j</groupId>
-                <artifactId>native-linux-ppc64le</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.aayushatharva.brotli4j</groupId>
-                <artifactId>native-linux-riscv64</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.aayushatharva.brotli4j</groupId>
-                <artifactId>native-osx-aarch64</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.aayushatharva.brotli4j</groupId>
-                <artifactId>native-osx-x86_64</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.aayushatharva.brotli4j</groupId>
-                <artifactId>native-windows-x86_64</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-             <dependency>
-                <groupId>com.aayushatharva.brotli4j</groupId>
-                <artifactId>native-windows-aarch64</artifactId>
-                <version>${project.version}</version>
-            </dependency>           
         </dependencies>
     </dependencyManagement>
 

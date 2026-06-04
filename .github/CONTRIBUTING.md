@@ -52,6 +52,19 @@ In your pull request, please include a detailed description of the changes you m
 </br>
 Once your pull request is submitted, it will be reviewed by one or more maintainers. They may ask for additional changes or provide feedback. Once your pull request is approved, it will be merged into the master branch.
 
+# Releasing
+When preparing a release, the project version must be bumped in lockstep across **every** `pom.xml` in the repository so all published artifacts (including the BOM) share the same version. Update the `<version>` (or `<parent><version>`) in:
+
+<li> root <code>pom.xml</code> </li>
+<li> <code>natives/pom.xml</code> and every <code>natives/&lt;arch&gt;/pom.xml</code> </li>
+<li> <code>brotli4j/pom.xml</code> </li>
+<li> <code>service/pom.xml</code> </li>
+<li> <code>bom/pom.xml</code> </li>
+<li> <code>all/pom.xml</code> </li>
+
+</br>
+Do not forget <code>bom/pom.xml</code>: if its version is not bumped, the published <code>brotli4j-bom</code> will reference a stale version and consumers importing it will resolve outdated artifacts.
+
 # Attribution
 We appreciate all contributions to Brotli4j and want to make sure that contributors are properly credited for their work. In your pull request, please add yourself to the list of contributors in the AUTHORS.md file. You can also add yourself to the list by opening a pull request that only modifies that file.
 
