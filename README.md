@@ -38,6 +38,70 @@ For maven, the natives will
 </dependency>
 ```
 
+### BOM (Bill of Materials)
+
+If you depend on more than one Brotli4j artifact (for example, when explicitly pinning a specific
+native), import the BOM so every Brotli4j dependency stays on a single, consistent version. After
+importing the BOM, declare Brotli4j artifacts **without** a `<version>` and the BOM supplies it.
+
+> [!NOTE]
+> The BOM only manages versions. It is orthogonal to the Gradle `Brotli4JRule` metadata rule
+> (documented below), which automatically selects the correct native for your architecture. Use the
+> BOM when you reference individual `native-*` artifacts and want their versions managed centrally.
+
+#### Maven
+
+```xml
+<dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>com.aayushatharva.brotli4j</groupId>
+            <artifactId>brotli4j-bom</artifactId>
+            <version>1.23.0</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+    </dependencies>
+</dependencyManagement>
+
+<dependencies>
+    <dependency>
+        <groupId>com.aayushatharva.brotli4j</groupId>
+        <artifactId>brotli4j</artifactId>
+    </dependency>
+    <!-- Optional: pin a specific runtime native (version managed by the BOM) -->
+    <dependency>
+        <groupId>com.aayushatharva.brotli4j</groupId>
+        <artifactId>native-linux-x86_64</artifactId>
+        <scope>runtime</scope>
+    </dependency>
+</dependencies>
+```
+
+#### Gradle (Kotlin DSL)
+
+```kotlin
+dependencies {
+    implementation(platform("com.aayushatharva.brotli4j:brotli4j-bom:1.23.0"))
+
+    implementation("com.aayushatharva.brotli4j:brotli4j")
+    // Optional: pin a specific runtime native (version managed by the BOM)
+    runtimeOnly("com.aayushatharva.brotli4j:native-linux-x86_64")
+}
+```
+
+#### Gradle (Groovy DSL)
+
+```groovy
+dependencies {
+    implementation platform('com.aayushatharva.brotli4j:brotli4j-bom:1.23.0')
+
+    implementation 'com.aayushatharva.brotli4j:brotli4j'
+    // Optional: pin a specific runtime native (version managed by the BOM)
+    runtimeOnly 'com.aayushatharva.brotli4j:native-linux-x86_64'
+}
+```
+
 ### Gradle
 
 For gradle, some additional configuration must be added in order to allow gradle to resolve the correct native artifacts automatically,

@@ -56,6 +56,7 @@
         <module>natives</module>
         <module>brotli4j</module>
         <module>service</module>
+        <module>bom</module>
         <module>all</module>
     </modules>
 
