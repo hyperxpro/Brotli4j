@@ -26,7 +26,7 @@ jobs:
   MacOS-x86_64-Build-JDK8:
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up JDK 8
         uses: actions/setup-java@v5
         with:
@@ -43,7 +43,7 @@ jobs:
   MacOS-x86_64-Build-JDK11:
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up JDK 11
         uses: actions/setup-java@v5
         with:
@@ -55,7 +55,7 @@ jobs:
   MacOS-x86_64-Build-JDK17:
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up JDK 17
         uses: actions/setup-java@v5
         with:
@@ -67,7 +67,7 @@ jobs:
   MacOS-x86_64-Build-JDK21:
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up JDK 21
         uses: actions/setup-java@v5
         with:
@@ -79,7 +79,7 @@ jobs:
   Linux-x86_64-Build-JDK8:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Log in to GHCR
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
       - name: Build in prebuilt CentOS 6 container
@@ -101,7 +101,7 @@ jobs:
   Linux-x86_64-Build-JDK11:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Log in to GHCR
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
       - name: Build in prebuilt CentOS 6 container
@@ -118,7 +118,7 @@ jobs:
   Linux-x86_64-Build-JDK17:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Log in to GHCR
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
       - name: Build in prebuilt CentOS 6 container
@@ -135,7 +135,7 @@ jobs:
   Linux-x86_64-Build-JDK21:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Log in to GHCR
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
       - name: Build in prebuilt CentOS 6 container
@@ -152,8 +152,8 @@ jobs:
   Linux-Aarch64-Build-JDK8:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/cache@v5
+      - uses: actions/checkout@v7
+      - uses: actions/cache@v6
         env:
           cache-name: cache-m2-repository-${{ runner.os }}-jdk8-aarch64
         with:
@@ -193,8 +193,8 @@ jobs:
   Linux-Aarch64-Build-JDK11:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/cache@v5
+      - uses: actions/checkout@v7
+      - uses: actions/cache@v6
         env:
           cache-name: cache-m2-repository-${{ runner.os }}-jdk11-aarch64
         with:
@@ -227,8 +227,8 @@ jobs:
   Linux-Aarch64-Build-JDK17:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/cache@v5
+      - uses: actions/checkout@v7
+      - uses: actions/cache@v6
         env:
           cache-name: cache-m2-repository-${{ runner.os }}-jdk17-aarch64
         with:
@@ -262,8 +262,8 @@ jobs:
   Linux-Aarch64-Build-JDK21:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/cache@v5
+      - uses: actions/checkout@v7
+      - uses: actions/cache@v6
         env:
           cache-name: cache-m2-repository-${{ runner.os }}-jdk21-aarch64
         with:
@@ -297,8 +297,8 @@ jobs:
   Linux-ArmV7-Build-JDK8:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/cache@v5
+      - uses: actions/checkout@v7
+      - uses: actions/cache@v6
         env:
           cache-name: cache-m2-repository-${{ runner.os }}-jdk8-arm7
         with:
@@ -337,8 +337,8 @@ jobs:
   Linux-ArmV7-Build-JDK11:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/cache@v5
+      - uses: actions/checkout@v7
+      - uses: actions/cache@v6
         env:
           cache-name: cache-m2-repository-${{ runner.os }}-jdk11-armv7
         with:
@@ -371,8 +371,8 @@ jobs:
   Linux-ArmV7-Build-JDK17:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/cache@v5
+      - uses: actions/checkout@v7
+      - uses: actions/cache@v6
         env:
           cache-name: cache-m2-repository-${{ runner.os }}-jdk11-armv7
         with:
@@ -406,8 +406,8 @@ jobs:
   Linux-s390x-Build-JDK8:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/cache@v5
+      - uses: actions/checkout@v7
+      - uses: actions/cache@v6
         env:
           cache-name: cache-m2-repository-${{ runner.os }}-jdk8-s390x
         with:
@@ -446,8 +446,8 @@ jobs:
   Linux-s390x-Build-JDK11:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/cache@v5
+      - uses: actions/checkout@v7
+      - uses: actions/cache@v6
         env:
           cache-name: cache-m2-repository-${{ runner.os }}-jdk8-s390x
         with:
@@ -480,8 +480,8 @@ jobs:
   Linux-ppc64le-Build-JDK8:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/cache@v5
+      - uses: actions/checkout@v7
+      - uses: actions/cache@v6
         env:
           cache-name: cache-m2-repository-${{ runner.os }}-jdk8-ppc64le
         with:
@@ -519,8 +519,8 @@ jobs:
   Linux-ppc64le-Build-JDK11:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/cache@v5
+      - uses: actions/checkout@v7
+      - uses: actions/cache@v6
         env:
           cache-name: cache-m2-repository-${{ runner.os }}-jdk11-ppc64le
         with:
@@ -553,8 +553,8 @@ jobs:
   Linux-riscv64-Build-JDK11:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/cache@v5
+      - uses: actions/checkout@v7
+      - uses: actions/cache@v6
         env:
           cache-name: cache-m2-repository-${{ runner.os }}-jdk11-riscv64
         with:
@@ -598,8 +598,8 @@ jobs:
   Linux-riscv64-Build-JDK17:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/cache@v5
+      - uses: actions/checkout@v7
+      - uses: actions/cache@v6
         env:
           cache-name: cache-m2-repository-${{ runner.os }}-jdk17-riscv64
         with:
@@ -633,8 +633,8 @@ jobs:
   Linux-riscv64-Build-JDK21:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/cache@v5
+      - uses: actions/checkout@v7
+      - uses: actions/cache@v6
         env:
           cache-name: cache-m2-repository-${{ runner.os }}-jdk21-riscv64
         with:
@@ -667,7 +667,7 @@ jobs:
   Windows-x86_64-Build-JDK8:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up JDK 8
         uses: actions/setup-java@v5
         with:
@@ -688,7 +688,7 @@ jobs:
   Windows-x86_64-Build-JDK11:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up JDK 11
         uses: actions/setup-java@v5
         with:
@@ -703,7 +703,7 @@ jobs:
   Windows-x86_64-Build-JDK17:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up JDK 17
         uses: actions/setup-java@v5
         with:
@@ -718,7 +718,7 @@ jobs:
   Windows-x86_64-Build-JDK21:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up JDK 21
         uses: actions/setup-java@v5
         with:
@@ -733,7 +733,7 @@ jobs:
   Windows-ARM-Build-JDK8:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Install ARM64 MSVC Build Tools
         run: |
           choco install visualstudio2022buildtools --no-progress --yes --limit-output
@@ -776,7 +776,7 @@ jobs:
       - Windows-x86_64-Build-JDK8
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Download all build artifacts
         uses: actions/download-artifact@v8
         with:
@@ -790,7 +790,7 @@ jobs:
     if: github.event_name == 'workflow_dispatch' && inputs.do_release == true
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Download all build artifacts
         uses: actions/download-artifact@v8
         with:
