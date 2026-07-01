@@ -48,7 +48,7 @@ jobs:
           - { arch: riscv64, os: ubuntu2004, jdk: 17, platform: linux/riscv64,  dir: docker-ci/riscv64/ubuntu2004-jdk17 }
           - { arch: riscv64, os: ubuntu2204, jdk: 21, platform: linux/riscv64,  dir: docker-ci/riscv64/ubuntu2204-jdk21 }
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Compute short SHA
         id: sha
