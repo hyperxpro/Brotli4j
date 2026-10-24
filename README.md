@@ -34,7 +34,7 @@ For maven, the natives will
 <dependency>
     <groupId>com.aayushatharva.brotli4j</groupId>
     <artifactId>brotli4j</artifactId>
-    <version>1.23.0</version>
+    <version>1.24.0</version>
 </dependency>
 ```
 
@@ -57,7 +57,7 @@ importing the BOM, declare Brotli4j artifacts **without** a `<version>` and the 
         <dependency>
             <groupId>com.aayushatharva.brotli4j</groupId>
             <artifactId>brotli4j-bom</artifactId>
-            <version>1.23.0</version>
+            <version>1.24.0</version>
             <type>pom</type>
             <scope>import</scope>
         </dependency>
@@ -82,7 +82,7 @@ importing the BOM, declare Brotli4j artifacts **without** a `<version>` and the 
 
 ```kotlin
 dependencies {
-    implementation(platform("com.aayushatharva.brotli4j:brotli4j-bom:1.23.0"))
+    implementation(platform("com.aayushatharva.brotli4j:brotli4j-bom:1.24.0"))
 
     implementation("com.aayushatharva.brotli4j:brotli4j")
     // Optional: pin a specific runtime native (version managed by the BOM)
@@ -94,7 +94,7 @@ dependencies {
 
 ```groovy
 dependencies {
-    implementation platform('com.aayushatharva.brotli4j:brotli4j-bom:1.23.0')
+    implementation platform('com.aayushatharva.brotli4j:brotli4j-bom:1.24.0')
 
     implementation 'com.aayushatharva.brotli4j:brotli4j'
     // Optional: pin a specific runtime native (version managed by the BOM)
@@ -136,8 +136,8 @@ To add the dependency, use:
 
 ```kotlin
 dependencies {
-    implementation("com.aayushatharva.brotli4j:brotli4j:1.23.0")
-    runtimeOnly("com.aayushatharva.brotli4j:natives:1.23.0")
+    implementation("com.aayushatharva.brotli4j:brotli4j:1.24.0")
+    runtimeOnly("com.aayushatharva.brotli4j:natives:1.24.0")
 }
 ```
 
@@ -209,7 +209,7 @@ If you are using the shadow gradle plugin, then in your `build.gradle.kts` inclu
 
 ```kotlin
 dependencies {
-    shaded("com.aayushatharva.brotli4j:natives:1.23.0")
+    shaded("com.aayushatharva.brotli4j:natives:1.24.0")
 }
 
 tasks {
@@ -279,7 +279,7 @@ val shaded by configurations.registering {
 }
 
 dependencies {
-    shaded("com.aayushatharva.brotli4j:natives:1.23.0")
+    shaded("com.aayushatharva.brotli4j:natives:1.24.0")
 }
 
 tasks {
@@ -416,7 +416,7 @@ If you are using the shadow gradle plugin, then in your `build.gradle` include:
 
 ```kotlin
 dependencies {
-    shaded("com.aayushatharva.brotli4j:natives:1.23.0")
+    shaded("com.aayushatharva.brotli4j:natives:1.24.0")
 }
 
 tasks {
@@ -482,7 +482,7 @@ configurations.register("shaded") {
 }
 
 dependencies {
-    shaded("com.aayushatharva.brotli4j:natives:1.23.0")
+    shaded("com.aayushatharva.brotli4j:natives:1.24.0")
 }
 
 tasks {
