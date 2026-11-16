@@ -25,24 +25,18 @@ Brotli4j provides Brotli compression and decompression for Java.
 
 ## Native backends
 
-The multi-release JAR keeps JNI on JDK 8–21 and includes an FFM implementation for JDK 22+.
-Both implementations use the existing Java API and platform-native artifacts; no dependency or
-application-code changes are needed to select a backend.
+JDK 8–21 use JNI. On JDK 22+, the default is the Foreign Function & Memory API (FFM); JVMs without a
+native linker fall back to JNI. The API and dependencies are the same for both.
 
-On JDK 22+, `-Dbrotli4j.backend=jni` selects JNI and `-Dbrotli4j.backend=ffm` selects FFM.
-Without the property, FFM is selected when the JVM provides a native linker; otherwise JNI is used.
-Explicitly requesting FFM on a JVM without a linker fails with an explanatory error. Other property
-values are rejected. Selection happens when the backend classes are first initialized; set the
-property at JVM startup. JDK 8–21 always use JNI and ignore this property.
-
-For FFM on the class path, grant native access with `--enable-native-access=ALL-UNNAMED`.
-For the module path, use `--enable-native-access=com.aayushatharva.brotli4j`.
-Native-access requirements for JNI depend on the JDK version as well.
-`-Djdk.util.jar.enableMultiRelease=false` selects the root JNI classes on newer JDKs.
-Applications that create shaded JARs must preserve the `Multi-Release: true` manifest entry and
-`META-INF/versions/22` to retain the FFM implementation.
-
-Build with JDK 22+ to include FFM classes; builds on older JDKs contain only JNI.
+- Switch back to JNI with `-Dbrotli4j.backend=jni` (or force FFM with `-Dbrotli4j.backend=ffm`), set at
+  JVM startup.
+- Without native access the JVM prints a warning (FFM on JDK 22+, both backends on JDK 24+) and future
+  JDKs will block it. Grant it with `--enable-native-access=ALL-UNNAMED`, or
+  `--enable-native-access=com.aayushatharva.brotli4j` on the module path.
+- Shaded JARs must keep the `Multi-Release: true` manifest entry and `META-INF/versions/22`;
+  without them, JNI is used.
+- `-Djdk.util.jar.enableMultiRelease=false` loads only the JNI classes, so FFM code isn't loaded at all.
+  It applies to every multi-release JAR in the JVM.
 
 ## Download
 
