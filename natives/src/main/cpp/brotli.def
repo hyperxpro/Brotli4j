@@ -1,0 +1,22 @@
+; Additional C exports used by the Java FFM bindings.
+; JNI entry points are exported separately through JNIEXPORT.
+EXPORTS
+    BrotliGetDictionary
+    BrotliSetDictionaryData
+    BrotliDecoderCreateInstance
+    BrotliDecoderDestroyInstance
+    BrotliDecoderDecompressStream
+    BrotliDecoderHasMoreOutput
+    BrotliDecoderTakeOutput
+    BrotliDecoderIsFinished
+    BrotliDecoderAttachDictionary
+    BrotliEncoderCreateInstance
+    BrotliEncoderDestroyInstance
+    BrotliEncoderSetParameter
+    BrotliEncoderCompressStream
+    BrotliEncoderHasMoreOutput
+    BrotliEncoderIsFinished
+    BrotliEncoderTakeOutput
+    BrotliEncoderPrepareDictionary
+    BrotliEncoderDestroyPreparedDictionary
+    BrotliEncoderAttachPreparedDictionary

@@ -77,4 +77,19 @@ add_library (brotli ${LIB_TYPE}
                 		"natives/src/main/cpp/encoder_jni.cc"
                 )
 
+# Export the C API alongside JNI for Foreign Function & Memory downcalls.
+if(WIN32)
+    # JNIEXPORT keeps the JNI exports. List only the C functions used by FFM;
+    # BROTLI_SHARED_COMPILATION would also dllexport unused APIs and data.
+    target_sources(brotli PRIVATE "natives/src/main/cpp/brotli.def")
+else()
+    # Preserve the existing export visibility on ELF and Mach-O platforms.
+    target_compile_definitions(brotli PRIVATE
+        BROTLI_SHARED_COMPILATION
+        BROTLICOMMON_SHARED_COMPILATION
+        BROTLIDEC_SHARED_COMPILATION
+        BROTLIENC_SHARED_COMPILATION
+    )
+endif()
+
 SET_TARGET_PROPERTIES (brotli PROPERTIES LINKER_LANGUAGE CXX)
