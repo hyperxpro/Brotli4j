@@ -23,6 +23,21 @@ Brotli4j provides Brotli compression and decompression for Java.
 > Install [Microsoft Visual C++ Redistributable](https://learn.microsoft.com/en-US/cpp/windows/latest-supported-vc-redist?view=msvc-170) before running this
 > library on Windows
 
+## Native backends
+
+JDK 8–21 use JNI. On JDK 22+, the default is the Foreign Function & Memory API (FFM); JVMs without a
+native linker fall back to JNI. The API and dependencies are the same for both.
+
+- Switch back to JNI with `-Dbrotli4j.backend=jni` (or force FFM with `-Dbrotli4j.backend=ffm`), set at
+  JVM startup.
+- Without native access the JVM prints a warning (FFM on JDK 22+, both backends on JDK 24+) and future
+  JDKs will block it. Grant it with `--enable-native-access=ALL-UNNAMED`, or
+  `--enable-native-access=com.aayushatharva.brotli4j` on the module path.
+- Shaded JARs must keep the `Multi-Release: true` manifest entry and `META-INF/versions/22`;
+  without them, JNI is used.
+- `-Djdk.util.jar.enableMultiRelease=false` loads only the JNI classes, so FFM code isn't loaded at all.
+  It applies to every multi-release JAR in the JVM.
+
 ## Download
 
 ### Maven

@@ -142,7 +142,7 @@ public class BrotliCommon {
             if (isDictionaryDataSet) {
                 return;
             }
-            if (!CommonJNI.nativeSetDictionaryData(data)) {
+            if (!CommonJNI.setDictionaryData(data)) {
                 throw new RuntimeException("setting dictionary failed");
             }
             isDictionaryDataSet = true;

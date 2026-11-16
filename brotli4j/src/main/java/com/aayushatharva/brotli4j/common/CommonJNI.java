@@ -14,5 +14,10 @@ import java.nio.ByteBuffer;
  */
 @Upstream
 class CommonJNI {
+    // Callers go through this method so the JDK 22+ version can route the call to JNI or FFM.
+    static boolean setDictionaryData(ByteBuffer data) {
+        return nativeSetDictionaryData(data);
+    }
+
     static native boolean nativeSetDictionaryData(ByteBuffer data);
 }
